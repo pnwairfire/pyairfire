@@ -95,13 +95,14 @@ class PointExtractor(object):
 
         self._ensure_lat_lng_within_domain(lat, lng)
 
-        #from IPython import embed; embed()
+        from IPython import embed; embed()
 
-        # TODO: Compute based on domain corner coordinate, domain resolution,
-        # and lat/lng
+        lat_index = int((lat - self.sw_lat) / self.lat_res)
 
-        lat_index = 0 # compute actual value from sw_lat, lat, and lat_res
-        lng_index = 0 # compute actual value from sw_lng, lng, and lng_res
+        # TODO: write unit tests to make sure this is correct
+        adjusted_lng = (lng + 360.0) % 360
+        adjusted_sw_lng = (self.sw_lng + 360.0) %30
+        lng_index = int((adjusted_lng - adjusted_sw_lng) / self.lat_res)
 
         return (lat_index, lng_index)
 
@@ -109,6 +110,5 @@ class PointExtractor(object):
     def _ensure_lat_lng_within_domain(self, lat, lng):
         # TODO: Implement.  Take into account possibility of crossing
         # international date line or the poles
+        # for international dateline, add 360 to lng's and then mod 360?
         pass
-
-
