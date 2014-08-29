@@ -21,3 +21,11 @@ the directory that contains libhdf5_hl.7.dylib, needed by netCDF4.  That can be 
 as in the following:
 
     DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/ ./bin/bluesky/extract_point_pm25_time_series.py
+
+
+## Running tests
+
+Use nose:
+
+    nosetests
+    nosetests test/pyairfire/bluesky/dispersionnc_tests.py
