@@ -30,10 +30,11 @@ def parse_options():
     usage = "usage: %prog [options]"
     parser = OptionParser(usage=usage)
     parser.add_option("-f", "--dispersion-nc-file", dest="nc_file_pathname",
-                      help="netCDF input file pathname (required)", metavar="FILE")
+        help="netCDF input file pathname (required)", metavar="FILE")
     parser.add_option("--lat", dest="lat", help="latitude (required)", type=float)
     parser.add_option("--lng", dest="lng", help="longitude (required)", type=float)
-    parser.add_option("-v", "--verbose", dest="verbose", help="longitude (required)", type=float)
+    parser.add_option("-v", "--verbose", dest="verbose", help="to turn on extra output",
+        action="store_true", default=False)
 
     options, args = parser.parse_args()
 
@@ -56,7 +57,7 @@ def main():
         pe = PointExtractor(options.nc_file_pathname)
         point_time_series = pe.extract(options.lat, options.lng)
 
-        print json.dumps([float(e) for e in point_time_series])
+        print json.dumps(point_time_series)
 
     except Exception, e:
         exit_with_msg(e.message)

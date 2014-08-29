@@ -9,6 +9,7 @@ dispersion nc files.
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2014, AirFire, PNW, USFS"
 
+import datetime
 import os
 
 from netcdf import netcdf
@@ -25,23 +26,79 @@ class PointExtractor(object):
             raise RuntimeError("%s doesn't exists" % (nc_file_pathname))
 
         (self.nc_file, is_new) = netcdf.open(nc_file_pathname)
+        self.pm25 = self.nc_file.getvar('PM25')
+        self.pms5_data_set = self.pm25.group()
+
+        self._extract_atributes()
+        self._extract_times()
+
+    ##
+    ## Public Interface
+    ##
 
     def extract(self, lat, lng):
         (x,y) = self._compute_grid_indices(lat, lng)
-        data = self.nc_file.getvar('PM25')
-        #data = self.nc_file.obtain_variable('PM25')
+        point_time_series = self.pm25[0, :, 0, x, y]  # <-- how is this correct?
 
-        point_time_series = data[0, :, 0, x, y]
+        r = []
+        for i in xrange(len(point_time_series)):
+            r.append({
+                't': float(point_time_series[i]),
+                'l': self.times[i].strftime('%Y-%m-%dT%H:%M:%SZ')
+            })
 
-        return point_time_series
+        return r
 
+    ##
+    ## Private Methods
+    ##
+
+    def _extract_atributes(self):
+        # The global attributes ':XORIG' and ':YORIG' seem to define the
+        # SW corner of the domain, and ':XCELL' and ':YCELL' seem to define
+        # the resolution. For example, the following is from
+        # executing 'ncdump -h' on a PNW-4km smoke_dispersion.nc file:
+        #  ...
+        #  :XCENT = -118.300003051758 ;
+        #  :YCENT = 45. ;
+        #  :XORIG = -128.300003051758 ;
+        #  :YORIG = 40. ;
+        #  :XCELL = 0.0399999991059303 ;
+        #  :YCELL = 0.0399999991059303 ;
+        #  ...
+
+        # lat and lng resolution
+        self.lat_res = self.pms5_data_set.YCELL
+        self.lng_res = self.pms5_data_set.XCELL
+
+        # SW corner of domain
+        self.sw_lat = self.pms5_data_set.YORIG
+        self.sw_lng = self.pms5_data_set.XORIG
+
+    def _extract_times(self):
+        self.tflag = self.nc_file.getvar('TFLAG')
+        self.times = []
+        for d, t in self.tflag[0,:,0]:
+            # 'd' is an integer of the form 2014238, which translates
+            # to the 238th day of 2014, which is August 26th.
+            # 't' is an integer reprenting 10000 times the hour of the
+            # day.  Ex. 0 is midnight, 10000 is 1am, ..., 230000 is 11pm
+            d = int(d) # just to make sure
+            year = d / 1000
+            day_of_year = d % 1000
+            month = 1  # TODO: determine from day_of_year
+            day = 1  # TODO: determine from day_of_year
+            hour = int(t) / 10000
+            self.times.append(datetime.datetime(year, month, day, hour))
 
     def _compute_grid_indices(self, lat, lng):
+
+        self._ensure_lat_lng_within_domain(lat, lng)
+
+        #from IPython import embed; embed()
+
         # TODO: Compute based on domain corner coordinate, domain resolution,
         # and lat/lng
-
-        sw_lat, sw_lng = self._sw_corner()
-        lat_res, lng_res = self._resolution()
 
         lat_index = 0 # compute actual value from sw_lat, lat, and lat_res
         lng_index = 0 # compute actual value from sw_lng, lng, and lng_res
@@ -49,38 +106,9 @@ class PointExtractor(object):
         return (lat_index, lng_index)
 
 
-    def _sw_corner(self):
-        # TODO: the global attributes ':XORIG' and ':YORIG' seem to define the
-        # SW corner of the domain  For example, the following is from executing 'ncdump -h'
-        # on a smoke_dispersion.nc file:
-        #  ...
-        #  :XCENT = -118.300003051758 ;
-        #  :YCENT = 45. ;
-        #  :XORIG = -128.300003051758 ;
-        #  :YORIG = 40. ;
-        #  ...
-        # read those values
-        #
-        # If this proves impossible, they can be read from summar.json and passed into this
-        # class' contstructor
+    def _ensure_lat_lng_within_domain(self, lat, lng):
+        # TODO: Implement.  Take into account possibility of crossing
+        # international date line or the poles
+        pass
 
-        yorig = 40.0 # TODO: read actual value
-        xorig = -128.0 # TODO: read actual value
-        return (yorig, xorig)
 
-    def _resolution(self):
-        # TODO: the global attributes ':XCELL' an ':YCELL' seem to define the
-        # resolution.  For example, the following is from executing 'ncdump -h'
-        # on a smoke_dispersion.nc file:
-        #  ...
-        #  :XCELL = 0.0399999991059303 ;
-        #  :YCELL = 0.0399999991059303 ;
-        #  ...
-        # read those values
-        #
-        # If this proves impossible, they can be read from summar.json and passed into this
-        # class' contstructor
-
-        ycell = 0.4 # TODO: read actual value
-        xcell = 0.4 # TODO: read actual value
-        return (ycell, xcell)
