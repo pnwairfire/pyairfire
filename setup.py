@@ -1,4 +1,7 @@
 from distutils.core import setup
+from pip.req import parse_requirements
+
+REQUIREMENTS = [str(ir.req) for ir in parse_requirements('requirements.txt')]
 
 setup(
     name='pyairfire',
@@ -9,5 +12,5 @@ setup(
     scripts=[],
     url='git@bitbucket.org:fera/airfire-pyairfire.git',
     description='General toolbox of pythong utilities for AirFire team.',
-    install_requires=["netcdf==0.0.28"],
+    install_requires=REQUIREMENTS,
 )
