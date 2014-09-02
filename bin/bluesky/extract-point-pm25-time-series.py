@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""extract_point_pm25_time_seroes.py: Script to extract the predicted pm2.5
+"""extract_point_pm25_time_series.py: Script to extract the predicted pm2.5
 levels at a specific lat/lon from a bluesky dispersion nc output file.
 """
 
