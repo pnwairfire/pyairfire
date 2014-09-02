@@ -22,7 +22,7 @@ __all__ = [
 class PointExtractor(object):
 
     def __init__(self, nc_file_pathname):
-        self._initialize()
+        self._initialize(nc_file_pathname)
 
     ##
     ## Public Interface
@@ -35,8 +35,8 @@ class PointExtractor(object):
         r = []
         for i in xrange(len(point_time_series)):
             r.append({
-                't': float(point_time_series[i]),
-                'l': self.times[i].strftime('%Y-%m-%dT%H:%M:%SZ')
+                't': self.times[i].strftime('%Y-%m-%dT%H:%M:%SZ'),
+                'l': float(point_time_series[i])
             })
 
         return r
@@ -45,16 +45,16 @@ class PointExtractor(object):
     ## Private Methods
     ##
 
-    def _initialize(self):
+    def _initialize(self, nc_file_pathname):
+        if not os.path.isfile(nc_file_pathname):
+            raise RuntimeError("%s doesn't exist" % (nc_file_pathname))
+        (self.nc_file, is_new) = netcdf.open(nc_file_pathname)
+
         self._extract_pm25()
         self._extract_attributes()
         self._extract_times()
 
     def _extract_pm25(self):
-        if not os.path.isfile(nc_file_pathname):
-            raise RuntimeError("%s doesn't exist" % (nc_file_pathname))
-
-        (self.nc_file, is_new) = netcdf.open(nc_file_pathname)
         self.pm25 = self.nc_file.getvar('PM25')
         self.pms5_data_set = self.pm25.group()
 

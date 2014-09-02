@@ -15,7 +15,7 @@ except:
     from pyairfire.bluesky.dispersionnc import PointExtractor
 
 
-def new_initialize(self):
+def new_initialize(self, nc_file_pathname):
     self.sw_lat = 0
     self.sw_lng = 0
     self.lat_res = 1
