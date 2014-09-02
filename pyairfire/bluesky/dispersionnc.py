@@ -80,12 +80,26 @@ class PointExtractor(object):
         self.lat_res = self.pms5_data_set.YCELL
         self.lng_res = self.pms5_data_set.XCELL
 
-        # SW corner of domain
+        # grid dimensions
+        self.num_rows = self.pms5_data_set.NROWS # this corresponds to lat
+        self.num_cols = self.pms5_data_set.NCOLS # this corresponds to lng
+
+        # SW and NE corners of domain
         self.sw_lat = self.pms5_data_set.YORIG
         self.sw_lng = self.pms5_data_set.XORIG
+        self._compute_ne_corner()
+        self._compute_adjusted_corner_longitudes()
 
-        self.num_rows = self.pms5_data_set.NROWS
-        self.num_cols = self.pms5_data_set.NCOLS
+
+    def _compute_ne_corner(self):
+        self.ne_lat = self.sw_lat + self.lat_res * self.num_rows
+        self.ne_lng = self.sw_lng + self.lng_res * self.num_cols
+        if self.ne_lat > 180.0:
+            self.ne_lat -= 360.0
+
+    def _compute_adjusted_corner_longitudes(self):
+        self.adjusted_sw_lng = self._adjust_lng(self.sw_lng)
+        self.adjusted_ne_lng = self.adjusted_sw_lng + self.lng_res * self.num_cols
 
     def _extract_times(self):
         self.tflag = self.nc_file.getvar('TFLAG')
@@ -109,20 +123,19 @@ class PointExtractor(object):
         return datetime.datetime(year,1,1,hour) +  datetime.timedelta(day_of_year-1)
 
     def _adjust_lng(self, lng):
+        # TODO: this works for anything other than domains that cross GMT.
+        # Update to handle all possible domains (namely those that cross GMT
+        # and those that cross GMT and international dateline)
         return (lng + 360.0) % 360
 
     def _compute_grid_indices(self, lat, lng):
         # NROWS corresponds to latitude, NCOLS corresponds to the longitude
         adjusted_lng = self._adjust_lng(lng)
-        adjusted_sw_lng = self._adjust_lng(self.sw_lng)
-        adjusted_ne_lng = adjusted_sw_lng + self.lng_res * self.num_cols
 
-        ne_lat = self.sw_lat + self.lat_res * self.num_rows
-
-        if not self.sw_lat <= lat <= ne_lat or not adjusted_sw_lng <= adjusted_lng <= adjusted_ne_lng:
+        if not self.sw_lat <= lat <= self.ne_lat or not self.adjusted_sw_lng <= adjusted_lng <= self.adjusted_ne_lng:
             raise RuntimeError("%s/%s outside of domain" % (lat, lng))
 
         lat_index = int((lat - self.sw_lat) / self.lat_res)
-        lng_index = int((adjusted_lng - adjusted_sw_lng) / self.lat_res)
+        lng_index = int((adjusted_lng - self.adjusted_sw_lng) / self.lat_res)
 
         return (lat_index, lng_index)

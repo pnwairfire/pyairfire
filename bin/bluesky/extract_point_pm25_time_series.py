@@ -21,10 +21,10 @@ except:
 
 
 def exit_with_msg(msg, extra_output=None):
-        print "* Error: %s" % (msg)
-        if extra_output:
-            extra_output()
-        sys.exit(1)
+    print "* Error: %s" % (msg)
+    if extra_output:
+        extra_output()
+    sys.exit(1)
 
 def parse_options():
     usage = "usage: %prog [options]"
