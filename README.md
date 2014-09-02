@@ -29,3 +29,14 @@ Use nose:
 
     nosetests
     nosetests test/pyairfire/bluesky/dispersionnc_tests.py
+
+## Installing
+
+### Installing With pip
+
+For example, to install v0.1.1, use the following:
+
+    sudo pip install git+https://bitbucket.org/fera/airfire-pyairfire@v0.1.1
+
+The repo is currently private. So, you'll need to be on the FERA bitbucket team
+to install from the repo.
