@@ -8,13 +8,13 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2014, AirFire, PNW, USFS"
 
 import json
-import os
 import sys
 from optparse import OptionParser
 
 try:
     from pyairfire.bluesky.dispersionnc import PointExtractor
 except:
+    import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
     from pyairfire.bluesky.dispersionnc import PointExtractor
