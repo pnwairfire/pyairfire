@@ -29,8 +29,8 @@ class PointExtractor(object):
     ##
 
     def extract(self, lat, lng):
-        (x,y) = self._compute_grid_indices(lat, lng)
-        point_time_series = self.pm25[0, :, 0, x, y]  # <-- how is this correct?
+        (lat_index, lng_index) = self._compute_grid_indices(lat, lng)
+        point_time_series = self.pm25[0, :, 0, lat_index, lng_index]  # <-- how is this correct?
 
         r = []
         for i in xrange(len(point_time_series)):
@@ -108,27 +108,21 @@ class PointExtractor(object):
         day_of_year = d % 1000
         return datetime.datetime(year,1,1,hour) +  datetime.timedelta(day_of_year-1)
 
-    def _adjust_lng(lng):
+    def _adjust_lng(self, lng):
         return (lng + 360.0) % 360
 
     def _compute_grid_indices(self, lat, lng):
+        # NROWS corresponds to latitude, NCOLS corresponds to the longitude
         adjusted_lng = self._adjust_lng(lng)
         adjusted_sw_lng = self._adjust_lng(self.sw_lng)
-        adjusted_ne_lng = self._adjust_lng(self.sw_lng + self.lng_res*  .... self.num_rows or self.num_rols?...)
+        adjusted_ne_lng = adjusted_sw_lng + self.lng_res * self.num_cols
 
-        ne_lat = ....
+        ne_lat = self.sw_lat + self.lat_res * self.num_rows
 
-        if lat < self.sw_lat or ne_lat < lat or lng < adjusted_sw_lng or adjusted_ne_lng < lng:
-            raise RuntimeError("%s/%s outside of domain" % (lat/lng))
+        if not self.sw_lat <= lat <= ne_lat or not adjusted_sw_lng <= adjusted_lng <= adjusted_ne_lng:
+            raise RuntimeError("%s/%s outside of domain" % (lat, lng))
 
         lat_index = int((lat - self.sw_lat) / self.lat_res)
         lng_index = int((adjusted_lng - adjusted_sw_lng) / self.lat_res)
 
         return (lat_index, lng_index)
-
-
-    def _ensure_lat_lng_within_domain(self, lat, lng):
-        # TODO: Implement.  Take into account possibility of crossing
-        # international date line or the poles
-        # for international dateline, add 360 to lng's and then mod 360?
-        pass

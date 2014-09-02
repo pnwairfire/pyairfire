@@ -47,18 +47,27 @@ class PointExtractorTest(unittest.TestCase):
         pass
 
     def test_compute_grid_indices(self):
-        # TODO: case where domain is completely in western hemisphere, lat/lng outside of domain
-        # TODO: case where domain is completely in western hemisphere, lat/lng inside domain
+        ## Cases where domain is completely in western hemisphere
+        self.pe.sw_lat = 40
+        self.pe.lat_res = 1
+        self.pe.num_rows = 10
+        self.pe.sw_lng = -160
+        self.pe.lng_res = 1
+        self.pe.num_cols = 10
+        # lat/lng outside of domain
+        with self.assertRaises(RuntimeError) as r:
+            self.pe._compute_grid_indices(35, -155) # south of it
+        with self.assertRaises(RuntimeError) as r:
+            self.pe._compute_grid_indices(45, -165) # west of it
+        # lat/lng inside domain
+        self.assertEqual((5, 2), self.pe._compute_grid_indices(45.23, -157.232))
+
         # TODO: case where domain is completely in eastern hemisphere, lat/lng outside of domain
         # TODO: case where domain is completely in eastern hemisphere, lat/lng inside domain
         # TODO: case where domain straddles international dateline, lat/lng outside of domain
         # TODO: case where domain straddles international dateline, lat/lng inside domain
         # TODO: case where domain straddles international GMT, lat/lng outside of domain
         # TODO: case where domain straddles international GMT, lat/lng inside domain
-        pass
-
-    def test_ensure_lat_lng_within_domain(self):
-        # TODO: implement, somehow mocking out dependency on netCDF file
         pass
 
 
