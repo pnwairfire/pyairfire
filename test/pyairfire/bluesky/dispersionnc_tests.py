@@ -33,8 +33,15 @@ class PointExtractorTest(unittest.TestCase):
 
     def test_convert_to_datetime(self):
         self.assertEqual(
-            self.pe._convert_to_datetime(20141, 200000),
-            datetime.datetime(2014,1,1,))
+            self.pe._convert_to_datetime(2014001, 200000),
+            datetime.datetime(2014,1,1,20))
+        self.assertEqual(
+            self.pe._convert_to_datetime(2014232, 10000),
+            datetime.datetime(2014,8,20,1))
+        self.assertEqual(
+            self.pe._convert_to_datetime(2012232, 10000),  # leap year
+            datetime.datetime(2012,8,19,1))
+
 
     def test_adjust_lng(self):
         pass
