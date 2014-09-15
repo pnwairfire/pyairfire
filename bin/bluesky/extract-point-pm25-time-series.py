@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
-"""extract_point_pm25_time_series.py: Script to extract the predicted pm2.5
+"""extract-point-pm25-time-series.py: Script to extract the predicted pm2.5
 levels at a specific lat/lon from a bluesky dispersion nc output file.
+
+Example calls:
+ > ./bin/bluesky/extract-point-pm25-time-series.py \
+    -f ~/Downloads/smoke_dispersion-pnw-4k-2014082600.nc --lat=45.68938 --lng=-116.476
 """
 
 __author__      = "Joel Dubowy"

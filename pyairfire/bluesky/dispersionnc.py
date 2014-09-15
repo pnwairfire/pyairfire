@@ -29,6 +29,11 @@ class PointExtractor(object):
     ##
 
     def extract(self, lat, lng):
+        """Extracts PM2.5 levels for grid cell containing lat/lng over prediction time window
+
+        @todo:
+         - cache results
+        """
         (lat_index, lng_index) = self._compute_grid_indices(lat, lng)
         point_time_series = self.pm25[0, :, 0, lat_index, lng_index]  # <-- how is this correct?
 
@@ -125,7 +130,7 @@ class PointExtractor(object):
     def _adjust_lng(self, lng):
         # TODO: this works for anything other than domains that cross GMT.
         # Update to handle all possible domains (namely those that cross GMT
-        # and those that cross GMT and international dateline)
+        # and/or the international dateline)
         return (lng + 360.0) % 360
 
     def _compute_grid_indices(self, lat, lng):
