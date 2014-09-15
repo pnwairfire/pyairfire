@@ -43,8 +43,26 @@ class PointExtractorTest(unittest.TestCase):
             datetime.datetime(2012,8,19,1))
 
     def test_compute_ne_corner(self):
-        # TODO: case where it's entirely in eastern hemisphere
         # TODO: case where it's entirely in western hemisphere
+        self.pe.sw_lat = 40
+        self.pe.lat_res = 1
+        self.pe.num_rows = 15
+        self.pe.sw_lng = -160
+        self.pe.lng_res = 2
+        self.pe.num_cols = 8
+        self.pe._compute_ne_corner()
+        self.assertEqual((55, -144), (self.pe.ne_lat, self.pe.ne_lng))
+
+        # TODO: case where it's entirely in eastern hemisphere
+        self.pe.sw_lat = -30
+        self.pe.lat_res = 1
+        self.pe.num_rows = 10
+        self.pe.sw_lng = 160
+        self.pe.lng_res = 1
+        self.pe.num_cols = 10
+        self.pe._compute_ne_corner()
+        self.assertEqual((-20, 170), (self.pe.ne_lat, self.pe.ne_lng))
+
         # TODO: case where it's western boundary is international dateline
         # TODO: case where it's eastern boundary is international dateline
         # TODO: case where it crosses international dateline
@@ -92,9 +110,11 @@ class PointExtractorTest(unittest.TestCase):
     def test_compute_grid_indices(self):
         ## Cases where domain is completely in western hemisphere
         self.pe.sw_lat = 40
+        self.pe.ne_lat = 50
         self.pe.lat_res = 1
         self.pe.num_rows = 10
         self.pe.sw_lng = -160
+        self.pe.ne_lng = -150
         self.pe.lng_res = 1
         self.pe.num_cols = 10
         # lat/lng outside of domain
@@ -107,9 +127,11 @@ class PointExtractorTest(unittest.TestCase):
 
         ## Cases where domain is completely in eastern hemisphere
         self.pe.sw_lat = -30
+        self.pe.ne_lat = -20
         self.pe.lat_res = 1
         self.pe.num_rows = 10
         self.pe.sw_lng = 160
+        self.pe.ne_lng = 170
         self.pe.lng_res = 1
         self.pe.num_cols = 10
         # lat/lng outside of domain
@@ -122,9 +144,11 @@ class PointExtractorTest(unittest.TestCase):
 
         # Case where domain straddles international dateline
         self.pe.sw_lat = 30
+        self.pe.ne_lat = 40
         self.pe.lat_res = 1
         self.pe.num_rows = 10
         self.pe.sw_lng = 170
+        self.pe.ne_lng = -170
         self.pe.lng_res = 1
         self.pe.num_cols = 20
         # lat/lng outside of domain
@@ -140,9 +164,11 @@ class PointExtractorTest(unittest.TestCase):
 
         # Case where domain straddles GMT
         self.pe.sw_lat = 30
+        self.pe.ne_lat = 40
         self.pe.lat_res = 1
         self.pe.num_rows = 10
         self.pe.sw_lng = -10
+        self.pe.ne_lng = 10
         self.pe.lng_res = 1
         self.pe.num_cols = 20
         # lat/lng outside of domain
