@@ -35,16 +35,35 @@ class PointExtractor(object):
          - cache results
         """
         (lat_index, lng_index) = self._compute_grid_indices(lat, lng)
-        point_time_series = self.pm25[0, :, 0, lat_index, lng_index]  # <-- how is this correct?
+        neighbor_indices = self._compute_neighbor_indices(lat_index, lng_index)
 
-        r = []
+        # TODO: make sure this is indexing self.pm25 correctly, given each pair of lat/lng indices
+        point_time_series = self.pm25[0, :, 0, lat_index, lng_index]
+        neighbor_time_series = [self.pm25[0, :, 0, _lat_index, _lng_index] for _lat_index, _lng_index in neighbor_indices]
+
+        r = {
+            'idx': [lat_index, lng_index],
+            'n_idx': neighbor_indices,
+            'd': []
+
+        }
         for i in xrange(len(point_time_series)):
-            r.append({
+            r['d'].append({
                 't': self.times[i].strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'l': float(point_time_series[i])
+                'l': float(point_time_series[i]),
+                'n': [float(n) for n[i] in neighbor_time_series]
             })
 
         return r
+
+    def _compute_neighbor_indices(self, lat_index, lng_index):
+        neighbor_indices = []
+        for _lat_index in xrange(max(0, lat_index), min(self.num_rows-1, lat_index)):
+            for _lng_index in xrange(max(0, lng_index), min(self.num_cols-1, lng_index)):
+                if _lat_index == lat_index and _lng_index == lng_index:
+                    continue
+                neighbor_indices.append([_lat_index, _lng_index])
+        return neighbor_indices
 
     ##
     ## Private Methods

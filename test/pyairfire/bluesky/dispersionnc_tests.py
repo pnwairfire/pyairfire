@@ -182,6 +182,17 @@ class PointExtractorTest(unittest.TestCase):
         self.assertEqual((2, 2), self.pe._compute_grid_indices(32.0, -7.23))
         self.assertEqual((3, 18), self.pe._compute_grid_indices(33.2, 8.2))
 
+    def test_compute_neighbor_indices(self):
+        # TODO: case where lat,lng is SW corner grid cell
+        # TODO: case where lat,lng is NW corner grid cell
+        # TODO: case where lat,lng is NE corner grid cell
+        # TODO: case where lat,lng is SE corner grid cell
+        # TODO: case where lat,lng is on W side, not corner
+        # TODO: case where lat,lng is on N side, not corner
+        # TODO: case where lat,lng is on E side, not corner
+        # TODO: case where lat,lng is on S side, not corner
+        # TODO: case where lat,lng is in the middle somewhere
+        pass
 
 if __name__ == '__main__':
     test_main(verbose=True)
