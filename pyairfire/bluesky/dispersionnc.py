@@ -39,10 +39,13 @@ class PointExtractor(object):
         Returns data of the form:
 
         {
-            "grid_indices": [142, 254],  // <-- indices of grid cell containing lat/lng
+            "grid_indices": {
+                "lat": 142,   // <-- indices of grid cell containing lat/lng
+                "lng": 254    // <-- containing lat/lng
+            },
             "grid_index_ranges": {
-                "lat": [141, 143],  //  <-- i.e. defines neighborhood around (142, 254)
-                "lng": [253, 255]
+                "lat": [141, 143],  //  <-- i.e. defines neighborhood
+                "lng": [253, 255]   //  <-- around (142, 254)
             },
             "data": [
                 {
@@ -75,7 +78,10 @@ class PointExtractor(object):
         point_time_series = self.pm25[0, :, 0, lat_index_range[0]:lat_index_range[-1]+1, lng_index_range[0]:lng_index_range[-1]+1]
 
         r = {
-            "grid_indices": [lat_index, lng_index],
+            "grid_indices": {
+                "lat": lat_index,
+                "lng": lng_index
+            },
             "grid_index_ranges": {
                 "lat": list(lat_index_range),
                 "lng": list(lng_index_range)
