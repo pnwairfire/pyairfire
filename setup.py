@@ -5,7 +5,7 @@ REQUIREMENTS = [str(ir.req) for ir in parse_requirements('requirements.txt')]
 
 setup(
     name='pyairfire',
-    version='0.1.3',
+    version='0.1.4',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=['pyairfire', 'pyairfire.bluesky'],

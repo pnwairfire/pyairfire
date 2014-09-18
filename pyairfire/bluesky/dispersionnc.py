@@ -20,6 +20,11 @@ __all__ = [
 
 
 class PointExtractor(object):
+    """
+    Example:
+     >>> from pyairfire.bluesky.dispersionnc import PointExtractor
+     >>> PointExtractor("/Users/jdubowy/Downloads/bluesky-output/smoke_dispersion-pnw-4k-2014082600.nc").extract(47.0, -122)
+    """
 
     def __init__(self, nc_file_pathname):
         self._initialize(nc_file_pathname)
@@ -39,26 +44,24 @@ class PointExtractor(object):
                 "lng": [253, 255]
             },
             "data": [
-                [
-                    {
-                        "t": "2014-08-28T01:00:00Z",
-                        "l": [
-                            [1.0, 1.0, 2.0],    // <-- These three rows represent the pm2.5 levels
-                            [1.0, 2.0, 3.0],    // <-- in the neighborhood of the lat/lng at a
-                            [2.0, 3.0, 3.0]     // <-- specific moment in the time window
-                        ]
-                    },
-                    ...,
-                    {
-                        "t": "2014-08-28T23:00:00Z",
-                        "l": [
-                            [0.0, 0.0, 0.0],
-                            [0.0, 1.0, 1.0],
-                            [1.0, 1.0, 2.0]
-                        ]
-                    }
-                ]
-
+                {
+                    "t": "2014-08-28T01:00:00Z",
+                    "l": [
+                        [1.0, 1.0, 2.0],    // <-- These three rows represent the pm2.5 levels
+                        [1.0, 2.0, 3.0],    // <-- in the neighborhood of the lat/lng at a
+                        [2.0, 3.0, 3.0]     // <-- specific moment in the time window
+                    ]
+                },
+                ...,
+                {
+                    "t": "2014-08-28T23:00:00Z",
+                    "l": [
+                        [0.0, 0.0, 0.0],
+                        [0.0, 1.0, 1.0],
+                        [1.0, 1.0, 2.0]
+                    ]
+                }
+            ]
         }
 
         @todo:
