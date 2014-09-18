@@ -123,7 +123,7 @@ class PointExtractorTest(unittest.TestCase):
         with self.assertRaises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(45, -165) # west of it
         # lat/lng inside domain
-        self.assertEqual((xrange(4,7), xrange(1,4)), self.pe._compute_grid_index_ranges(45.23, -157.232))
+        self.assertEqual((5, 2, xrange(4,7), xrange(1,4)), self.pe._compute_grid_index_ranges(45.23, -157.232))
 
         ## Cases where domain is completely in eastern hemisphere
         self.pe.sw_lat = -30
@@ -140,7 +140,7 @@ class PointExtractorTest(unittest.TestCase):
         with self.assertRaises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(-25, 155) # west of it
         # lat/lng inside domain
-        self.assertEqual((xrange(6,9), xrange(7,10)), self.pe._compute_grid_index_ranges(-22.23, 168.232))
+        self.assertEqual((7, 8, xrange(6,9), xrange(7,10)), self.pe._compute_grid_index_ranges(-22.23, 168.232))
 
         # Case where domain straddles international dateline
         self.pe.sw_lat = 30
@@ -159,8 +159,8 @@ class PointExtractorTest(unittest.TestCase):
         with self.assertRaises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, -155) # east of it
         # lat/lng inside domain
-        self.assertEqual((xrange(1,4), xrange(1,4)), self.pe._compute_grid_index_ranges(32.0, 172.3))
-        self.assertEqual((xrange(2,5), xrange(17,20)), self.pe._compute_grid_index_ranges(33.2, -172.0))
+        self.assertEqual((2, 2, xrange(1,4), xrange(1,4)), self.pe._compute_grid_index_ranges(32.0, 172.3))
+        self.assertEqual((3, 18, xrange(2,5), xrange(17,20)), self.pe._compute_grid_index_ranges(33.2, -172.0))
 
         # Case where domain straddles GMT
         self.pe.sw_lat = 30
@@ -179,8 +179,8 @@ class PointExtractorTest(unittest.TestCase):
         with self.assertRaises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, 14.2) # east of it
         # lat/lng inside domain
-        self.assertEqual((xrange(1,4), xrange(1,4)), self.pe._compute_grid_index_ranges(32.0, -7.23))
-        self.assertEqual((xrange(2,5), xrange(17,20)), self.pe._compute_grid_index_ranges(33.2, 8.2))
+        self.assertEqual((2, 2, xrange(1,4), xrange(1,4)), self.pe._compute_grid_index_ranges(32.0, -7.23))
+        self.assertEqual((3, 18, xrange(2,5), xrange(17,20)), self.pe._compute_grid_index_ranges(33.2, 8.2))
 
 
         # TODO: case where lat,lng is SW corner grid cell

@@ -39,8 +39,9 @@ class PointExtractor(object):
         Returns data of the form:
 
         {
+            "grid_indices": [142, 254],  // <-- indices of grid cell containing lat/lng
             "grid_index_ranges": {
-                "lat": [141, 143],  //  <-- i.e. grid index of lat/lng was (142, 254)
+                "lat": [141, 143],  //  <-- i.e. defines neighborhood around (142, 254)
                 "lng": [253, 255]
             },
             "data": [
@@ -67,13 +68,14 @@ class PointExtractor(object):
         @todo:
          - cache results
         """
-        (lat_index_range, lng_index_range) = self._compute_grid_index_ranges(lat, lng)
+        (lat_index, lng_index, lat_index_range, lng_index_range) = self._compute_grid_index_ranges(lat, lng)
 
         # TODO: make sure this is indexing self.pm25 correctly, given each pair
         # of lat/lng indices in the index ranges
         point_time_series = self.pm25[0, :, 0, lat_index_range[0]:lat_index_range[-1]+1, lng_index_range[0]:lng_index_range[-1]+1]
 
         r = {
+            "grid_indices": [lat_index, lng_index],
             "grid_index_ranges": {
                 "lat": list(lat_index_range),
                 "lng": list(lng_index_range)
@@ -189,4 +191,4 @@ class PointExtractor(object):
         lat_index_range = xrange(max(0, lat_index-1), min(self.num_rows, lat_index+2))
         lng_index_range = xrange(max(0, lng_index-1), min(self.num_cols, lng_index+2))
 
-        return (lat_index_range, lng_index_range)
+        return (lat_index, lng_index, lat_index_range, lng_index_range)
