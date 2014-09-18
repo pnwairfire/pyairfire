@@ -11,6 +11,7 @@ Example calls:
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2014, AirFire, PNW, USFS"
 
+import datetime
 import json
 import sys
 from optparse import OptionParser
@@ -59,7 +60,10 @@ def main():
 
     try:
         pe = PointExtractor(options.nc_file_pathname)
+        t = datetime.datetime.now()
         point_time_series = pe.extract(options.lat, options.lng)
+        if options.verbose:
+            print "It took %f seconds to extract" % ((datetime.datetime.now() - t).seconds)
 
         print json.dumps(point_time_series)
 

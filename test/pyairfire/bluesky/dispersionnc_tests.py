@@ -107,7 +107,7 @@ class PointExtractorTest(unittest.TestCase):
         # TODO: cases where it overlaps poles
         pass
 
-    def test_compute_grid_indices(self):
+    def test_compute_grid_index_ranges(self):
         ## Cases where domain is completely in western hemisphere
         self.pe.sw_lat = 40
         self.pe.ne_lat = 50
@@ -119,11 +119,11 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.num_cols = 10
         # lat/lng outside of domain
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(35, -155) # south of it
+            self.pe._compute_grid_index_ranges(35, -155) # south of it
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(45, -165) # west of it
+            self.pe._compute_grid_index_ranges(45, -165) # west of it
         # lat/lng inside domain
-        self.assertEqual((5, 2), self.pe._compute_grid_indices(45.23, -157.232))
+        self.assertEqual((xrange(4,7), xrange(1,4)), self.pe._compute_grid_index_ranges(45.23, -157.232))
 
         ## Cases where domain is completely in eastern hemisphere
         self.pe.sw_lat = -30
@@ -136,11 +136,11 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.num_cols = 10
         # lat/lng outside of domain
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(-35, 165) # south of it
+            self.pe._compute_grid_index_ranges(-35, 165) # south of it
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(-25, 155) # west of it
+            self.pe._compute_grid_index_ranges(-25, 155) # west of it
         # lat/lng inside domain
-        self.assertEqual((7, 9), self.pe._compute_grid_indices(-22.23, 169.232))
+        self.assertEqual((xrange(6,9), xrange(7,10)), self.pe._compute_grid_index_ranges(-22.23, 168.232))
 
         # Case where domain straddles international dateline
         self.pe.sw_lat = 30
@@ -153,14 +153,14 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.num_cols = 20
         # lat/lng outside of domain
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(25, 175) # south of it
+            self.pe._compute_grid_index_ranges(25, 175) # south of it
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(35, 155) # west of it
+            self.pe._compute_grid_index_ranges(35, 155) # west of it
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(35, -155) # east of it
+            self.pe._compute_grid_index_ranges(35, -155) # east of it
         # lat/lng inside domain
-        self.assertEqual((2, 2), self.pe._compute_grid_indices(32.0, 172.3))
-        self.assertEqual((3, 18), self.pe._compute_grid_indices(33.2, -172.0))
+        self.assertEqual((xrange(1,4), xrange(1,4)), self.pe._compute_grid_index_ranges(32.0, 172.3))
+        self.assertEqual((xrange(2,5), xrange(17,20)), self.pe._compute_grid_index_ranges(33.2, -172.0))
 
         # Case where domain straddles GMT
         self.pe.sw_lat = 30
@@ -173,16 +173,16 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.num_cols = 20
         # lat/lng outside of domain
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(25, 0.0) # south of it
+            self.pe._compute_grid_index_ranges(25, 0.0) # south of it
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(35, -12.2) # west of it
+            self.pe._compute_grid_index_ranges(35, -12.2) # west of it
         with self.assertRaises(RuntimeError) as r:
-            self.pe._compute_grid_indices(35, 14.2) # east of it
+            self.pe._compute_grid_index_ranges(35, 14.2) # east of it
         # lat/lng inside domain
-        self.assertEqual((2, 2), self.pe._compute_grid_indices(32.0, -7.23))
-        self.assertEqual((3, 18), self.pe._compute_grid_indices(33.2, 8.2))
+        self.assertEqual((xrange(1,4), xrange(1,4)), self.pe._compute_grid_index_ranges(32.0, -7.23))
+        self.assertEqual((xrange(2,5), xrange(17,20)), self.pe._compute_grid_index_ranges(33.2, 8.2))
 
-    def test_compute_neighbor_indices(self):
+
         # TODO: case where lat,lng is SW corner grid cell
         # TODO: case where lat,lng is NW corner grid cell
         # TODO: case where lat,lng is NE corner grid cell
@@ -191,8 +191,7 @@ class PointExtractorTest(unittest.TestCase):
         # TODO: case where lat,lng is on N side, not corner
         # TODO: case where lat,lng is on E side, not corner
         # TODO: case where lat,lng is on S side, not corner
-        # TODO: case where lat,lng is in the middle somewhere
-        pass
+
 
 if __name__ == '__main__':
     test_main(verbose=True)

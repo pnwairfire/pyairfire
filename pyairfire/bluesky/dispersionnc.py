@@ -31,39 +31,60 @@ class PointExtractor(object):
     def extract(self, lat, lng):
         """Extracts PM2.5 levels for grid cell containing lat/lng over prediction time window
 
+        Returns data of the form:
+
+        {
+            "grid_index_ranges": {
+                "lat": [141, 143],  //  <-- i.e. grid index of lat/lng was (142, 254)
+                "lng": [253, 255]
+            },
+            "data": [
+                [
+                    {
+                        "t": "2014-08-28T01:00:00Z",
+                        "l": [
+                            [1.0, 1.0, 2.0],    // <-- These three rows represent the pm2.5 levels
+                            [1.0, 2.0, 3.0],    // <-- in the neighborhood of the lat/lng at a
+                            [2.0, 3.0, 3.0]     // <-- specific moment in the time window
+                        ]
+                    },
+                    ...,
+                    {
+                        "t": "2014-08-28T23:00:00Z",
+                        "l": [
+                            [0.0, 0.0, 0.0],
+                            [0.0, 1.0, 1.0],
+                            [1.0, 1.0, 2.0]
+                        ]
+                    }
+                ]
+
+        }
+
         @todo:
          - cache results
         """
-        (lat_index, lng_index) = self._compute_grid_indices(lat, lng)
-        neighbor_indices = self._compute_neighbor_indices(lat_index, lng_index)
+        (lat_index_range, lng_index_range) = self._compute_grid_index_ranges(lat, lng)
 
-        # TODO: make sure this is indexing self.pm25 correctly, given each pair of lat/lng indices
-        point_time_series = self.pm25[0, :, 0, lat_index, lng_index]
-        neighbor_time_series = [self.pm25[0, :, 0, _lat_index, _lng_index] for _lat_index, _lng_index in neighbor_indices]
+        # TODO: make sure this is indexing self.pm25 correctly, given each pair
+        # of lat/lng indices in the index ranges
+        point_time_series = self.pm25[0, :, 0, lat_index_range[0]:lat_index_range[-1]+1, lng_index_range[0]:lng_index_range[-1]+1]
 
         r = {
-            'idx': [lat_index, lng_index],
-            'n_idx': neighbor_indices,
-            'd': []
+            "grid_index_ranges": {
+                "lat": list(lat_index_range),
+                "lng": list(lng_index_range)
+            },
+            'data': []
 
         }
         for i in xrange(len(point_time_series)):
-            r['d'].append({
+            r['data'].append({
                 't': self.times[i].strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'l': float(point_time_series[i]),
-                'n': [float(n) for n[i] in neighbor_time_series]
+                'l': [[float(e) for e in i] for i in point_time_series[i]]  #  TODO: need to cast to floats?
             })
 
         return r
-
-    def _compute_neighbor_indices(self, lat_index, lng_index):
-        neighbor_indices = []
-        for _lat_index in xrange(max(0, lat_index), min(self.num_rows-1, lat_index)):
-            for _lng_index in xrange(max(0, lng_index), min(self.num_cols-1, lng_index)):
-                if _lat_index == lat_index and _lng_index == lng_index:
-                    continue
-                neighbor_indices.append([_lat_index, _lng_index])
-        return neighbor_indices
 
     ##
     ## Private Methods
@@ -152,7 +173,7 @@ class PointExtractor(object):
         # and/or the international dateline)
         return (lng + 360.0) % 360
 
-    def _compute_grid_indices(self, lat, lng):
+    def _compute_grid_index_ranges(self, lat, lng):
         # NROWS corresponds to latitude, NCOLS corresponds to the longitude
         adjusted_lng = self._adjust_lng(lng)
 
@@ -162,4 +183,7 @@ class PointExtractor(object):
         lat_index = int((lat - self.sw_lat) / self.lat_res)
         lng_index = int((adjusted_lng - self.adjusted_sw_lng) / self.lat_res)
 
-        return (lat_index, lng_index)
+        lat_index_range = xrange(max(0, lat_index-1), min(self.num_rows, lat_index+2))
+        lng_index_range = xrange(max(0, lng_index-1), min(self.num_cols, lng_index+2))
+
+        return (lat_index_range, lng_index_range)
