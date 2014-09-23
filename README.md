@@ -34,11 +34,19 @@ Use nose:
 
 ## Installing
 
+The repo is currently public. So, you don't need to be on the FERA bitbucket team
+to install from the repo.
+
 ### Installing With pip
 
-For example, to install v0.2.0, use the following:
+First, install pip:
+
+    sudo apt-get install python-pip
+
+Then, to install, for example, v0.2.0, use the following:
 
     sudo pip install git+https://bitbucket.org/fera/airfire-pyairfire@v0.2.0
 
-The repo is currently private. So, you'll need to be on the FERA bitbucket team
-to install from the repo.
+If you get an error like    ```AttributeError: 'NoneType' object has no attribute 'skip_requirements_regex```, it means you need in upgrade pip.  One way to do so is with the following:
+
+    pip install --upgrade pip
