@@ -75,8 +75,7 @@ def parse_options():
         if not m:
             exit_with_msg("Extra fields must be of the form 'key=value'",
                 lambda: parser.print_help())
-        f,k = f.split('=')
-        fields[k] = v
+        fields[m.group(1)] = m.group(2)
 
     if options.verbose:
         for short_key, long_key, name, attr in REQUIRED_OPTIONS:
