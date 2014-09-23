@@ -82,8 +82,10 @@ def parse_options():
             print "%s (%s'%s'): %s" % (name,
                 "'%s', "  % (short_key) if short_key else '', long_key,
                 options.__dict__[attr])
-        for k,v  in fields.items():
-            print "%s: ('-f', '--field'): %s" % (k, v)
+        if fields:
+            print "Extra fields ('-f', '--field'):"
+            for k,v  in fields.items():
+                print "  %s: %s" % (k, v)
 
     return options, fields
 
