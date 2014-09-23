@@ -4,6 +4,9 @@ dispersion nc files.
 @see: https://github.com/ecolell/netcdf
 """
 
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2014, AirFire, PNW, USFS"
+
 import datetime
 import hashlib
 import json
