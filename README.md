@@ -36,9 +36,9 @@ Use nose:
 
 ### Installing With pip
 
-For example, to install v0.1.1, use the following:
+For example, to install v0.2.0, use the following:
 
-    sudo pip install git+https://bitbucket.org/fera/airfire-pyairfire@v0.1.1
+    sudo pip install git+https://bitbucket.org/fera/airfire-pyairfire@v0.2.0
 
 The repo is currently private. So, you'll need to be on the FERA bitbucket team
 to install from the repo.
