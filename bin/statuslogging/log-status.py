@@ -41,8 +41,8 @@ REQUIRED_OPTIONS = [
 ]
 KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
 def parse_options():
-    usage = "usage: %prog [options]"
-    parser = OptionParser(usage=usage)
+    #usage = "usage: %prog [options]"
+    parser = OptionParser() #usage=usage)
 
     # Required options
     parser.add_option("-e", "--api-endpoint", dest="api_endpoint",
