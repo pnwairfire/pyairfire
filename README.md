@@ -50,3 +50,7 @@ Then, to install, for example, v0.2.0, use the following:
 If you get an error like    ```AttributeError: 'NoneType' object has no attribute 'skip_requirements_regex```, it means you need in upgrade pip.  One way to do so is with the following:
 
     pip install --upgrade pip
+
+## Usage:
+
+Look at the docstrings in the code for usage examples.
