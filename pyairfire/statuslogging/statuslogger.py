@@ -1,7 +1,4 @@
-"""dispersionnc.py: Provides uilities for extracting data from smoke
-dispersion nc files.
-
-@see: https://github.com/ecolell/netcdf
+"""statuslogger.py:
 """
 
 __author__      = "Joel Dubowy"
@@ -14,16 +11,15 @@ import socket
 import urllib2
 import urlparse
 
+from statuslogclient import StatusLogClient
+
 __all__ = [
     'StatusLogger'
 ]
 
-class StatusLogger(object):
+class StatusLogger(StatusLogClient):
     """Class for submitting statuses to status-logs service
     """
-
-    TIMESTAMP_FORMAT = "%Y%m%dT%H%M%SZ"
-    TIMEOUT = 3 # seconds
 
     def __init__(self, api_endpoint, api_key, api_secret, process, **static_fields):
         """Constructor
@@ -38,20 +34,20 @@ class StatusLogger(object):
         static_fields -- this should contain fields that are specific to your application
         and static for the life of your process (ex. 'domain=NAM84')
         """
-        self.api_endpoint = api_endpoint
-        self.api_key = api_key
-        self.api_secret = api_secret
+        super(StatusLogger, self).__init__(api_endpoint, api_key=api_key, api_secret=api_secret)
         self.process = process
         self.static_fields = static_fields
         self.machine = self._machine()
 
     def log(self, status, error_handler=None, **extra_fields):
+        """Submits status
+        """
         try:
             data = {
                 'status': status,
                 'machine': self.machine,
                 'process': self.process,
-                'timestamp': datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'),
+                'timestamp': datetime.datetime.utcnow().strftime(self.TIMESTAMP_FORMAT),
 
             }
             data.update(self.static_fields)
@@ -72,7 +68,7 @@ class StatusLogger(object):
     def _signed_url(self):
         path = urlparse.urlparse(self.api_endpoint).path
         query_string_params = {
-            '_ts': datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"),
+            '_ts': datetime.datetime.utcnow().strftime(self.TIMESTAMP_FORMAT),
             '_k': self.api_key
         }
         query_string = '&'.join(sorted([

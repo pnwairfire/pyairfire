@@ -17,20 +17,12 @@ import sys
 from optparse import OptionParser
 
 try:
-    from pyairfire.statuslogging import StatusLogger
+    from pyairfire import statuslogging, scripting
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
-    from pyairfire.statuslogging import StatusLogger
-
-def exit_with_msg(msg, extra_output=None):
-    print "\n*** ERROR: %s\n" % (msg)
-    if extra_output:
-        extra_output()
-    print
-    sys.exit(1)
-
+    from pyairfire import statuslogging, scripting
 
 REQUIRED_OPTIONS = [
     ('-e', '--api-endpoint', 'api endpoint', 'api_endpoint'),
@@ -39,7 +31,7 @@ REQUIRED_OPTIONS = [
     ('-p', '--process', 'process name', 'process'),
     ('-o', '--status', 'status', 'status')
 ]
-KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
+
 def parse_options():
     #usage = "usage: %prog [options]"
     parser = OptionParser() #usage=usage)
@@ -57,53 +49,44 @@ def parse_options():
         help="String valued status, ex. 'Ok' (required")
 
     # Optional
-    parser.add_option('-f', '--field',  dest="fields", action="append",
-        help="extra fields to add to status log", default=[])
+    parser.add_option('-f', '--field', dest="fields", type="string",
+        action="callback", help="extra fields to add to status log", default={},
+        callback=scripting.options.extract_and_set_key_value)
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
         help="to turn on extra output", default=False)
 
     options, args = parser.parse_args()
 
-    for short_key, long_key, name, attr in REQUIRED_OPTIONS:
-        if not options.__dict__[attr]:
-            msg = "specify %s (%s'%s')" % (name, "'%s', "  % (short_key) if short_key else '', long_key)
-            exit_with_msg(msg, lambda: parser.print_help())
-
-    fields = {}
-    for f in options.fields:
-        m = KEY_VALUE_EXTRACTER.search(f.strip())
-        if not m:
-            exit_with_msg("Extra fields must be of the form 'key=value'",
-                lambda: parser.print_help())
-        fields[m.group(1)] = m.group(2)
+    scripting.options.check_required_options(options, REQUIRED_OPTIONS,
+        lambda: parser.print_help())
 
     if options.verbose:
         for short_key, long_key, name, attr in REQUIRED_OPTIONS:
             print "%s (%s'%s'): %s" % (name,
                 "'%s', "  % (short_key) if short_key else '', long_key,
                 options.__dict__[attr])
-        if fields:
+        if options.fields:
             print "Extra fields ('-f', '--field'):"
-            for k,v  in fields.items():
+            for k,v  in options.fields.items():
                 print "  %s: %s" % (k, v)
 
-    return options, fields
+    return options
 
 def error_handler(e):
-    exit_with_msg("Failed to submit status: %s" % (e))
+    scripting.utils.exit_with_msg("Failed to submit status: %s" % (e))
 
 def main():
-    options, fields = parse_options()
+    options = parse_options()
 
     try:
-        sl = StatusLogger(options.api_endpoint, options.api_key, options.api_secret, options.process)
+        sl = statuslogging.StatusLogger(options.api_endpoint, options.api_key, options.api_secret, options.process)
         t = datetime.datetime.now()
-        sl.log(options.status, error_handler=error_handler, **fields)
+        sl.log(options.status, error_handler=error_handler, **dict(options.fields))
         if options.verbose:
             print "It took %f seconds to submit the log" % ((datetime.datetime.now() - t).seconds)
 
     except Exception, e:
-        exit_with_msg(e.message)
+        scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
     main()
