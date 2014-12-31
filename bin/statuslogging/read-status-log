@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+
+"""read-status-log: Script to ....
+
+Note: This script doesn't buy you much more than you can do with curl.  It's
+mostly for testing the underlying statuslogging.StatusReader class
+
+Example calls:
+ > ./bin/statuslogging/read-status-log \
+    -e http://status-log-production.herokuapp.com/status-logs
+ > ./bin/statuslogging/read-status-log -l 10 -o 20 -q status=Good \
+    -e http://status-log-production.herokuapp.com/status-logs
+"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2014, AirFire, PNW, USFS"
+
+import re
+import sys
+from optparse import OptionParser
+
+try:
+    from pyairfire import statuslogging, scripting
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
+    sys.path.insert(0, root_dir)
+    from pyairfire import statuslogging, scripting
+
+REQUIRED_OPTIONS = [
+    ('-e', '--api-endpoint', 'api endpoint', 'api_endpoint')
+]
+
+def parse_options():
+    #usage = "usage: %prog [options]"
+    parser = OptionParser() #usage=usage)
+
+    # Required options
+    parser.add_option("-e", "--api-endpoint", dest="api_endpoint",
+        help="status logger submission API endpoint (required)")
+
+    # Optional
+    parser.add_option("-q", "--query", type="string", dest="query",
+        action="callback", help="extra query parameters", default={},
+        callback=scripting.options.extract_and_set_key_value)
+    parser.add_option("-l", "--limit", type="int", dest="limit",
+        help="maximum number of status logs to be returned by API")
+    parser.add_option("-o", "--offset", type="int", dest="offset",
+        help="offset used in conjunction with limit")
+    parser.add_option("-n", "--newer-than", dest="newer_than", action="callback",
+        help="",
+        callback=scripting.options.parse_datetime)
+    parser.add_option("-p", "--older-than", dest="older_than", action="callback",
+        help="",
+        callback=scripting.options.parse_datetime)
+    parser.add_option("-r", "--most-recent-by-group", dest="most_recent_by_group",
+        help="")
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
+        help="to turn on extra output", default=False)
+
+    options, args = parser.parse_args()
+
+    scripting.options.check_required_options(options, REQUIRED_OPTIONS,
+        lambda: parser.print_help())
+
+    if options.verbose:
+        for short_key, long_key, name, attr in REQUIRED_OPTIONS:
+            print "%s (%s'%s'): %s" % (name,
+                "'%s', "  % (short_key) if short_key else '', long_key,
+                options.__dict__[attr])
+        if options.query:
+            print "Query parameters ('-q', '--query'):"
+            for k,v  in options.query.items():
+                print "  %s: %s" % (k, v)
+
+    return options
+
+def main():
+    options = parse_options()
+
+    try:
+        sr = statuslogging.StatusReader(options.api_endpoint)
+        logs = sr.read(limit=options.limit, offset=options.offset,
+            newer_than=options.newer_than, older_than=options.older_than,
+            most_recent_by_group=options.most_recent_by_group,
+            **dict(options.query))
+        print logs
+    except Exception, e:
+        raise
+        scripting.utils.exit_with_msg(e.message)
+
+if __name__ == "__main__":
+    main()
