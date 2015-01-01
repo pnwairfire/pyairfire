@@ -47,19 +47,23 @@ def extract_and_set_key_value(option, opt, value, parser):
     d = getattr(parser.values, option.dest)
     d[m.group(1)] = m.group(2)
 
-RECOGNIZED_DATETIME_FORMATS =[
+RECOGNIZED_DATETIME_FORMATS = [
     '%Y-%m-%dT%H:%M:%S',
     '%Y-%m-%dT%H:%M:%SZ',
     '%Y/%m/%dT%H:%M:%S',
     '%Y/%m/%dT%H:%M:%SZ',
     '%Y%m%dT%H%M%S',
-    '%Y%m%dT%H%M%SZ'
+    '%Y%m%dT%H%M%SZ',
     '%Y-%m-%d',
     '%Y/%m/%d',
     '%Y%m%d'
 ]
 def parse_datetime(option, opt, value, parser):
-    for format in self.RECOGNIZED_DATETIME_FORMATS:
+    """Parses datetime from string value
+
+    Note: Expects value to be of one of the formats listed in RECOGNIZED_DATETIME_FORMATS
+    """
+    for format in RECOGNIZED_DATETIME_FORMATS:
         try:
             dt = datetime.datetime.strptime(value, format)
             setattr(parser.values, option.dest, dt)

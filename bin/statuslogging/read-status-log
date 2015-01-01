@@ -47,14 +47,14 @@ def parse_options():
         help="maximum number of status logs to be returned by API")
     parser.add_option("-o", "--offset", type="int", dest="offset",
         help="offset used in conjunction with limit")
-    parser.add_option("-n", "--newer-than", dest="newer_than", action="callback",
-        help="",
-        callback=scripting.options.parse_datetime)
-    parser.add_option("-p", "--older-than", dest="older_than", action="callback",
-        help="",
-        callback=scripting.options.parse_datetime)
+    parser.add_option("-n", "--newer-than", type="string", dest="newer_than",
+        action="callback", help="Only return entries newer than this datetime",
+        default=None, callback=scripting.options.parse_datetime)
+    parser.add_option("-p", "--older-than", type="string", dest="older_than",
+        action="callback", help="Only return entries older than this datetime",
+        default=None, callback=scripting.options.parse_datetime)
     parser.add_option("-r", "--most-recent-by-group", dest="most_recent_by_group",
-        help="")
+        help="group by this entry data field (ex. 'domain'")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
         help="to turn on extra output", default=False)
 
