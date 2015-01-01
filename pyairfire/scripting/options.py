@@ -23,9 +23,9 @@ def check_required_options(options, required_options, extra_error_output):
 
     where the last element of each tuple is the attribute name in the options object.
     """
-    for short_key, long_key, name, attr in required_options:
-        if not options.__dict__[attr]:
-            msg = "specify %s (%s'%s')" % (name, "'%s', "  % (short_key) if short_key else '', long_key)
+    for  ro in required_options:
+        if not options.__dict__[ro['dest']]:
+            msg = "specify %s (%s'%s')" % (ro['name'], "'%s', "  % (ro['short_key']) if ro['short'] else '', ro['long'])
             exit_with_msg(msg, extra_error_output)
 
 KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')

@@ -28,7 +28,13 @@ except:
     from pyairfire import statuslogging, scripting
 
 REQUIRED_OPTIONS = [
-    ('-e', '--api-endpoint', 'api endpoint', 'api_endpoint')
+    {
+        'short': '-e',
+        'long': '--api-endpoint',
+        'desc': 'api endpoint',
+        'dest': 'api_endpoint',
+        'help': 'status logger query API endpoint (required)'
+    }
 ]
 
 def parse_options():
@@ -36,8 +42,8 @@ def parse_options():
     parser = OptionParser() #usage=usage)
 
     # Required options
-    parser.add_option("-e", "--api-endpoint", dest="api_endpoint",
-        help="status logger submission API endpoint (required)")
+    for ro in REQUIRED_OPTIONS:
+        parser.add_option(ro['short'], ro['long'], dest=ro['dest'], help=ro['help'])
 
     # Optional
     parser.add_option("-q", "--query", type="string", dest="query",
@@ -64,10 +70,10 @@ def parse_options():
         lambda: parser.print_help())
 
     if options.verbose:
-        for short_key, long_key, name, attr in REQUIRED_OPTIONS:
-            print "%s (%s'%s'): %s" % (name,
-                "'%s', "  % (short_key) if short_key else '', long_key,
-                options.__dict__[attr])
+        for ro in REQUIRED_OPTIONS:
+            print "%s (%s'%s'): %s" % (ro['desc'],
+                "'%s', "  % (ro['short']) if ro['short'] else '', ro['long'],
+                options.__dict__[ro['dest']])
         if options.query:
             print "Query parameters ('-q', '--query'):"
             for k,v  in options.query.items():

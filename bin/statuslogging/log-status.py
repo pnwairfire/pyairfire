@@ -25,11 +25,41 @@ except:
     from pyairfire import statuslogging, scripting
 
 REQUIRED_OPTIONS = [
-    ('-e', '--api-endpoint', 'api endpoint', 'api_endpoint'),
-    ('-k', '--api-key', 'api key', 'api_key'),
-    ('-s', '--api-secret', 'api secret', 'api_secret'),
-    ('-p', '--process', 'process name', 'process'),
-    ('-o', '--status', 'status', 'status')
+    {
+        'short': '-e',
+        'long': '--api-endpoint',
+        'desc': 'api endpoint',
+        'dest': 'api_endpoint',
+        'help': 'status logger submission API endpoint (required)'
+    },
+    {
+        'short': '-k',
+        'long': '--api-key',
+        'desc': 'api key',
+        'dest':  'api_key',
+        'help': 'api key used to make requests to status logger service (required)'
+    },
+    {
+        'short': '-s',
+        'long': '--api-secret',
+        'desc': 'api secret',
+        'dest': 'api_secret',
+        'help': 'api secret used to make requests to status logger service (required)'
+    },
+    {
+        'short': '-p',
+        'long': '--process',
+        'desc': 'process name',
+        'dest': 'process',
+        'help': 'name of process (required)'
+    },
+    {
+        'short': '-o',
+        'long': '--status',
+        'desc': 'status',
+        'dest': 'status',
+        'help': "String valued status, ex. 'Ok' (required)"
+    }
 ]
 
 def parse_options():
@@ -37,16 +67,8 @@ def parse_options():
     parser = OptionParser() #usage=usage)
 
     # Required options
-    parser.add_option("-e", "--api-endpoint", dest="api_endpoint",
-        help="status logger submission API endpoint (required)")
-    parser.add_option("-k", "--api-key", dest="api_key",
-        help="api key used to make requests to status logger service (required)")
-    parser.add_option("-s", "--api-secret", dest="api_secret",
-        help="api secret used to make requests to status logger service (required)")
-    parser.add_option("-p", "--process", dest="process",
-        help="name of process (required)")
-    parser.add_option('-o', "--status", dest="status",
-        help="String valued status, ex. 'Ok' (required")
+    for ro in REQUIRED_OPTIONS:
+        parser.add_option(ro['short'], ro['long'], dest=ro['dest'], help=ro['help'])
 
     # Optional
     parser.add_option('-f', '--field', dest="fields", type="string",
@@ -61,10 +83,10 @@ def parse_options():
         lambda: parser.print_help())
 
     if options.verbose:
-        for short_key, long_key, name, attr in REQUIRED_OPTIONS:
-            print "%s (%s'%s'): %s" % (name,
-                "'%s', "  % (short_key) if short_key else '', long_key,
-                options.__dict__[attr])
+        for ro in REQUIRED_OPTIONS:
+            print "%s (%s'%s'): %s" % (ro['desc'],
+                "'%s', "  % (ro['short']) if ro['short'] else '', ro['long'],
+                options.__dict__[ro['dest']])
         if options.fields:
             print "Extra fields ('-f', '--field'):"
             for k,v  in options.fields.items():
