@@ -72,6 +72,11 @@ def parse_options():
             print "Query parameters ('-q', '--query'):"
             for k,v  in options.query.items():
                 print "  %s: %s" % (k, v)
+        print "Query limit: %s" % (options.limit)
+        print "Query offset: %s" % (options.offset)
+        print "Newer than: %s" % (options.older_than)
+        print "Older than : %s" % (options.newer_than)
+        print "Most recent by group : %s" % (options.most_recent_by_group)
 
     return options
 
