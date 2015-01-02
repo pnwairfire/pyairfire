@@ -25,7 +25,7 @@ def check_required_options(options, required_options, extra_error_output):
     """
     for  ro in required_options:
         if not options.__dict__[ro['dest']]:
-            msg = "specify %s (%s'%s')" % (ro['name'], "'%s', "  % (ro['short_key']) if ro['short'] else '', ro['long'])
+            msg = "specify %s (%s'%s')" % (ro['desc'], "'%s', "  % (ro['short']) if ro['short'] else '', ro['long'])
             exit_with_msg(msg, extra_error_output)
 
 KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
