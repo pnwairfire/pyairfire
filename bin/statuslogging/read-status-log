@@ -97,7 +97,6 @@ def main():
             **dict(options.query))
         print logs
     except Exception, e:
-        raise
         scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
