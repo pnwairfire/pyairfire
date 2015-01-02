@@ -18,18 +18,13 @@ from optparse import OptionParser
 
 try:
     from pyairfire.bluesky.dispersionnc import PointExtractor
+    from pyairfire.scripting.utils import exit_with_msg
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
     from pyairfire.bluesky.dispersionnc import PointExtractor
 
-
-def exit_with_msg(msg, extra_output=None):
-    print "* Error: %s" % (msg)
-    if extra_output:
-        extra_output()
-    sys.exit(1)
 
 def parse_options():
     usage = "usage: %prog [options]"
