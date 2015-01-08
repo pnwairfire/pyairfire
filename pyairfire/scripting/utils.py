@@ -1,5 +1,5 @@
 __author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2014, AirFire, PNW, USFS"
+__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import sys
 
