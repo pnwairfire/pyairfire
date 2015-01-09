@@ -5,7 +5,7 @@ from distutils.core import setup
 # results in the folloing error on Heroku:
 #    TypeError: parse_requirements() missing 1 required keyword argument: 'session'
 with open('requirements.txt') as f:
-    required = f.read().splitlines()
+    REQUIREMENTS = f.read().splitlines()
 
 setup(
     name='pyairfire',
