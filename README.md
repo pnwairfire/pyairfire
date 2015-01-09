@@ -7,9 +7,18 @@ Team.
 
 ### Install Dependencies
 
-Run the following to install dependencies:
+Note: the full set of dependencies is listed in requirements-full.txt. The file
+requirements.txt contains all but netCDF.  The netCDF package fails to install
+on heroku due to the following error:
 
-    pip install -r requirements.txt
+    TypeError: parse_requirements() missing 1 required keyword argument: 'session'
+
+So, requirements.txt omits netCDF so that the pyairfire can be installed on
+heroku.  What this means is that if you want to use pyairfire.bluesky.dispersionnc,
+you need to either manually install netCDF or use requirements-full.txt to
+install the full set of dependencies:
+
+    pip install -r requirements-full.txt
 
 ### Setup Environment
 
