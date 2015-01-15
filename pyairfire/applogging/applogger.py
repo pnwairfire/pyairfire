@@ -4,11 +4,6 @@ The two main purposes of this module are 1) to provide reusable logging setup
 code, and 2) to maintain and provide a reference to the client app's logger
 object so that.
 
-Examples:
-  > logger = applogger.setup_logger()
-  > logger = applogger.setup_logger(log_file='foo.log')
-  > logger
-
 Bugs:
  - duplicate logging
 """
@@ -42,6 +37,14 @@ def setup_logger(**options):
         logging.getLogger to get logger object
      - log_file -- file to write logs; default: write to stdout
      - log_level -- integer log level: default: logging.INFO
+
+    Examples:
+      > from pyairfire.applogging import applogger
+      > logger = applogger.setup_logger()
+      > logger = applogger.setup_logger(log_file='foo.log')
+      > logger = applogger.setup_logger(log_level=10) # logging.DEBUG
+      > logger = applogger.setup_logger(enabled=False)
+      > logger = applogger.setup_logger(print_debug=True)
     """
     global _logger
     if options.get('enabled', True):
