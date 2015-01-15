@@ -1,4 +1,4 @@
-"""statusreader.py:
+"""pyairfire.statuslogging.statusreader
 """
 
 __author__      = "Joel Dubowy"
