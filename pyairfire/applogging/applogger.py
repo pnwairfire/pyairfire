@@ -13,6 +13,7 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import logging
 import sys
+from logging import handlers
 
 __all__ = [
     'setup_logger',
@@ -49,7 +50,7 @@ def setup_logger(**options):
     global _logger
     if options.get('enabled', True):
         if options.get('log_file'):
-            handler = logging.handlers.RotatingFileHandler(options['log_file'], maxBytes=10000, backupCount=1)
+            handler = handlers.RotatingFileHandler(options['log_file'], maxBytes=10000, backupCount=1)
         else:
             handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(logging.Formatter('[%(levelname)s][%(asctime)s] %(message)s'))
