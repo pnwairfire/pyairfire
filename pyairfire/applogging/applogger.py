@@ -38,6 +38,7 @@ def setup_logger(**options):
         logging.getLogger to get logger object
      - log_file -- file to write logs; default: write to stdout
      - log_level -- integer log level: default: logging.INFO
+     - print_debug - whether or not to print out debug info; default False
 
     Examples:
       > from pyairfire.applogging import applogger
@@ -48,6 +49,15 @@ def setup_logger(**options):
       > logger = applogger.setup_logger(print_debug=True)
     """
     global _logger
+
+    if options.get('print_debug'):
+        print " * [pyairfire.applogging.applogger] Enabled: %s" % (
+            options.get('enabled', True))
+        print " * [pyairfire.applogging.applogger] Log File: %s" % (
+            options.get('log_file', '(None)'))
+        print " * [pyairfire.applogging.applogger] Log Level: %s" % (
+            options.get('log_level', '(Not Specified)'))
+
     if options.get('enabled', True):
         if options.get('log_file'):
             handler = handlers.RotatingFileHandler(options['log_file'], maxBytes=10000, backupCount=1)
@@ -60,7 +70,6 @@ def setup_logger(**options):
             _logger.setLevel(options['log_level'])
         _logger.addHandler(handler)
     else:
-        print " * Logging: Disabled"
         _logger = DummyLogger()
     return _logger
 
