@@ -2,35 +2,73 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import datetime
+import logging
 import re
-from optparse import OptionValueError
+from optparse import OptionValueError, OptionParser
 
 from .utils import exit_with_msg
 
-def check_required_options(options, required_options, extra_error_output):
-    """
+__all__ = [
+    'add_options',
+    'parse_options',
+    'check_required_options',
+    'output_options',
+    'extract_and_set_key_value',
+    'parse_datetime',
+    'add_logging_options',
+    'configure_logging_from_options'
+]
+
+def add_options(parser, option_hashes):
+    for o in option_hashes:
+        opt_strs = [e for e in [o.get('short'), o.get('long')] if e]
+        kwargs = dict([(k,v) for k,v in o.items() if k not in ('short', 'long')])
+        parser.add_option(*opt_strs, **kwargs)
+
+def parse_options(option_hashes, usage="usage: %prog [options]"):
+    parser = OptionParser(usage=usage)
+    add_options(parser, option_hashes)
+    add_logging_options(parser)
+    options, args = parser.parse_args()
+    return parser, options, args
+
+
+def check_required_options(options, required_options, parser):
+    """Checks that all required options are defined
 
     Arguments:
+     - options --
      - required_options -- array of required option tuples (see note below)
-     - extra_error_output -- callable outputter of extra error msg content
+     - parser -- optparse.OptionParser instance
 
     Expects required options to be of the form:
 
         REQUIRED_OPTIONS = [
-            ('-f', '--foo', 'foo descriptor', 'foo'),
+            {
+                'short': '-f',
+                'long': '--foo-bar',
+                'dest': 'foo_bar',
+                'help': 'foo bar help (required)'
+            },
+
             ...
         ]
 
     where the last element of each tuple is the attribute name in the options object.
     """
-    for  ro in required_options:
-        if not options.__dict__[ro['dest']]:
-            msg = "specify %s (%s'%s')" % (ro['desc'], "'%s', "  % (ro['short']) if ro['short'] else '', ro['long'])
-            exit_with_msg(msg, extra_error_output)
+    for o in required_options:
+        if not options.__dict__[o['dest']]:
+            opt_strs = '/'.join([e for e in [o.get('short'), o.get('long')] if e])
+            msg = "specify '%s'" % (opt_strs)
+            exit_with_msg(msg, parser.print_help())
 
-KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
+def output_options(parser):
+    for o in parser.option_list:
+        logging.info("'%s': %s" % (o.get_opt_string(), o.dest))
 
 ## Callbacks for add_option
+
+KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
 
 def extract_and_set_key_value(option, opt, value, parser):
     """Splits value into key/value, and set in destination dict
@@ -73,3 +111,53 @@ def parse_datetime(option, opt, value, parser):
             pass
     # If we got here, none of them matched, so raise error
     raise OptionValueError("Invalid datetime format '%s' for option %s" % (value, opt))
+
+
+# Logging Related Options
+
+LOG_LEVELS = [
+    'DEBUG',
+    'INFO',
+    'WARNING',
+    'ERROR',
+    'CRITICAL'
+]
+
+def add_logging_options(parser):
+    add_options(parser, [
+        {
+            'long': "--log-level",
+            'dest': "log_level",
+            'action': "store",
+            'default': None,
+            'help': "python log level (%s)" % (','.join(LOG_LEVELS))
+        },
+        {
+            'long': "--log-file",
+            'dest': "log_file",
+            'action': "store",
+            'default': None,
+            'help': "log file"
+        },
+        {
+            'long': "--log-message-format",
+            'dest': "log_message_format",
+            'action': "store",
+            'default': None,
+            'help': "log message format"
+        },
+    ])
+
+def configure_logging_from_options(options, parser):
+    level = logging.WARNING  # default
+    if options.log_level:
+        log_level = options.log_level.upper()
+        if log_level not in LOG_LEVELS:
+            exit_with_msg(
+                'Invalid log level: %s' % (log_level),
+                extra_output=extra_error_output)
+        level = getattr(logging, log_level)
+
+    format = options.log_message_format or '%(levelname)s:%(message)s'
+
+    logging.basicConfig(format=format, level=level, filename=options.log_file)
