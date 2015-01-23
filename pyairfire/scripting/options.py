@@ -26,17 +26,20 @@ def add_options(parser, option_hashes):
         parser.add_option(*opt_strs, **kwargs)
 
 def parse_options(required_options, optional_options,
-        usage="usage: %prog [options]"):
+        usage="usage: %prog [options]", pre_validation=None):
     # Parse options
     parser = OptionParser(usage=usage)
     add_options(parser, required_options)
     add_options(parser, optional_options)
     add_logging_options(parser)
     options, args = parser.parse_args()
-    # Check options
-    check_required_options(options, required_options, parser)
     # Configure logging
     configure_logging_from_options(options, parser)
+    # Do any pre-validation logic
+    if pre_validation:
+        pre_validation(parser, options)
+    # Check options
+    check_required_options(options, required_options, parser)
     # Output options
     output_options(options)
 
