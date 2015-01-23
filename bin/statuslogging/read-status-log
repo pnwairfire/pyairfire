@@ -27,67 +27,79 @@ except:
     sys.path.insert(0, root_dir)
     from pyairfire import statuslogging, scripting
 
+# Note: though some argue that all required parameters should be specified as
+# positional arguments, I prefer using 'options' flags, even though this
+# means that there are required 'options', which is oxymoronic.
+
 REQUIRED_OPTIONS = [
     {
         'short': '-e',
         'long': '--api-endpoint',
-        'desc': 'api endpoint',
         'dest': 'api_endpoint',
         'help': 'status logger query API endpoint (required)'
     }
 ]
 
-def parse_options():
-    #usage = "usage: %prog [options]"
-    parser = OptionParser() #usage=usage)
-
-    # Required options
-    for ro in REQUIRED_OPTIONS:
-        parser.add_option(ro['short'], ro['long'], dest=ro['dest'], help=ro['help'])
-
-    # Optional
-    parser.add_option("-q", "--query", type="string", dest="query",
-        action="callback", help="extra query parameters", default={},
-        callback=scripting.options.extract_and_set_key_value)
-    parser.add_option("-l", "--limit", type="int", dest="limit",
-        help="maximum number of status logs to be returned by API")
-    parser.add_option("-o", "--offset", type="int", dest="offset",
-        help="offset used in conjunction with limit")
-    parser.add_option("-n", "--newer-than", type="string", dest="newer_than",
-        action="callback", help="Only return entries newer than this datetime",
-        default=None, callback=scripting.options.parse_datetime)
-    parser.add_option("-p", "--older-than", type="string", dest="older_than",
-        action="callback", help="Only return entries older than this datetime",
-        default=None, callback=scripting.options.parse_datetime)
-    parser.add_option("-r", "--most-recent-by-group", dest="most_recent_by_group",
-        help="group by this entry data field (ex. 'domain'")
-    parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
-        help="to turn on extra output", default=False)
-
-    options, args = parser.parse_args()
-
-    scripting.options.check_required_options(options, REQUIRED_OPTIONS,
-        lambda: parser.print_help())
-
-    if options.verbose:
-        for ro in REQUIRED_OPTIONS:
-            print "%s (%s'%s'): %s" % (ro['desc'],
-                "'%s', "  % (ro['short']) if ro['short'] else '', ro['long'],
-                options.__dict__[ro['dest']])
-        if options.query:
-            print "Query parameters ('-q', '--query'):"
-            for k,v  in options.query.items():
-                print "  %s: %s" % (k, v)
-        print "Query limit: %s" % (options.limit)
-        print "Query offset: %s" % (options.offset)
-        print "Newer than: %s" % (options.older_than)
-        print "Older than : %s" % (options.newer_than)
-        print "Most recent by group : %s" % (options.most_recent_by_group)
-
-    return options
+OPTIONAL_OPTIONS = [
+    {
+        'short': "-q",
+        'long': "--query",
+        'type': "string",
+        'dest': "query",
+        'action': "callback",
+        'help': "extra query parameters",
+        'default': {},
+        'callback': scripting.options.extract_and_set_key_value
+    },
+    {
+        'short': "-l",
+        'long': "--limit",
+        'type': "int",
+        'dest': "limit",
+        'help': "maximum number of status logs to be returned by API"
+    },
+    {
+        'short': "-o",
+        'long': "--offset",
+        'type': "int",
+        'dest': "offset",
+        'help': "offset used in conjunction with limit"
+    },
+    {
+        'short': "-n",
+        'long': "--newer-than",
+        'type': "string",
+        'dest': "newer_than",
+        'action': "callback",
+        'help': "Only return entries newer than this datetime",
+        'default': None,
+        'callback': scripting.options.parse_datetime
+    },
+    {
+        'short': "-p",
+        'long': "--older-than",
+        'type': "string",
+        'dest': "older_than",
+        'action': "callback",
+        'help': "Only return entries older than this datetime",
+        'default': None,
+        'callback': scripting.options.parse_datetime
+    },
+    {
+        'short': "-r",
+        'long': "--most-recent-by-group",
+        'dest': "most_recent_by_group",
+        'help': "group by this entry data field (ex. 'domain'"
+    }
+]
 
 def main():
-    options = parse_options()
+    parser, options, args = scripting.options.parse_options(
+        REQUIRED_OPTIONS + OPTIONAL_OPTIONS)
+    scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
+    scripting.options.configure_logging_from_options(options, parser)
+    #output_options(options)
+    scripting.options.output_options(options)
 
     try:
         sr = statuslogging.StatusReader(options.api_endpoint)
