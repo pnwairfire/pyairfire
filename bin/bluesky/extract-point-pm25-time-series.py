@@ -13,57 +13,57 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import datetime
 import json
+import logging
 import sys
 from optparse import OptionParser
 
 try:
     from pyairfire.bluesky.dispersionnc import PointExtractor
-    from pyairfire.scripting.utils import exit_with_msg
+    from pyairfire import scripting
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
     from pyairfire.bluesky.dispersionnc import PointExtractor
 
+REQUIRED_OPTIONS = [
+    {
+        'short': "-f",
+        'long': "--dispersion-nc-file",
+        'dest': "nc_file_pathname",
+        'help': "netCDF input file pathname (required)",
+        'metavar': "FILE"
+    },
+    {
+        'short': "--lat",
+        'dest': "lat",
+        'help': "latitude (required)",
+        'type': float
+    },
+    {
+        'short': "--lng",
+        'dest': "lng",
+        'help': "longitude (required)",
+        'type': float
+    }
+]
 
-def parse_options():
-    usage = "usage: %prog [options]"
-    parser = OptionParser(usage=usage)
-    parser.add_option("-f", "--dispersion-nc-file", dest="nc_file_pathname",
-        help="netCDF input file pathname (required)", metavar="FILE")
-    parser.add_option("--lat", dest="lat", help="latitude (required)", type=float)
-    parser.add_option("--lng", dest="lng", help="longitude (required)", type=float)
-    parser.add_option("-v", "--verbose", dest="verbose", help="to turn on extra output",
-        action="store_true", default=False)
-
-    options, args = parser.parse_args()
-
-    if not options.nc_file_pathname:
-        exit_with_msg("specify nc filename ('-f')", lambda: parser.print_help())
-    if not options.lat or not options.lng:
-        exit_with_msg("specify lat and lng ('--lat/--lng')", parser.print_help)
-
-    if options.verbose:
-        print "NC file pathname: %s" % (options.nc_file_pathname)
-        print "latitude: %s" % (options.lat)
-        print "Longitude: %s" % (options.lng)
-
-    return options
+OPTIONAL_OPTIONS = []
 
 def main():
-    options = parse_options()
+    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
+        OPTIONAL_OPTIONS)
 
     try:
         pe = PointExtractor(options.nc_file_pathname)
         t = datetime.datetime.now()
         point_time_series = pe.extract(options.lat, options.lng)
-        if options.verbose:
-            print "It took %f seconds to extract" % ((datetime.datetime.now() - t).seconds)
-
+        logging.info("It took %f seconds to extract" % (
+            (datetime.datetime.now() - t).seconds))
         print json.dumps(point_time_series)
 
     except Exception, e:
-        exit_with_msg(e.message)
+        scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
     main()
