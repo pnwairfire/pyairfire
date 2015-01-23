@@ -12,6 +12,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import datetime
+import logging
 import re
 import sys
 from optparse import OptionParser
@@ -66,14 +67,6 @@ OPTIONAL_OPTIONS = [
         'help': "extra fields to add to status log",
         'default': {},
         'callback': scripting.options.extract_and_set_key_value
-    },
-    {
-        'short': "-v",
-        'long': "--verbose",
-        'dest': "verbose",
-        'action': "store_true",
-        'help': "to turn on extra output",
-        'default': False
     }
 ]
 
@@ -88,8 +81,8 @@ def main():
         sl = statuslogging.StatusLogger(options.api_endpoint, options.api_key, options.api_secret, options.process)
         t = datetime.datetime.now()
         sl.log(options.status, error_handler=error_handler, **dict(options.fields))
-        if options.verbose:
-            print "It took %f seconds to submit the log" % ((datetime.datetime.now() - t).seconds)
+        logging.info("It took %f seconds to submit the log" % (
+            (datetime.datetime.now() - t).seconds))
 
     except Exception, e:
         scripting.utils.exit_with_msg(e.message)
