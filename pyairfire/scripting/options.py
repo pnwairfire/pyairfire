@@ -25,13 +25,22 @@ def add_options(parser, option_hashes):
         kwargs = dict([(k,v) for k,v in o.items() if k not in ('short', 'long')])
         parser.add_option(*opt_strs, **kwargs)
 
-def parse_options(option_hashes, usage="usage: %prog [options]"):
+def parse_options(required_options, optional_options,
+        usage="usage: %prog [options]"):
+    # Parse options
     parser = OptionParser(usage=usage)
-    add_options(parser, option_hashes)
+    add_options(parser, required_options)
+    add_options(parser, optional_options)
     add_logging_options(parser)
     options, args = parser.parse_args()
-    return parser, options, args
+    # Check options
+    check_required_options(options, required_options, parser)
+    # Configure logging
+    configure_logging_from_options(options, parser)
+    # Output options
+    output_options(options)
 
+    return parser, options, args
 
 def check_required_options(options, required_options, parser):
     """Checks that all required options are defined
