@@ -25,6 +25,7 @@ except:
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
     from pyairfire.bluesky.dispersionnc import PointExtractor
+    from pyairfire import scripting
 
 REQUIRED_OPTIONS = [
     {
