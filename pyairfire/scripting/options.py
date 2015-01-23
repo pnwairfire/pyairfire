@@ -62,9 +62,9 @@ def check_required_options(options, required_options, parser):
             msg = "specify '%s'" % (opt_strs)
             exit_with_msg(msg, parser.print_help())
 
-def output_options(parser):
-    for o in parser.option_list:
-        logging.info("'%s': %s" % (o.get_opt_string(), o.dest))
+def output_options(options):
+    for k,v in options.__dict__.items():
+        logging.info("%s: %s" % (' '.join(k.split('_')), v))
 
 ## Callbacks for add_option
 
@@ -158,6 +158,6 @@ def configure_logging_from_options(options, parser):
                 extra_output=extra_error_output)
         level = getattr(logging, log_level)
 
-    format = options.log_message_format or '%(levelname)s:%(message)s'
+    format = options.log_message_format or '%(asctime)s %(levelname)s: %(message)s'
 
     logging.basicConfig(format=format, level=level, filename=options.log_file)
