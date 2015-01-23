@@ -94,12 +94,8 @@ OPTIONAL_OPTIONS = [
 ]
 
 def main():
-    parser, options, args = scripting.options.parse_options(
-        REQUIRED_OPTIONS + OPTIONAL_OPTIONS)
-    scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
-    scripting.options.configure_logging_from_options(options, parser)
-    #output_options(options)
-    scripting.options.output_options(options)
+    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
+        OPTIONAL_OPTIONS)
 
     try:
         sr = statuslogging.StatusReader(options.api_endpoint)
