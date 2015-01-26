@@ -18,7 +18,6 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 import json
 import re
 import sys
-from optparse import OptionParser
 
 try:
     from pyairfire import statuslogging, scripting

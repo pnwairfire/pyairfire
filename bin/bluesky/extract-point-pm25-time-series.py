@@ -15,7 +15,6 @@ import datetime
 import json
 import logging
 import sys
-from optparse import OptionParser
 
 try:
     from pyairfire.bluesky.dispersionnc import PointExtractor

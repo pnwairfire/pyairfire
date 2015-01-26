@@ -15,7 +15,6 @@ import datetime
 import logging
 import re
 import sys
-from optparse import OptionParser
 
 try:
     from pyairfire import statuslogging, scripting
