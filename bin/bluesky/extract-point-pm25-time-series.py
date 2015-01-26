@@ -27,6 +27,10 @@ except:
     from pyairfire.bluesky.dispersionnc import PointExtractor
     from pyairfire import scripting
 
+# Note: though some argue that all required parameters should be specified as
+# positional arguments, I prefer using 'options' flags, even though this
+# means that there are required 'options', which is oxymoronic.
+
 REQUIRED_OPTIONS = [
     {
         'short': "-f",
