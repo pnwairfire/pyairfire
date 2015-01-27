@@ -41,6 +41,7 @@ REQUIRED_OPTIONS = [
 ]
 
 OPTIONAL_OPTIONS = [
+    # Query Options
     {
         'short': "-q",
         'long': "--query",
@@ -90,6 +91,43 @@ OPTIONAL_OPTIONS = [
         'long': "--most-recent-by-group",
         'dest': "most_recent_by_group",
         'help': "group by this entry data field (ex. 'domain'"
+    },
+    # Notification options
+    {
+        'short': '-t',
+        'long': "--email-recipients",
+        'dest': "email_recipients",
+        'help': "email address to send queried logs to"
+    },
+    {
+        'short': '-s',
+        'long': "--email-subject",
+        'dest': "email_subject",
+        'help': "subject of email"
+    },
+    {
+        'short': '-m',
+        'long': "--smtp-server",
+        'dest': "smtp_server",
+        'help': "SMTP server host and port (ex. 'smtp.google.com:587')"
+    },
+    {
+        'long': "--smtp-username",
+        'dest': "smtp_username",
+        'help': "Username to log into SMTP server"
+    },
+    {
+        'long': "--smtp-password",
+        'dest': "smtp_password",
+        'help': "Password to log into SMTP server"
+    },
+    # General Options
+    {
+        'long': "--quiet",
+        'dest': "quiet",
+        'help': "suppress ouput of queried logs",
+        'action': 'store_true',
+        'default': False
     }
 ]
 
@@ -98,12 +136,22 @@ def main():
         OPTIONAL_OPTIONS)
 
     try:
+        query = dict(options.query)
+
+        # read
         sr = statuslogging.StatusReader(options.api_endpoint)
         logs = sr.read(limit=options.limit, offset=options.offset,
             newer_than=options.newer_than, older_than=options.older_than,
-            most_recent_by_group=options.most_recent_by_group,
-            **dict(options.query))
-        sys.stdout.write(json.dumps(logs))
+            most_recent_by_group=options.most_recent_by_group, **query)
+
+        # notify
+        sn = statuslogging.StatusNotifier(**options.__dict__)
+        sn.send(logs, subject=options.email_subject, query=query)
+
+        if not options.quiet:
+            # dump to output
+            sys.stdout.write(json.dumps(logs))
+
     except Exception, e:
         scripting.utils.exit_with_msg(e.message)
 
