@@ -38,29 +38,26 @@ class StatusNotifier(object):
         self.options = options
 
     def send(self, status_logs, subject=None, query=None):
-        if self.options.get('email_recipients'):
-            try:
-                self.send_email(status_logs, self.options['email_recipients'],
-                    sender=self.options.get('email_sender'), subject=subject, query=query)
+        for channel in ['email', 'sms']:
+            recipient_key = '%s_recipients' % (channel)
+            sender_key = '%s_sender' % (channel)
+            if self.options.get(recipient_key):
+                try:
+                    m = getattr(self, 'send_%s' % (channel))
+                    m(status_logs, self.options[recipient_key],
+                        sender=self.options.get(sender_key), subject=subject, query=query)
 
-            except StatusNotificationError, e:
-                # log message but move on
-                logging.error("Failed to send email: %s", e.message)
-
-        if self.options.get('sms_recipients'):
-            try:
-                self.send_sms(status_logs, self.options['sms_recipients'], sms_sender)
-            except StatusNotificationError, e:
-                # log message but move on
-                logging.error("Failed to send email: %s", e.message)
+                except StatusNotificationError, e:
+                    # log message but move on
+                    logging.error("Failed to send %s: %s", channel, e.message)
 
     ## Email
 
     DEFAULT_EMAIL_SENDER = "no-reply@status"
     DEFAULT_EMAIL_SUBJECT = "Status Log Digest"
     DEFAILT_MAIL_SERVER = "localhost"
-    def send_email(self, status_logs, recipients, sender=None, subject=None,
-            query=None):
+    def send_email(self, status_logs, recipients, sender=None, subject=None, query=None):
+        logging.debug('Sending Email')
         try:
             msg = MIMEMultipart('alternative')
             msg['From'] = sender or self.DEFAULT_EMAIL_SENDER
@@ -77,7 +74,7 @@ class StatusNotifier(object):
             s.ehlo()
 
             if self.options.get('smtp_username') and self.options.get('smtp_password'):
-                server.login(self.options['smtp_username'], self.options['smtp_password'])
+                s.login(self.options['smtp_username'], self.options['smtp_password'])
             s.sendmail(msg['from'], msg['recipients'], msg.as_string())
             s.quit()
         except smtplib.SMTPException, e:
@@ -102,6 +99,7 @@ class StatusNotifier(object):
     ## SMS
 
     DEFAULT_SMS_SENDER = "" # TODO: Fill this in
-    def send_sms(self, recipients, sender=None):
+    def send_sms(self, status_logs, recipients, sender=None, subject=None, query=None):
+        logging.debug('Sending SMS')
         # TODO: send sms to all addressses in to_email
-        logging.warning("SMS not supported")
+        raise StatusSMSError("SMS not supported")

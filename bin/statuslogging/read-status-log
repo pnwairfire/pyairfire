@@ -92,12 +92,19 @@ OPTIONAL_OPTIONS = [
         'dest': "most_recent_by_group",
         'help': "group by this entry data field (ex. 'domain'"
     },
-    # Notification options
+    # Email options
     {
         'short': '-t',
         'long': "--email-recipients",
         'dest': "email_recipients",
-        'help': "email address to send queried logs to"
+        'help': "email addresses to send queried logs to",
+        'action': 'append',
+        'default': []
+    },
+    {
+        'long': "--email-sender",
+        'dest': "email_sender",
+        'help': "from email address for queried log email"
     },
     {
         'short': '-s',
@@ -121,6 +128,19 @@ OPTIONAL_OPTIONS = [
         'dest': "smtp_password",
         'help': "Password to log into SMTP server"
     },
+    # # SMS options  <-- not supported
+    # {
+    #     'long': "--sms-recipients",
+    #     'dest': "sms_recipients",
+    #     'help': "phone numbers to to send queried log SMS to",
+    #     'action': 'append',
+    #     'default': []
+    # },
+    # {
+    #     'long': "--sms-sender",
+    #     'dest': "sms_sender",
+    #     'help': "from phone number for queried log SMS"
+    # },
     # General Options
     {
         'long': "--quiet",
