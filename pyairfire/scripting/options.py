@@ -69,7 +69,8 @@ def check_required_options(options, required_options, parser):
     where the last element of each tuple is the attribute name in the options object.
     """
     for o in required_options:
-        if not options.__dict__[o['dest']]:
+        dest = o.get('dest') or '_'.join((o.get('long') or o.get('short')).strip('-').split('-'))
+        if not options.__dict__[dest]:
             opt_strs = '/'.join([e for e in [o.get('short'), o.get('long')] if e])
             msg = "specify '%s'" % (opt_strs)
             exit_with_msg(msg, parser.print_help())
