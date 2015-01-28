@@ -79,6 +79,7 @@ class StatusNotifier(object):
                 s.ehlo()
 
             if self.options.get('smtp_username') and self.options.get('smtp_password'):
+                logging.debug('Logging into SMTP server with u/p')
                 s.login(self.options['smtp_username'], self.options['smtp_password'])
 
             s.sendmail(msg['from'], recipients, msg.as_string())
@@ -89,19 +90,40 @@ class StatusNotifier(object):
             raise StatusNotificationError(str(e))
 
     def generate_email_content(self, status_logs, query=None):
+        text = json.dumps(status_logs)
+        logging.debug("Email contents (text):\n%s", text)
+
         html = """
             <html>
               <head></head>
               <body>
-                %s
+                <div>
+                    <h2>Query</h2>
+                    <ul>
+                        %s
+                    </ul>
+                </div>
+                <div>
+                    <h2>Statuses</h2>
+                    <div>
+                        %s
+                    </div>
+                </div>
               </body>
             </html>
-        """ % ('\n'.join([json.dumps(sl) for sl in status_logs]))  # TEMP
+        """ % (
+            ''.join(["<li></li>"]),
+            ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
+            )
+        logging.debug("Email contents (html):\n%s", html)
 
         return {
-            'text': json.dumps(status_logs), # TEMP
+            'text': text,
             'html': html
         }
+
+    def status_log_as_html(self, status_log):
+        return "<div>%s</div>" % (json.dumps(status_log))  # TEMP
 
     ## SMS
 
