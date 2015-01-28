@@ -2,6 +2,7 @@
 
 TODO:
  - use templating system for html (and text?) email
+ - add option to pass in custom status log html/text formatter
 """
 
 __author__      = "Joel Dubowy"
@@ -98,13 +99,25 @@ class StatusNotifier(object):
 
         html = """
             <html>
-              <head></head>
+              <head>
+                <style type="text/css">
+                  .failure {
+                    color: red;
+                  }
+                  .good {
+                    color: green;
+                  }
+                  li span.key {
+                      font-weight: bold;
+                  }
+                </style>
+              </head>
               <body>
                 <div>
                     <h2>Query</h2>
                     <ul>
-                        <li><span>Newer than<aspan>: %s</li>
-                        <li><span>Older than<aspan>: %s</li>
+                        <li><span class="key">Newer than<aspan>: %s</li>
+                        <li><span class="key">Older than<aspan>: %s</li>
                         %s
                     </ul>
                 </div>
@@ -117,11 +130,12 @@ class StatusNotifier(object):
         """ % (
             self.options.get('newer_than') or 'N/A',
             self.options.get('older_than') or 'N/A',
-            ''.join(["<li><span>%s</span>: %s</li>" % (k, v) for (k, v) in query.items()]) if query else "",
+            ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in query.items()]) if query else "",
             ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
             )
         logging.debug("Email contents (html):\n%s", html)
 
+        # TODO: strip leading/trailing whitespace from html, and then remove newlines
         return {
             'text': text,
             'html': html
@@ -131,15 +145,16 @@ class StatusNotifier(object):
         html = """
             <div>
                 <div>Process: %s</div>
-                <div>Status: %s</div>
+                <div>Status: <span class="%s">%s<span></div>
                 <ul>
                     %s
                 </ul>
             </div>
         """ % (
             status_log['process'],
+            status_log['status'].lower(),
             status_log['status'],
-            ''.join(["<li><span>%s</span>: %s</li>" % (k, v) for (k, v) in status_log.items()]),
+            ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in status_log.items()]),
         )
 
         return html

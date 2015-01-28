@@ -14,6 +14,9 @@ Example calls:
 
 Check out MailCatcher (http://mailcatcher.me/) to test email notications
     gem install mailcatcher
+
+TODO:
+ - add option to pass in custom status log html/text formatter
 """
 
 __author__      = "Joel Dubowy"
