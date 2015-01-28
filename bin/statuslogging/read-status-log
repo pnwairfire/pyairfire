@@ -2,7 +2,8 @@
 
 """read-status-log: Script to ....
 
-Note: This script doesn't buy you much more than you can do with curl.  It's
+Note: Without using the email or sms options, this script doesn't
+buy you much more than you can do with curl.  It's
 mostly for testing the underlying statuslogging.StatusReader class
 
 Example calls:
@@ -10,6 +11,9 @@ Example calls:
     -e http://status-log-production.herokuapp.com/status-logs
  > ./bin/statuslogging/read-status-log -l 10 -o 20 -q status=Good \
     -e http://status-log-production.herokuapp.com/status-logs
+
+Check out MailCatcher (http://mailcatcher.me/) to test email notications
+    gem install mailcatcher
 """
 
 __author__      = "Joel Dubowy"
