@@ -68,15 +68,21 @@ class StatusNotifier(object):
             msg.attach(MIMEText(content['text'], 'plain'))
             msg.attach(MIMEText(content['html'], 'html'))
 
-            s = smtplib.SMTP(self.options.get('smtp_server') or self.DEFAILT_MAIL_SERVER)
-            s.ehlo()
-            s.starttls()
-            s.ehlo()
+            server = self.options.get('smtp_server') or self.DEFAILT_MAIL_SERVER
+            logging.debug('Connecting to SMTP server %s', server)
+            s = smtplib.SMTP(server)
+
+            if self.options.get('smtp_starttls'):
+                logging.debug('Using STARTTLS')
+                s.ehlo()
+                s.starttls()
+                s.ehlo()
 
             if self.options.get('smtp_username') and self.options.get('smtp_password'):
                 s.login(self.options['smtp_username'], self.options['smtp_password'])
             s.sendmail(msg['from'], msg['recipients'], msg.as_string())
             s.quit()
+
         except smtplib.SMTPException, e:
             # Note: e.message is blank
             raise StatusNotificationError(str(e))

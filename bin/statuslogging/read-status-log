@@ -132,6 +132,13 @@ OPTIONAL_OPTIONS = [
         'dest': "smtp_password",
         'help': "Password to log into SMTP server"
     },
+    {
+        'long': "--smtp-starttls",
+        'dest': "smtp_starttls",
+        'help': "Use STARTTLS",
+        'action': 'store_true',
+        'default': False
+    },
     # # SMS options  <-- not supported
     # {
     #     'long': "--sms-recipients",
