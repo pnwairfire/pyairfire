@@ -161,6 +161,7 @@ Possible Query Parameters (not an exaustive list):
         if not options.quiet:
             # dump to output
             sys.stdout.write(json.dumps(logs))
+            sys.stdout.write('\n')
 
     except Exception, e:
         scripting.utils.exit_with_msg(e)
