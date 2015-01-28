@@ -26,9 +26,23 @@ def add_options(parser, option_hashes):
         parser.add_option(*opt_strs, **kwargs)
 
 def parse_options(required_options, optional_options,
-        usage="usage: %prog [options]", pre_validation=None):
+        usage="usage: %prog [options]", pre_validation=None,
+        post_options_outputter=None):
+    """....
+
+    Arguments:
+     - required_options --
+     - optional_options --
+    Kwargs
+     - usage --
+     - pre_validation --
+     - extra_help_output -- callable that generates text to be output after
+        options are listed
+    """
     # Parse options
     parser = OptionParser(usage=usage)
+    if post_options_outputter:
+        parser.format_epilog = lambda formatter: post_options_outputter()
     add_options(parser, required_options)
     add_options(parser, optional_options)
     add_logging_options(parser)

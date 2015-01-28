@@ -131,8 +131,21 @@ OPTIONAL_OPTIONS = [
 ]
 
 def main():
+    post_options_content = """
+Possible Query Parameters (not an exaustive list):
+  - limit -- ex. limit=10
+  - offset -- ex. offset=30
+  - newer_than -- newer_than=2015-01-14
+  - older_than -- older_than=2015-01-14T18:23:23Z
+  - most_recent_by_group -- most_recent_by_group=domain
+  - status -- ex. status=Good
+  - step -- ex. step=Fill Data
+  - action -- ex. action=Start
+  - machine -- ex. machine=Smokey
+
+"""
     parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
-        OPTIONAL_OPTIONS)
+        OPTIONAL_OPTIONS, post_options_outputter=lambda: post_options_content)
 
     try:
         query = dict(options.query)
