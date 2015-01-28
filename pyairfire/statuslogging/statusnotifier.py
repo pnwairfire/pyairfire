@@ -116,8 +116,6 @@ class StatusNotifier(object):
                 <div>
                     <h2>Query</h2>
                     <ul>
-                        <li><span class="key">Newer than<aspan>: %s</li>
-                        <li><span class="key">Older than<aspan>: %s</li>
                         %s
                     </ul>
                 </div>
@@ -128,8 +126,6 @@ class StatusNotifier(object):
               </body>
             </html>
         """ % (
-            self.options.get('newer_than') or 'N/A',
-            self.options.get('older_than') or 'N/A',
             ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in query.items()]) if query else "",
             ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
             )

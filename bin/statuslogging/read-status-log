@@ -9,8 +9,15 @@ underlying statuslogging.StatusReader class or for sending notifications.
 Example calls:
  > ./bin/statuslogging/read-status-log \
     -e http://status-log-production.herokuapp.com/status-logs
- > ./bin/statuslogging/read-status-log -l 10 -o 20 -q status=Good \
-    -e http://status-log-production.herokuapp.com/status-logs
+ > ./bin/statuslogging/read-status-log \
+    -e http://status-log-production.herokuapp.com/status-logs \
+    -q limit=10 -q offset=20 -q status=Good
+ > ./bin/statuslogging/read-status-log \
+    -e http://status-log-production.herokuapp.com/status-logs \
+    -q newer_than=2015-01-01 -q older_than=2015-01-02 -q status=Failure \
+    -r jdubowy@uw.edi -r foo@bar.com
+
+
 
 Check out MailCatcher (http://mailcatcher.me/) to test email notications
     gem install mailcatcher
@@ -59,49 +66,9 @@ OPTIONAL_OPTIONS = [
         'default': {},
         'callback': scripting.options.extract_and_set_key_value
     },
-    {
-        'short': "-l",
-        'long': "--limit",
-        'type': "int",
-        'dest': "limit",
-        'help': "maximum number of status logs to be returned by API"
-    },
-    {
-        'short': "-o",
-        'long': "--offset",
-        'type': "int",
-        'dest': "offset",
-        'help': "offset used in conjunction with limit"
-    },
-    {
-        'short': "-n",
-        'long': "--newer-than",
-        'type': "string",
-        'dest': "newer_than",
-        'action': "callback",
-        'help': "Only return entries newer than this datetime",
-        'default': None,
-        'callback': scripting.options.parse_datetime
-    },
-    {
-        'short': "-p",
-        'long': "--older-than",
-        'type': "string",
-        'dest': "older_than",
-        'action': "callback",
-        'help': "Only return entries older than this datetime",
-        'default': None,
-        'callback': scripting.options.parse_datetime
-    },
-    {
-        'short': "-r",
-        'long': "--most-recent-by-group",
-        'dest': "most_recent_by_group",
-        'help': "group by this entry data field (ex. 'domain'"
-    },
     # Email options
     {
-        'short': '-t',
+        'short': '-r',
         'long': "--email-recipients",
         'dest': "email_recipients",
         'help': "email addresses to send queried logs to",
@@ -114,13 +81,11 @@ OPTIONAL_OPTIONS = [
         'help': "from email address for queried log email"
     },
     {
-        'short': '-s',
         'long': "--email-subject",
         'dest': "email_subject",
         'help': "subject of email"
     },
     {
-        'short': '-m',
         'long': "--smtp-server",
         'dest': "smtp_server",
         'help': "SMTP server host and port (ex. 'smtp.google.com:587')"
@@ -174,9 +139,7 @@ def main():
 
         # read
         sr = statuslogging.StatusReader(options.api_endpoint)
-        logs = sr.read(limit=options.limit, offset=options.offset,
-            newer_than=options.newer_than, older_than=options.older_than,
-            most_recent_by_group=options.most_recent_by_group, **query)
+        logs = sr.read(**query)
 
         # notify
         sn = statuslogging.StatusNotifier(**options.__dict__)
