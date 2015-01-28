@@ -80,7 +80,8 @@ class StatusNotifier(object):
 
             if self.options.get('smtp_username') and self.options.get('smtp_password'):
                 s.login(self.options['smtp_username'], self.options['smtp_password'])
-            s.sendmail(msg['from'], msg['recipients'], msg.as_string())
+
+            s.sendmail(msg['from'], recipients, msg.as_string())
             s.quit()
 
         except smtplib.SMTPException, e:
