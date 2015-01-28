@@ -1,4 +1,7 @@
 """pyairfire.statuslogging.statusnotifier
+
+TODO:
+ - use templating system for html (and text?) email
 """
 
 __author__      = "Joel Dubowy"
@@ -100,19 +103,21 @@ class StatusNotifier(object):
                 <div>
                     <h2>Query</h2>
                     <ul>
+                        <li><span>Newer than<aspan>: %s</li>
+                        <li><span>Older than<aspan>: %s</li>
                         %s
                     </ul>
                 </div>
                 <div>
-                    <h2>Statuses</h2>
-                    <div>
-                        %s
-                    </div>
+                    <h2>Statuses Logs</h2>
+                    %s
                 </div>
               </body>
             </html>
         """ % (
-            ''.join(["<li></li>"]),
+            self.options.get('newer_than') or 'N/A',
+            self.options.get('older_than') or 'N/A',
+            ''.join(["<li><span>%s</span>: %s</li>" % (k, v) for (k, v) in query.items()]) if query else "",
             ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
             )
         logging.debug("Email contents (html):\n%s", html)
@@ -123,7 +128,21 @@ class StatusNotifier(object):
         }
 
     def status_log_as_html(self, status_log):
-        return "<div>%s</div>" % (json.dumps(status_log))  # TEMP
+        html = """
+            <div>
+                <div>Process: %s</div>
+                <div>Status: %s</div>
+                <ul>
+                    %s
+                </ul>
+            </div>
+        """ % (
+            status_log['process'],
+            status_log['status'],
+            ''.join(["<li><span>%s</span>: %s</li>" % (k, v) for (k, v) in status_log.items()]),
+        )
+
+        return html
 
     ## SMS
 

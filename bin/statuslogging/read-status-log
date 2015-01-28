@@ -2,9 +2,9 @@
 
 """read-status-log: Script to ....
 
-Note: Without using the email or sms options, this script doesn't
-buy you much more than you can do with curl.  It's
-mostly for testing the underlying statuslogging.StatusReader class
+Note: Without using the email [or eventually sms] options, this script doesn't
+buy you much more than you can do with curl.  It's mostly for testing the
+underlying statuslogging.StatusReader class or for sending notifications.
 
 Example calls:
  > ./bin/statuslogging/read-status-log \
