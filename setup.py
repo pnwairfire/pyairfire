@@ -9,13 +9,14 @@ with open('requirements.txt') as f:
 
 setup(
     name='pyairfire',
-    version='0.5.5',
+    version='0.5.6',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=[
         'pyairfire',
         'pyairfire.applogging',
         'pyairfire.bluesky',
+        'pyairfire.datetime',
         'pyairfire.scripting',
         'pyairfire.statuslogging',
         'pyairfire.web'
