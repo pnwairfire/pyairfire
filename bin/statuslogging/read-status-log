@@ -149,14 +149,12 @@ Possible Query Parameters (not an exaustive list):
 
     try:
         query = dict(options.query)
+        notifier_options = options.__dict__
+        api_endpoint = notifier_options.pop('api_endpoint')
+        email_subject = notifier_options.pop('email_subject', None)
+        sn = statuslogging.StatusNotifier(**notifier_options)
+        logs = sn.query_and_notify(api_endpoint, query=query, subject=email_subject)
 
-        # read
-        sr = statuslogging.StatusReader(options.api_endpoint)
-        logs = sr.read(**query)
-
-        # notify
-        sn = statuslogging.StatusNotifier(**options.__dict__)
-        sn.send(logs, subject=options.email_subject, query=query)
 
         if not options.quiet:
             # dump to output

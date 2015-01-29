@@ -4,11 +4,12 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
-from statuslogclient import StatusLogClient
 import json
 import logging
 import urllib
 import urllib2
+
+from statuslogclient import StatusLogClient
 
 __all__ = [
     'StatusReader'

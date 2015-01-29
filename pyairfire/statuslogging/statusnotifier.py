@@ -14,6 +14,9 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from statusreader import StatusReader
+
+
 __all__ = [
     'StatusNotifier',
     'StatusEmailError'
@@ -38,8 +41,23 @@ class StatusNotifier(object):
          - email_sender --
          - sms_recipients --
          - sms_sender --
+         - smtp_server --
+         - smtp_starttls --
+         - smtp_username --
+         - smtp_password --
         """
         self.options = options
+
+    def query_and_notify(self, api_endpoint, query=None, subject=None):
+        # query
+        sr = StatusReader(api_endpoint)
+        query = query or {}
+        logs = sr.read(**query)
+
+        # notify
+        self.send(logs, subject=subject, query=query)
+
+        return logs
 
     def send(self, status_logs, subject=None, query=None):
         for channel in ['email', 'sms']:
