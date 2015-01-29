@@ -112,33 +112,19 @@ def extract_and_set_key_value(option, opt, value, parser):
     d = getattr(parser.values, option.dest)
     d[m.group(1)] = m.group(2)
 
-RECOGNIZED_DATETIME_FORMATS = [
-    '%Y-%m-%dT%H:%M:%S',
-    '%Y-%m-%dT%H:%M:%SZ',
-    '%Y/%m/%dT%H:%M:%S',
-    '%Y/%m/%dT%H:%M:%SZ',
-    '%Y%m%dT%H%M%S',
-    '%Y%m%dT%H%M%SZ',
-    '%Y-%m-%d',
-    '%Y/%m/%d',
-    '%Y%m%d'
-]
 def parse_datetime(option, opt, value, parser):
     """Parses datetime from string value
 
-    Note: Expects value to be of one of the formats listed in RECOGNIZED_DATETIME_FORMATS
+    Note: Expects value to be of one of the formats listed in
+    RECOGNIZED_DATETIME_FORMATS
     """
-    for format in RECOGNIZED_DATETIME_FORMATS:
-        try:
-            dt = datetime.datetime.strptime(value, format)
-            setattr(parser.values, option.dest, dt)
-            return
-        except ValueError:
-            # Go on to next format
-            pass
-    # If we got here, none of them matched, so raise error
-    raise OptionValueError("Invalid datetime format '%s' for option %s" % (value, opt))
-
+    try:
+        dt = datetime.datetime.strptime(value, format)
+    except ValueError:
+        # If we got here, none of them matched, so raise error
+        raise OptionValueError("Invalid datetime format '%s' for option %s" % (
+            value, opt))
+    setattr(parser.values, option.dest, dt)
 
 # Logging Related Options
 
