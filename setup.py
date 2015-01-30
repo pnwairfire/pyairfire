@@ -17,6 +17,7 @@ setup(
         'pyairfire.applogging',
         'pyairfire.bluesky',
         'pyairfire.datetime',
+        'pyairfire.fabric',
         'pyairfire.scripting',
         'pyairfire.statuslogging',
         'pyairfire.web'
