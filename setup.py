@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='pyairfire',
-    version='0.5.6',
+    version='0.6.0',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=[
