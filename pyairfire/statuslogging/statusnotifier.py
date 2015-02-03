@@ -138,13 +138,14 @@ class StatusNotifier(object):
                     </ul>
                 </div>
                 <div>
-                    <h2>Statuses Logs</h2>
+                    <h2>%d Matching Statuses Logs Found</h2>
                     %s
                 </div>
               </body>
             </html>
         """ % (
             ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in query.items()]) if query else "",
+            len(status_logs['logs']),
             ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
             )
         logging.debug("Email contents (html):\n%s", html)
