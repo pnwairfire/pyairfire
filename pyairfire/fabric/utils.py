@@ -14,7 +14,6 @@ __all__ = [
 LOOPBACK_ADDRESSES_RE = re.compile('^(localhost|172.0.0.[1-8]|::1)$')
 
 def already_running(command):
-    api.env.warn_only = True
     command = command.strip('&').strip(' ')
     if api.env.warn_only:
         return api.run("pgrep -f '%s'" % (command)) != ''
