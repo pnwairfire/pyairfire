@@ -2,6 +2,7 @@ import datetime
 import time
 import timecop
 import unittest
+from pytest import raises
 
 # TODO: nosetests should take crae of updating sys path appropriately; figure
 #  out what's wrong
@@ -26,21 +27,15 @@ def new_initialize(self, nc_file_pathname):
     #self.times = ...1D array of datetime objects
 PointExtractor._initialize = new_initialize
 
-class PointExtractorTest(unittest.TestCase):
+class TestPointExtractor():
 
-    def setUp(self):
+    def setup(self):
         self.pe = PointExtractor('foo')
 
     def test_convert_to_datetime(self):
-        self.assertEqual(
-            self.pe._convert_to_datetime(2014001, 200000),
-            datetime.datetime(2014,1,1,20))
-        self.assertEqual(
-            self.pe._convert_to_datetime(2014232, 10000),
-            datetime.datetime(2014,8,20,1))
-        self.assertEqual(
-            self.pe._convert_to_datetime(2012232, 10000),  # leap year
-            datetime.datetime(2012,8,19,1))
+        assert datetime.datetime(2014,1,1,20) == self.pe._convert_to_datetime(2014001, 200000)
+        assert datetime.datetime(2014,8,20,1) == self.pe._convert_to_datetime(2014232, 10000)
+        assert datetime.datetime(2012,8,19,1) == self.pe._convert_to_datetime(2012232, 10000)  # leap year
 
     def test_compute_ne_corner(self):
         # TODO: case where it's entirely in western hemisphere
@@ -51,7 +46,7 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.lng_res = 2
         self.pe.num_cols = 8
         self.pe._compute_ne_corner()
-        self.assertEqual((55, -144), (self.pe.ne_lat, self.pe.ne_lng))
+        assert (55, -144) == (self.pe.ne_lat, self.pe.ne_lng)
 
         # TODO: case where it's entirely in eastern hemisphere
         self.pe.sw_lat = -30
@@ -61,7 +56,7 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.lng_res = 1
         self.pe.num_cols = 10
         self.pe._compute_ne_corner()
-        self.assertEqual((-20, 170), (self.pe.ne_lat, self.pe.ne_lng))
+        assert (-20, 170) == (self.pe.ne_lat, self.pe.ne_lng)
 
         # TODO: case where it's western boundary is international dateline
         # TODO: case where it's eastern boundary is international dateline
@@ -111,10 +106,10 @@ class PointExtractorTest(unittest.TestCase):
 
         def assert_output_match(expected, actual):
             for i in xrange(2):
-                self.assertEqual(expected[i], actual[i])
+                assert expected[i] == actual[i]
             for i in xrange(2,4):
                 for j in xrange(2):
-                    self.assertEqual(expected[i][j], actual[i][j])
+                    assert expected[i][j] == actual[i][j]
 
         ## Cases where domain is completely in western hemisphere
         self.pe.sw_lat = 40
@@ -129,10 +124,10 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.num_cols = 10
         # lat/lng outside of domain
         #self.pe._adjust_lng = lambda lng: (-155 + 360.0) % 360)
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, -155) # south of it
         #self.pe._adjust_lng = lambda lng: (-165 + 360.0) % 360)
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(45, -165) # west of it
         # lat/lng inside domain
         assert_output_match((5, 2, xrange(4,7), xrange(1,4)),
@@ -150,9 +145,9 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.lng_res = 1
         self.pe.num_cols = 10
         # lat/lng outside of domain
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(-35, 165) # south of it
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(-25, 155) # west of it
         # lat/lng inside domain
         assert_output_match((7, 8, xrange(6,9), xrange(7,10)),
@@ -170,11 +165,11 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.lng_res = 1
         self.pe.num_cols = 20
         # lat/lng outside of domain
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(25, 175) # south of it
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, 155) # west of it
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, -155) # east of it
         # lat/lng inside domain
         assert_output_match((2, 2, xrange(1,4), xrange(1,4)),
@@ -196,11 +191,11 @@ class PointExtractorTest(unittest.TestCase):
         self.pe.lng_res = 1
         self.pe.num_cols = 20
         # lat/lng outside of domain
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(25, 0.0) # south of it
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, -12.2) # west of it
-        with self.assertRaises(RuntimeError) as r:
+        with raises(RuntimeError) as r:
             self.pe._compute_grid_index_ranges(35, 14.2) # east of it
         # lat/lng inside domain
         assert_output_match((2, 2, xrange(1,4), xrange(1,4)),

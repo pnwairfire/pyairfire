@@ -35,11 +35,19 @@ netCDF4.  That can be set on the command line, such as in the following:
 
 ## Running tests
 
-Use nose:
+Use pytest:
 
-    nosetests
-    nosetests test/pyairfire/bluesky/dispersionnc_tests.py
-    nosetests -v -w ./test/pyairfire/bluesky/
+    py.test
+    py.test ./test/pyairfire/bluesky/dispersionnc_tests.py
+    py.test ./test/pyairfire/bluesky/
+
+You can also use the ```--collect-only``` option to see a list of all tests.
+
+    py.test --collect-only
+
+Use the '-s' option to see output:
+
+    py.test -s
 
 ## Installation
 
