@@ -29,6 +29,7 @@ TODO:
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
+import datetime
 import json
 import re
 import sys
@@ -65,6 +66,12 @@ OPTIONAL_OPTIONS = [
         'help': "extra query parameters",
         'default': {},
         'callback': scripting.options.extract_and_set_key_value
+    },
+    {
+        'long': "--number-of-past-days",
+        'type': 'int',
+        'help': "number of days in past to query logs"
+
     },
     # Email options
     {
@@ -149,12 +156,19 @@ Possible Query Parameters (not an exaustive list):
 
     try:
         query = dict(options.query)
+        if options.number_of_past_days:
+            if query.has_key('newer_than') or query.has_key('older_than'):
+                msg = ("Don't specify query fields 'newer_than' or 'older_than' along"
+                    " with option --number-of-past-days")
+                scripting.utils.exit_with_msg(msg)
+            newer_than = datetime.datetime.now()-datetime.timedelta(
+                days=options.number_of_past_days)
+            query.update(newer_than=newer_than.strftime("%Y-%m-%dT%H:%M:%S"))
         notifier_options = options.__dict__
         api_endpoint = notifier_options.pop('api_endpoint')
         email_subject = notifier_options.pop('email_subject', None)
         sn = statuslogging.StatusNotifier(**notifier_options)
         logs = sn.query_and_notify(api_endpoint, query=query, subject=email_subject)
-
 
         if not options.quiet:
             # dump to output
