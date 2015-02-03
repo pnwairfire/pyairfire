@@ -24,7 +24,8 @@ setup(
     ],
     scripts=[
         'bin/bluesky/extract-point-pm25-time-series.py',
-        'bin/statuslogging/log-status.py'
+        'bin/statuslogging/log-status.py',
+        'bin/statuslogging/read-status-log'
     ],
     url='git@bitbucket.org:fera/airfire-pyairfire.git',
     description='General toolbox of pythong utilities for AirFire team.',
