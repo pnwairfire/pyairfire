@@ -180,15 +180,16 @@ class StatusNotifier(object):
         else:
             html = """
                 <div>
-                    %s - %s - <span class="%s">%s</span> - %s - %s
+                    <span class="%s">%s</span> - %s - %s - %s - %s - %s...
                 </div>
             """ % (
-                status_log['process'],
-                status_log.get('domain'),
                 status_log['status'].lower(),
                 status_log['status'],
+                status_log['process'],
+                status_log.get('domain'),
                 status_log.get('initialization_time'),
                 status_log.get('machine'),
+                status_log.get('notes', '')[:40]
             )
 
         return html
