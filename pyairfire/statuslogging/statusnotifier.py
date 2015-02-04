@@ -141,11 +141,16 @@ class StatusNotifier(object):
                     <h2>%d Matching Statuses Logs Found</h2>
                     %s
                 </div>
+                <div>
+                    <h2>Details</h2>
+                    %s
+                </div>
               </body>
             </html>
         """ % (
             ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in query.items()]) if query else "",
             len(status_logs['logs']),
+            ''.join([self.status_log_as_html(sl, verbose=False) for sl in status_logs['logs']]),
             ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
             )
         logging.debug("Email contents (html):\n%s", html)
@@ -156,21 +161,35 @@ class StatusNotifier(object):
             'html': html
         }
 
-    def status_log_as_html(self, status_log):
-        html = """
-            <div>
-                <div>Process: %s</div>
-                <div>Status: <span class="%s">%s<span></div>
-                <ul>
-                    %s
-                </ul>
-            </div>
-        """ % (
-            status_log['process'],
-            status_log['status'].lower(),
-            status_log['status'],
-            ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in status_log.items()]),
-        )
+    def status_log_as_html(self, status_log, verbose=True):
+        if verbose:
+            html = """
+                <div>
+                    <div>Process: %s</div>
+                    <div>Status: <span class="%s">%s<span></div>
+                    <ul>
+                        %s
+                    </ul>
+                </div>
+            """ % (
+                status_log['process'],
+                status_log['status'].lower(),
+                status_log['status'],
+                ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in status_log.items()]),
+            )
+        else:
+            html = """
+                <div>
+                    %s - %s - <span class="%s">%s</span> - %s - %s
+                </div>
+            """ % (
+                status_log['process'],
+                status_log.get('domain'),
+                status_log['status'].lower(),
+                status_log['status'],
+                status_log.get('initialization_time'),
+                status_log.get('machine'),
+            )
 
         return html
 
