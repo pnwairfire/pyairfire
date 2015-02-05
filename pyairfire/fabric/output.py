@@ -5,6 +5,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import os
+import sys
 
 __all__ = [
     'error',
@@ -13,7 +14,7 @@ __all__ = [
 
 def error(msg):
     print "*** ERROR:  %s" % (msg)
-    exit(1)
+    sys.exit(1)
 
 def debug_log(msg):
     if os.environ.has_key('DEBUG'):
