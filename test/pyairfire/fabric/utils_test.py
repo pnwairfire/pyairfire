@@ -6,9 +6,9 @@ from pyairfire.fabric import utils
 class TestCreateSSHTunnel(object):
 
     def monkey_patch_run(self, monkeypatch):
-        def _run(command):
+        def _run(command, **kwargs):
             self.calls.append(command)
-        monkeypatch.setattr(utils, 'run_if_not_already_running', _run)
+        monkeypatch.setattr(utils, 'wrapped_run', _run)
         monkeypatch.setattr(api.env, 'host', "foo.bar")
 
     def setup(self):
@@ -32,16 +32,16 @@ class TestCreateSSHTunnel(object):
         self.monkey_patch_run(monkeypatch)
         utils.create_ssh_tunnel(123, 321, "bar.com", "foouser")
         assert len(self.calls) == 1
-        assert self.calls[0] == "ssh -N -p 22 foouser@bar.com -L 123/localhost/321 &"
+        assert self.calls[0] == "ssh -f -N -p 22 foouser@bar.com -L 123/localhost/321"
 
-        # trying to create same tunnel; run_if_not_already_running will be
+        # trying to create same tunnel; wrapped_run will be
         # called, but it should handle not trying to recreate the tunnel
         utils.create_ssh_tunnel(123, 321, "bar.com", "foouser")
         assert len(self.calls) == 2
-        assert self.calls[1] == "ssh -N -p 22 foouser@bar.com -L 123/localhost/321 &"
+        assert self.calls[1] == "ssh -f -N -p 22 foouser@bar.com -L 123/localhost/321"
 
         # trying to create a different tunnel
         utils.create_ssh_tunnel(123, 321, "bar.com", "foouser",
             local_host="127.0.0.1", ssh_port=272)
         assert len(self.calls) == 3
-        assert self.calls[2] == "ssh -N -p 272 foouser@bar.com -L 123/127.0.0.1/321 &"
+        assert self.calls[2] == "ssh -f -N -p 272 foouser@bar.com -L 123/127.0.0.1/321"
