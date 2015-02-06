@@ -59,7 +59,7 @@ class make_task(object):
     """
 
     # TODO: rename 'roles'/'self.roles' as 'roles_names'/'self.role_names'
-    def __init__(self, *roles):
+    def __init__(self, *roles, **options):
         """Constructor
 
         Args:
@@ -68,6 +68,7 @@ class make_task(object):
         # Note: put off checking if roles is defined until ___call__, simply
         # to be able to mention task's name in the error messages
         self.roles = roles
+        self.pre_task_execution = options.get('pre_task_execution')
 
     def check_roles(self):
         """Makes sure all roles needed by this task have user appropriately defined
@@ -85,6 +86,8 @@ class make_task(object):
 
         def decorated(*args, **kwargs):
             self.check_roles()
+            if self.pre_task_execution:
+                self.pre_task_execution(func, *args, **kwargs)
             func(*args, **kwargs)
 
         d = decorated
