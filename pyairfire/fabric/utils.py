@@ -8,6 +8,7 @@ import re
 from fabric import api
 
 __all__ = [
+    'already_running',
     'create_ssh_tunnel'
 ]
 
