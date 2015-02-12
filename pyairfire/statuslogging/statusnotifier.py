@@ -75,7 +75,7 @@ class StatusNotifier(object):
 
     ## Email
 
-    DEFAULT_EMAIL_SENDER = "no-reply@status"
+    DEFAULT_EMAIL_SENDER = "bluesky-status@airfire.org"
     DEFAULT_EMAIL_SUBJECT = "Status Log Digest"
     DEFAILT_MAIL_SERVER = "localhost"
     def send_email(self, status_logs, recipients, sender=None, subject=None, query=None):
