@@ -77,10 +77,12 @@ OPTIONAL_OPTIONS = [
     {
         'short': '-r',
         'long': "--email-recipients",
+        'type': "string",
         'dest': "email_recipients",
-        'help': "email addresses to send queried logs to",
-        'action': 'append',
-        'default': []
+        'help': "email addresses to send queried logs to; specicy emails separately or comma-separated",
+        'action': 'callback',
+        'default': [],
+        'callback': scripting.options.append_or_split_and_extend
     },
     {
         'long': "--email-sender",

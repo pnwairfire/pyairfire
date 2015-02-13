@@ -79,7 +79,7 @@ class StatusNotifier(object):
     DEFAULT_EMAIL_SUBJECT = "Status Log Digest"
     DEFAILT_MAIL_SERVER = "localhost"
     def send_email(self, status_logs, recipients, sender=None, subject=None, query=None):
-        logging.debug('Sending Email')
+        logging.info('Sending Email to %s', recipients)
         try:
             msg = MIMEMultipart('alternative')
             msg['From'] = sender or self.DEFAULT_EMAIL_SENDER
