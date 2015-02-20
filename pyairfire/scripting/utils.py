@@ -10,8 +10,9 @@ def exit_with_msg(msg, extra_output=None, output=None, exit_code=1,
     output = output or sys.stderr.write
     if extra_preceeding_output:
         extra_preceeding_output()
-    output("\n%s%s\n\n" % (prefix, msg))
+    output("\n%s%s\n" % (prefix, msg))
     if extra_output:
+        output('\n')
         extra_output()
     output('\n')
     sys.exit(exit_code)
