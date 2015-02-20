@@ -186,8 +186,7 @@ def configure_logging_from_options(options, parser):
         log_level = options.log_level.upper()
         if log_level not in LOG_LEVELS:
             exit_with_msg(
-                'Invalid log level: %s' % (log_level),
-                extra_output=extra_error_output)
+                'Invalid log level: %s' % (log_level))
         level = getattr(logging, log_level)
 
     format = options.log_message_format or '%(asctime)s %(levelname)s: %(message)s'
