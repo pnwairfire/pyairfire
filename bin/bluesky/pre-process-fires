@@ -7,9 +7,7 @@ Note: This script is self-contained, in that it's not dependent on any modules
 in pyairfire. This was done to allow sharing by means of simply passing around
 the script file rather than by installing pyairfire with pip.
 
-Example calls:
- > ./bin/bluesky/pre-process-fires \
-    fire_locations_1.csv fire_locations_2.csv:CA,USA
+See usage string, below, for examples calls
 """
 
 __author__      = "Joel Dubowy"
@@ -19,7 +17,12 @@ import csv
 import sys
 from optparse import OptionValueError, OptionParser
 
-USAGE = "usage: %prog filename[:countrycode[,countrycode]] ..."
+USAGE = """%prog filename[:countrycode[,countrycode]] ...
+
+where country codes, if specified, are used as a whitelist for filtering fires.
+
+Example:
+ > pre-process-fires fire_locations_1.csv fire_locations_2.csv:CA,USA"""
 
 def error_and_exit(msg, parser):
     print '\n** ' + str(msg) + ' **\n'
