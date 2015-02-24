@@ -50,9 +50,8 @@ class FiresMerger(object):
 
     def _merge(self):
         self._headers = None
-        self._fires = []
-        for f in self._fire_files:
-            self._fires.extend(self._process_file(f))
+        self._fires = reduce(lambda a,b: a+b,
+            [self._process_file(f) for f in self._fire_files])
 
     def _process_file(self, f):
         rows = []
