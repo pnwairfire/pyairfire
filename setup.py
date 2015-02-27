@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='pyairfire',
-    version='0.6.8',
+    version='0.6.9',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=[
@@ -27,7 +27,7 @@ setup(
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
-    url='git@bitbucket.org:fera/airfire-pyairfire.git',
-    description='General toolbox of pythong utilities for AirFire team.',
+    url='https://github.com/pnwairfire/pyairfire',
+    description='General toolbox of python utilities for AirFire team.',
     install_requires=REQUIREMENTS,
 )
