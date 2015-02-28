@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='pyairfire',
-    version='0.6.9',
+    version='0.6.10',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=[
@@ -24,6 +24,7 @@ setup(
     ],
     scripts=[
         'bin/bluesky/extract-point-pm25-time-series.py',
+        'bin/bluesky/pre-process-fires',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
