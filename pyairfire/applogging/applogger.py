@@ -2,7 +2,7 @@
 
 The two main purposes of this module are 1) to provide reusable logging setup
 code, and 2) to maintain and provide a reference to the client app's logger
-object so that.
+object
 
 Bugs:
  - duplicate logging
