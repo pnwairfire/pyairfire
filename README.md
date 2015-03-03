@@ -35,7 +35,11 @@ netCDF4.  That can be set on the command line, such as in the following:
 
 ## Running tests
 
-Use pytest:
+First, install test-specific packages:
+
+    pip install -r requirements-test.txt
+
+Once installed, you can run tests with pytest:
 
     py.test
     py.test ./test/pyairfire/bluesky/dispersionnc_tests.py
