@@ -11,7 +11,7 @@ with open('requirements-test.txt') as f:
 
 setup(
     name='pyairfire',
-    version='0.6.10',
+    version='0.6.11',
     license='MIT',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
