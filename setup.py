@@ -29,7 +29,7 @@ setup(
         "Programming Language :: Python :: 2",
         "Operating System :: POSIX",
         "Operating System :: MacOS"
-    ]
+    ],
     url='https://github.com/pnwairfire/pyairfire',
     description='General toolbox of python utilities for AirFire team.',
     install_requires=REQUIREMENTS,
