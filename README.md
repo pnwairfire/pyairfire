@@ -61,9 +61,9 @@ First, install pip:
 
     sudo apt-get install python-pip
 
-Then, to install, for example, v0.2.0, use the following:
+Then, to install, for example, v0.6.12, use the following:
 
-    sudo pip install git+https://github.com/pnwairfire/pyairfire@v0.6.9
+    sudo pip install git+https://github.com/pnwairfire/pyairfire@v0.6.12
 
 Or add it to your project's requirements.txt:
 
