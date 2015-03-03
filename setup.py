@@ -33,5 +33,5 @@ setup(
     url='https://github.com/pnwairfire/pyairfire',
     description='General toolbox of python utilities for AirFire team.',
     install_requires=REQUIREMENTS,
-    extras_require=TEST_REQUIREMENTS
+    tests_require=TEST_REQUIREMENTS
 )
