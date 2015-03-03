@@ -67,7 +67,7 @@ Then, to install, for example, v0.6.12, use the following:
 
 Or add it to your project's requirements.txt:
 
-    git+https://github.com/pnwairfire/pyairfire@v0.6.9
+    git+https://github.com/pnwairfire/pyairfire@v0.6.12
 
 If you get an error like    ```AttributeError: 'NoneType' object has no attribute 'skip_requirements_regex```, it means you need in upgrade pip.  One way to do so is with the following:
 
