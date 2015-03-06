@@ -160,7 +160,14 @@ def main():
         # warning on https://docs.python.org/2.7/library/subprocess.html
         proc.wait()
     except KeyboardInterrupt:
-        proc.kill()
+        # This script starts bluesky, which itself start's a suprocess.  Given
+        # BlueSky exe:
+        #   /path/to/bluesky
+        # BlueSky starts child process
+        #   /path/to/base/lib/bluesky
+        # So, calling `proc.kill()` isn't enough. We need to fill both bluesky
+        # and it's child process
+        subprocess.call(['pkill', '-P%s'%(proc.pid)])
 
 if __name__ == "__main__":
     main()
