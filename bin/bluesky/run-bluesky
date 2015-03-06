@@ -153,7 +153,14 @@ def main():
     cmd_args.append(options.config)
 
     logging.info("About to execute Bluesky:  %s" % (' '.join(cmd_args)))
-    subprocess.call(cmd_args)
+    proc = subprocess.Popen(cmd_args)
+    #proc = subprocess.Popen(["sleep", "5"]) # <-- for testing use of Popen
+    try:
+        # TODO: if we decide to use stdout=PIPE and/or stderr=PIPE, first see
+        # warning on https://docs.python.org/2.7/library/subprocess.html
+        proc.wait()
+    except KeyboardInterrupt:
+        proc.kill()
 
 if __name__ == "__main__":
     main()
