@@ -24,7 +24,7 @@ test_requirements = parse_requirements(dependency_links, 'requirements-test.txt'
 
 setup(
     name='pyairfire',
-    version='0.6.12',
+    version='0.6.13',
     license='MIT',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
