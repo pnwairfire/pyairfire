@@ -100,7 +100,7 @@ Example calls:
 
  Running through dispersion:
 
-  > ./run-bluesky \\
+  > run-bluesky \\
       --log-level info \\
       -c ~/BlueSky/ini-files/SF2_oe.ini \\
       -d 2014090800 \\
@@ -118,15 +118,15 @@ Example calls:
       -D LOCATION_AREA_THRESHOLD=5 \\
       -U HYSPLIT=v7 \\
       -Kno-cleanup \\
-      -E FOO=bar
+      -E FOO=bar \\
       -v
 
-  > ~./run-bluesky \\
+  > run-bluesky \\
       --log-level info \\
       -c /home/vagrant/BlueSky/ini-files/DRI6km-SF2_Hysplit.ini \\
       -d 2014053100 \\
       -b ~/code/airfire-bluesky-framework/build/bluesky \\
-      -o dispersion-1process-1fire
+      -o dispersion-1process-1fire \\
       -f /home/vagrant/BlueSky/data/fires/1-location-CA/ \\
       -D "META.targets=\$DISPERSION" \\
       -D DispersionGridOutput.HOURLY_COLORS=RedColorBar \\
