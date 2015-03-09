@@ -99,9 +99,14 @@ post_options_content = """
 Example calls:
 
  Running through dispersion:
-  > ./run-bluesky -c ~/BlueSky/ini-files/SF2_oe.ini -d 2014090800 \\
+
+  > ./run-bluesky \\
+      --log-level info \\
+      -c ~/BlueSky/ini-files/SF2_oe.ini \\
+      -d 2014090800 \\
       -b ~/code/airfire-bluesky-framework/build/bluesky \\
-      -o dispersion -f /home/vagrant/BlueSky/data/fires/2-locations-CA/ \\
+      -o dispersion \\
+      -f /home/vagrant/BlueSky/data/fires/2-locations-CA/ \\
       -D "META.targets=\$DISPERSION" \\
       -D DispersionGridOutput.HOURLY_COLORS=RedColorBar,BlueColorBar \\
       -D PolygonsKML.MAKE_POLYGONS_KMZ=True \\
@@ -116,8 +121,16 @@ Example calls:
       -E FOO=bar
       -v
 
- Running through emissions:
-  > ...
+  > ~./run-bluesky \\
+      --log-level info \\
+      -c /home/vagrant/BlueSky/ini-files/DRI6km-SF2_Hysplit.ini \\
+      -d 2014053100 \\
+      -b ~/code/airfire-bluesky-framework/build/bluesky \\
+      -o dispersion-1process-1fire
+      -f /home/vagrant/BlueSky/data/fires/1-location-CA/ \\
+      -D "META.targets=\$DISPERSION" \\
+      -D DispersionGridOutput.HOURLY_COLORS=RedColorBar \\
+      -D DispersionGridInput.LAYER=1
 """
 
 def main():
