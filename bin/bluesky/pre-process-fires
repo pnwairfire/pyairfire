@@ -5,7 +5,11 @@ BleuSky fire_locations.csv files
 
 Note: This script is self-contained, in that it's not dependent on any modules
 in pyairfire. This was done to allow sharing by means of simply passing around
-the script file rather than by installing pyairfire with pip.
+the script file rather than having to install the entire pyairfire package.
+
+TODO: If installing the entire pyairfire package isn't too much of a hurdle,
+move FiresMerger into something like pyairfire.bluesky.fires, and write unit
+tests (using the example in the usage text for one test case).
 
 See usage string, below, for examples calls
 """
