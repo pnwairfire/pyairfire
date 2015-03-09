@@ -139,9 +139,9 @@ def main():
 
     if options.output_dir_basename:
         options.config_options.append(
-            "DEFAULT.WORK_DIR=\${BS_DIR}/working/%s.@/" % (options.output_dir_basename))
+            "DEFAULT.WORK_DIR=${BS_DIR}/working/%s.@/" % (options.output_dir_basename))
         options.config_options.append(
-            "DEFAULT.OUTPUT_DIR=\${BS_DIR}/output/%s.@/" % (options.output_dir_basename))
+            "DEFAULT.OUTPUT_DIR=${BS_DIR}/output/%s.@/" % (options.output_dir_basename))
     if options.fire_data_files_dir:
         ts = options.init_time[:8]
         fl = os.path.join(options.fire_data_files_dir, "fire_locations_%s.csv"%(ts))
