@@ -4,6 +4,7 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 import datetime
 import logging
 import re
+import warnings
 from optparse import OptionValueError, OptionParser
 
 from .utils import exit_with_msg
@@ -41,6 +42,7 @@ def parse_options(required_options, optional_options,
      - extra_help_output -- callable that generates text to be output after
         options are listed
     """
+    warnings.warn("Deprecated - use pyairfire.scripting.args.parse_args", DeprecationWarning)
     # Parse options
     parser = OptionParser(usage=usage)
     if post_options_outputter:
