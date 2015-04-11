@@ -92,17 +92,18 @@ Use the '-s' option to see output:
 
 ### Installing With pip
 
-First, install pip:
+First, install pip (with sudo if necessary):
 
-    sudo apt-get install python-pip
+    apt-get install python-pip
 
-Then, to install, for example, v0.6.15, use the following:
+Then, to install, for example, v0.7.0, use the following (with sudo if
+necessary):
 
-    sudo pip install git+https://github.com/pnwairfire/pyairfire@v0.6.15
+    pip install git+https://github.com/pnwairfire/pyairfire@v0.7.0
 
 Or add it to your project's requirements.txt:
 
-    git+https://github.com/pnwairfire/pyairfire@v0.6.13
+    git+https://github.com/pnwairfire/pyairfire@v0.7.0
 
 If you get an error like    ```AttributeError: 'NoneType' object has no attribute 'skip_requirements_regex```, it means you need in upgrade pip.  One way to do so is with the following:
 
