@@ -99,7 +99,7 @@ First, install pip (with sudo if necessary):
 Then, to install, for example, v0.7.0, use the following (with sudo if
 necessary):
 
-    pip install git+https://github.com/pnwairfire/pyairfire@v0.7.0
+    pip install --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple pyairfire==0.7.0
 
 Or add it to your project's requirements.txt:
 
