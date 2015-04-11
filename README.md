@@ -3,35 +3,70 @@
 This is a general toolbox to hold python packages and scripts for the Airfire
 Team.
 
+## Non-python Dependencies
+
+Whether cloning the repo or installing with pip, you'll first need to
+manually install gdal, and netcdf, which puairfire depends on.
+
+On a mac, you can do so with [Homebrew](http://brew.sh/):
+
+    brew install homebrew/science/netcdf
+    brew install gdal --with-netcdf --enable-unsupported
+
+Note that the '--with-netcdf' option is required to build gdal with the
+netCDF driver. See http://trac.osgeo.org/gdal/wiki/NetCDF for more information.
+
+On ubuntu, the following should be sufficient:
+
+    sudo apt-get install libnetcdf-dev
+    sudo apt-get install python-gdal
+    sudo apt-get install libgdal1-1.7.0
+
 ## Development
+
+### Clone Repo
+
+Via ssh:
+
+    git clone git@github.com:pnwairfire/pyairfire.git
+
+or http:
+
+    git clone https://github.com/pnwairfire/pyairfire.git
 
 ### Install Dependencies
 
-Note: the full set of dependencies is listed in requirements-full.txt. The file
-requirements.txt contains all but netCDF.  The netCDF package fails to install
-on heroku due to the following error:
+After installing the non-python dependencies (mentioned above), run the
+following to install required python packages:
+
+    pip install -r requirements.txt
+
+#### The netcdf Package
+
+pyairfire requires the netcdf python package for generating single-point
+graphs from BlueSky ouput.  Unfortunately, the ```netcdf``` package has in
+the past failed to install due to the following error:
 
     TypeError: parse_requirements() missing 1 required keyword argument: 'session'
 
-So, requirements.txt omits netCDF so that the pyairfire can be installed on
-heroku.  What this means is that if you want to use pyairfire.bluesky.dispersionnc,
-you need to either manually install netCDF or use requirements-full.txt to
-install the full set of dependencies:
-
-    pip install -r requirements-full.txt
+This error is in pip.req.parse_requirements, which is not in pip's public
+API.  So, netcdf isn't listed in pyairfire's requirements in setup.py.
+If you'd like to use the single-point graph functionaility (in
+pyairfire.bluesky.dispersionnc), you'll need to install netcdf package
+manually.
 
 ### Setup Environment
 
 To import pyairfire in development, you'll have to add the repo root directory
 to the search path. Some of the scripts bin do this automatically.
 
-Another environmental variable that needs to be set is DYLD_LIBRARY_PATH, which
-needs to include the directory that contains libhdf5_hl.7.dylib, needed by
-netCDF4.  That can be set on the command line, such as in the following:
+Another environmental variable that sometimes needs to be set, depending
+on your platform, is DYLD_LIBRARY_PATH, which needs to include the directory
+that contains libhdf5_hl.7.dylib, needed by netCDF4.  That can be set on
+the command line, such as in the following:
 
     DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/ ./bin/bluesky/extract_point_pm25_time_series.py
     DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/ nosetests
-
 
 ## Running tests
 
