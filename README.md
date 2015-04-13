@@ -5,8 +5,9 @@ Team.
 
 ## Non-python Dependencies
 
-Whether cloning the repo or installing with pip, you'll first need to
-manually install gdal, and netcdf, which puairfire depends on.
+Whether cloning the repo or installing with pip, if you'll be using pyairfire
+to generate single point graphs from bluesky output, you'll first need to
+manually install gdal, and netcdf, which pyairfire depends on.
 
 On a mac, you can do so with [Homebrew](http://brew.sh/):
 
