@@ -125,8 +125,8 @@ class basic_auth(object):
             and message (which should default to authorized)
         """
         self.enabled = enabled
-        self.username = username
-        self.password = password
+        self.username = username # TODO: set to "" if None ?
+        self.password = password # TODO: set to "" if None ?
         self.request_authorization_getter = request_authorization_getter
         self.response_class = response_class
 
