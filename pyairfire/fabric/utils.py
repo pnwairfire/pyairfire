@@ -9,7 +9,8 @@ from fabric import api
 
 __all__ = [
     'already_running',
-    'create_ssh_tunnel'
+    'create_ssh_tunnel',
+    'destroy_ssh_tunnel'
 ]
 
 def already_running(command):
@@ -44,6 +45,15 @@ def wrapped_run(command, skip_if_already_running=False, silence_system_exit=Fals
 
 LOOPBACK_ADDRESSES_RE = re.compile('^(localhost|172.0.0.[1-8]|::1)$')
 
+def _ssh_tunnel_command(local_port, remote_port, remote_host, remote_user,
+        local_host, ssh_port):
+    # Notes are args:
+    #  '-f' -> forks process
+    #  '-N' -> no command to be run on server
+    return "ssh -f -N -p %s %s@%s -L %s/%s/%s" % (
+        ssh_port, remote_user, remote_host, local_port, local_host, remote_port
+    )
+
 def create_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
         local_host='localhost', ssh_port=22):
     """Creates an ssh tunnel
@@ -65,10 +75,24 @@ def create_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
     TODO: consider user as well in case b), above
     """
     if api.env.host != remote_host and not LOOPBACK_ADDRESSES_RE.match(remote_host):
-        # Notes are args:
-        #  '-f' -> forks process
-        #  '-N' -> no command to be run on server
-        command = "ssh -f -N -p %s %s@%s -L %s/%s/%s" % (
-            ssh_port, remote_user, remote_host, local_port, local_host, remote_port
-        )
+        command = _ssh_tunnel_command(local_port, remote_port, remote_host,
+            remote_user, local_host, ssh_port)
         wrapped_run(command, skip_if_already_running=True)
+
+def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
+        local_host='localhost', ssh_port=22):
+    """Destroys an ssh tunnel, if it exists
+
+    Args:
+     - local_port
+     - remote_port
+     - remote_host
+     - remote_user
+    Kwargs:
+     - local_host (default: 'localhost')
+     - ssh_port
+    """
+    command =  _ssh_tunnel_command(local_port, remote_port, remote_host,
+        remote_user, local_host, ssh_port)
+    if already_running(command):
+        api.run("pkill -f '%s'" % (command))
