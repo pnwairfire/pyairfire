@@ -77,7 +77,7 @@ class StatusNotifier(object):
 
     DEFAULT_EMAIL_SENDER = "bluesky-status@airfire.org"
     DEFAULT_EMAIL_SUBJECT = "Status Log Digest"
-    DEFAILT_MAIL_SERVER = "localhost"
+    DEFAULT_MAIL_SERVER = "localhost"
     def send_email(self, status_logs, recipients, sender=None, subject=None, query=None):
         logging.info('Sending Email to %s', recipients)
         try:
@@ -90,7 +90,7 @@ class StatusNotifier(object):
             msg.attach(MIMEText(content['text'], 'plain'))
             msg.attach(MIMEText(content['html'], 'html'))
 
-            server = self.options.get('smtp_server') or self.DEFAILT_MAIL_SERVER
+            server = self.options.get('smtp_server') or self.DEFAULT_MAIL_SERVER
             logging.debug('Connecting to SMTP server %s', server)
             s = smtplib.SMTP(server)
 
