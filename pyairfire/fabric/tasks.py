@@ -67,7 +67,11 @@ class make_task(object):
         """
         # Note: put off checking if roles is defined until ___call__, simply
         # to be able to mention task's name in the error messages
-        self.roles = roles
+        if os.environ.get('ROLES'):
+            self.roles = os.environ['ROLES'].split(',')
+        else:
+            self.roles = roles
+
         self.pre_task_execution = options.get('pre_task_execution')
 
     def check_roles(self):
