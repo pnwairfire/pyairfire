@@ -19,3 +19,11 @@ def error(msg):
 def debug_log(msg):
     if os.environ.has_key('DEBUG'):
         print msg
+
+def confirm(msg):
+    print(msg)
+    sys.stdout.write("Do you want to continue (y/n)?: ")
+    r = sys.stdin.readline().strip()
+    if 'y' != r.lower():
+        print("Exiting.")
+        sys.exit(0)
