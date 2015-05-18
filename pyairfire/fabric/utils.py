@@ -50,7 +50,7 @@ def _ssh_tunnel_command(local_port, remote_port, remote_host, remote_user,
     # Notes are args:
     #  '-f' -> forks process
     #  '-N' -> no command to be run on server
-    return "ssh -f -N -p %s %s@%s -L %s/%s/%s" % (
+    return "ssh -f -N -p %s %s@%s -L %s/%s/%s -oStrictHostKeyChecking=no" % (
         ssh_port, remote_user, remote_host, local_port, local_host, remote_port
     )
 
