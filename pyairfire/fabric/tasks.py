@@ -30,11 +30,15 @@ def get_env(roles, env_var_key):
     return os.environ[env_var_key]
 
 # TODO: rename 'roles' as 'role_hashes'
+DEFAULT_FABRIC_USER_KEY = 'FABRIC_USER'
 def update_roles(roles, env_var_key):
     """Updates fabric's hash of roles
 
     Note: we're assuming one user per role - the same user across all of
-    the machines playing that role. This could change.
+    the machines playing that role. This could change. (e.g. The current
+    code could be used to read different names for the different machines
+    playing the role - by using different interpolation keys - but maybe
+    there's an even better way to do it.
     """
     environment = get_env(roles, env_var_key)
     for role, role_array in roles[environment].items():
@@ -42,10 +46,15 @@ def update_roles(roles, env_var_key):
             data = {}
             variables = NOT_INTERPOLATED_MATCHER.findall(role_array[i])
             for v in variables:
-                k = "%s_%s" % (role.upper(), v.upper())
-                debug_log("setting %s" % (k))
-                if k in os.environ:
-                    data[v] = os.environ[k]
+                k1 = "%s_ROLE_%s" % (role.upper(), v.upper())
+                k2 = "%s_%s" % (role.upper(), v.upper())
+                debug_log("setting %s/%s" % (k1, k2))
+                if k1 in os.environ:
+                    data[v] = os.environ[k1]
+                elif k2 in os.environ:
+                    data[v] = os.environ[k2]
+                elif DEFAULT_FABRIC_USER_KEY in os.environ:
+                    data[v] = os.environ[DEFAULT_FABRIC_USER_KEY]
             try:
                 role_array[i] = role_array[i] % (data)
             except KeyError:
