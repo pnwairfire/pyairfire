@@ -64,24 +64,25 @@ class StatusNotifier(object):
 
     def send(self, status_logs, subject=None, query=None):
         for channel in ['email', 'sms']:
-            recipient_key = '%s_recipients' % (channel)
-            sender_key = '%s_sender' % (channel)
-            if self.options.get(recipient_key):
-                try:
-                    m = getattr(self, 'send_%s' % (channel))
-                    m(status_logs, self.options[recipient_key],
-                        sender=self.options.get(sender_key), subject=subject, query=query)
+            try:
+                m = getattr(self, 'send_%s' % (channel))
+                m(status_logs, subject=subject, query=query)
 
-                except StatusNotificationError, e:
-                    # log message but move on
-                    logging.error("Failed to send %s: %s", channel, e.message)
+            except StatusNotificationError, e:
+                # log message but move on
+                logging.error("Failed to send %s: %s", channel, e.message)
 
     ## Email
 
     DEFAULT_EMAIL_SENDER = "bluesky-status@airfire.org"
     DEFAULT_EMAIL_SUBJECT = "Status Log Digest"
     DEFAULT_MAIL_SERVER = "localhost"
-    def send_email(self, status_logs, recipients, sender=None, subject=None, query=None):
+    def send_email(self, status_logs, subject=None, query=None):
+        recipients = self.options.get('email_recipients')
+        if not recipients:
+            return
+
+        sender = self.options.get('email_sender')
         logging.info('Sending Email to %s', recipients)
         try:
             msg = MIMEMultipart('alternative')
@@ -200,7 +201,12 @@ class StatusNotifier(object):
     ## SMS
 
     DEFAULT_SMS_SENDER = "" # TODO: Fill this in
-    def send_sms(self, status_logs, recipients, sender=None, subject=None, query=None):
+    def send_sms(self, status_logs, subject=None, query=None):
+        recipients = self.options.get('sms_recipients')
+        if not recipients:
+            return
+
+        sender = self.options.get('sms_sender')
         logging.debug('Sending SMS')
         # TODO: send sms to all addressses in to_email
         raise StatusSMSError("SMS not supported")
