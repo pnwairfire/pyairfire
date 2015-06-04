@@ -77,7 +77,12 @@ class StatusNotifier(object):
     DEFAULT_EMAIL_SENDER = "bluesky-status@airfire.org"
     DEFAULT_EMAIL_SUBJECT = "Status Log Digest"
     DEFAULT_MAIL_SERVER = "localhost"
-    def send_email(self, status_logs, subject=None, query=None):
+    def send_email(self, status_logs, subject=None, query=None,
+            email_content_generator=None):
+        """
+        Note: email_content_generator is intended for clients calling this method
+          directly
+        """
         recipients = self.options.get('email_recipients')
         if not recipients:
             return
@@ -90,7 +95,10 @@ class StatusNotifier(object):
             msg['To'] = ', '.join(recipients)
             msg['Subject'] = subject or self.DEFAULT_EMAIL_SUBJECT
 
-            content = self.generate_email_content(status_logs, query=query)
+            content = (email_content_generator(status_logs, query=query)
+                if email_content_generator
+                else self.generate_email_content(status_logs, query=query))
+
             msg.attach(MIMEText(content['text'], 'plain'))
             msg.attach(MIMEText(content['html'], 'html'))
 
