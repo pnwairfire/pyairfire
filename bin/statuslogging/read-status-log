@@ -15,7 +15,7 @@ Example calls:
  > ./bin/statuslogging/read-status-log \
     -e http://status-log-production.herokuapp.com/status-logs \
     -q newer_than=2015-01-01 -q older_than=2015-01-02 -q status=Failure \
-    -r jdubowy@uw.edi -r foo@bar.com --smtp-server localhost:2025
+    -bar@baz.com -r foo@bar.com --smtp-server localhost:2025
 
 
 
