@@ -33,8 +33,11 @@ class StatusNotifier(object):
     """Class for querying the statuslog API
     """
 
-    def __init__(self, **options):
+    def __init__(self, api_endpoint, **options):
         """Constructor
+
+        Arguments:
+         - api_endpoint
 
         Options:
          - email_recipients --
@@ -47,12 +50,12 @@ class StatusNotifier(object):
          - smtp_password --
         """
         self.options = options
+        self.status_reader = StatusReader(api_endpoint)
 
-    def query_and_notify(self, api_endpoint, query=None, subject=None):
+    def query_and_notify(self, query=None, subject=None):
         # query
-        sr = StatusReader(api_endpoint)
         query = query or {}
-        logs = sr.read(**query)
+        logs = self.status_reader.read(**query)
 
         # notify
         self.send(logs, subject=subject, query=query)
