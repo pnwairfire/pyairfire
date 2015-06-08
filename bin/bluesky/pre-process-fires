@@ -1,15 +1,7 @@
 #!/usr/bin/env python
 
 """pre-process-fires: script to combine and filter fires from one or more
-BleuSky fire_locations.csv files
-
-Note: This script is self-contained, in that it's not dependent on any modules
-in pyairfire. This was done to allow sharing by means of simply passing around
-the script file rather than having to install the entire pyairfire package.
-
-TODO: If installing the entire pyairfire package isn't too much of a hurdle,
-move FiresMerger into something like pyairfire.bluesky.fires, and write unit
-tests (using the example in the usage text for one test case).
+BlueSky fire_locations.csv files
 
 See usage string, below, for examples calls
 """
@@ -17,10 +9,17 @@ See usage string, below, for examples calls
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
-import csv
 import sys
 import traceback
 from optparse import OptionValueError, OptionParser
+
+try:
+    from pyairfire.bluesky.merge.fires import FiresMerger
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
+    sys.path.insert(0, root_dir)
+    from pyairfire.bluesky.merge.fires import FiresMerger
 
 USAGE = """%prog filename[:countrycode[,countrycode]] ...
 
@@ -66,61 +65,11 @@ dsdho123,Fire XX,37.22,-112.3423,201405310000Z,,CA,barbar,bazbaz,
 sdfdsf,Fire L,44.22,-116.342,201405310000Z,,CA,bary,bazy,aaaaa
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 def error_and_exit(msg):
     print "\n** Error: " + str(msg) + " **\n\nUse '-h' for options and usage\n"
     sys.exit(1)
 
-class FiresMerger(object):
-
-    class FireFile(object):
-        def __init__(self, file_specifier):
-            a = file_specifier.split(':')
-            if len(a) > 2:
-                raise RuntimeError("Invalid fire file specifier: %s" % (file_specifier))
-            self.file_name = a[0]
-            if len(a) == 2:
-                if not a[1]:
-                    raise RuntimeError("Invalid fire file specifier: %s" % (file_specifier))
-                self.country_code_whitelist = set(a[1].split(','))
-            else:
-                self.country_code_whitelist = None
-
-    def __init__(self, *fire_files):
-        self._fire_files = [FiresMerger.FireFile(f) for f in fire_files]
-        self._merge()
-
-    def _merge(self):
-        self._headers = None
-        self._fires = reduce(lambda a,b: a+b,
-            [self._process_file(f) for f in self._fire_files])
-
-    def _process_file(self, f):
-        rows = []
-        with open(f.file_name, 'r') as input_file:
-            headers = []
-            for row in csv.reader(input_file):
-                if not headers:
-                    headers = [e.strip(' ') for e in row]
-                    if not self._headers:
-                        self._headers = headers
-                    else:
-                        self._headers.extend(sorted(set(headers).difference(self._headers)))
-                    headers = dict([(headers[i], i) for i in xrange(len(headers))])
-                else:
-                    if (not f.country_code_whitelist or
-                        row[headers['country']] in f.country_code_whitelist):
-                        rows.append({h:row[headers[h]] for h in headers})
-        return rows
-
-    def write(self, output_file=None):
-        stream = open(output_file, 'w') if output_file else sys.stdout
-        csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(self._headers)
-        for f in self._fires:
-            csvfile.writerow([f.get(h, '') for h in self._headers])
 
 def main():
     parser = OptionParser(usage=USAGE)
