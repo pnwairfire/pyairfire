@@ -1,7 +1,7 @@
 """pyairfire.bluesky.merge.fires
 
 TODO: write unit tests (using the example in the usage text of
-bin/pre-process-fires for one test case).
+bin/merge-fires for one test case).
 """
 
 __author__      = "Joel Dubowy"
