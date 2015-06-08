@@ -30,21 +30,21 @@ class FiresMerger(object):
         self._merge()
 
     def _merge(self):
-        self._headers = None
+        self._fire_headers = None
         self._fires = reduce(lambda a,b: a+b,
-            [self._process_file(f) for f in self._fire_files])
+            [self._process_fire_file(f) for f in self._fire_files])
 
-    def _process_file(self, f):
+    def _process_fire_file(self, f):
         rows = []
         with open(f.file_name, 'r') as input_file:
             headers = []
             for row in csv.reader(input_file):
                 if not headers:
                     headers = [e.strip(' ') for e in row]
-                    if not self._headers:
-                        self._headers = headers
+                    if not self._fire_headers:
+                        self._fire_headers = headers
                     else:
-                        self._headers.extend(sorted(set(headers).difference(self._headers)))
+                        self._fire_headers.extend(sorted(set(headers).difference(self._fire_headers)))
                     headers = dict([(headers[i], i) for i in xrange(len(headers))])
                 else:
                     if (not f.country_code_whitelist or
@@ -55,6 +55,6 @@ class FiresMerger(object):
     def write(self, output_file=None):
         stream = open(output_file, 'w') if output_file else sys.stdout
         csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(self._headers)
+        csvfile.writerow(self._fire_headers)
         for f in self._fires:
-            csvfile.writerow([f.get(h, '') for h in self._headers])
+            csvfile.writerow([f.get(h, '') for h in self._fire_headers])

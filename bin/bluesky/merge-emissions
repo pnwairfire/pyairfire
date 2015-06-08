@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+"""merge-emissions: script to combine emissions from one or more multiple
+BlueSky runs
+
+See usage string, below, for examples calls
+"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
+
+import sys
+import traceback
+from argparse import ArgumentParser, RawTextHelpFormatter
+
+try:
+    from pyairfire.bluesky.merge import fires, emissions
+    from pyairfire.scripting import utils
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
+    sys.path.insert(0, root_dir)
+    from pyairfire.bluesky.merge import fires, emissions
+    from pyairfire.scripting import utils
+
+USAGE = """%(prog)s <FILE SET> [<FILE SET> ...] \\
+        -f <OUTPUT FIRE LOCATIONS FILE> -e <OUTPUT EMISSIONS FILE>
+"""
+
+DESCRIPTION = """
+
+Each file set is of the form:
+
+    <EMISSIONS FILE>;<FIRE LOCATIONS FILE>[:COUNTRY CODE[,COUNTRY CODE]]
+
+where the country codes, if specified, are used as a whitelist for filtering
+fires.
+
+Note that the headers in the first emissions / fire locations input file set
+will show up in the output files as is. Any headers in subsequent files that
+haven't yet been encountered will be sorted and appended to the current
+headers.
+"""
+
+def main():
+    parser = ArgumentParser(usage=USAGE, description=DESCRIPTION,
+        formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-f', '--output-fire-locations-file', #meta=FILE,
+        help='output file to contain new, merged set of fire locations',
+        required=True)
+    parser.add_argument('-e', '--output-emissions-file', #meta=FILE,
+        help='output file to contain new, merged set of emissions',
+        required=True)
+    parser.add_argument('file_sets', nargs='+')
+
+    args  = parser.parse_args()
+    if not args.file_sets:
+        utils.exit_with_msg("Specify one or more fire locations / emissions csv file sets")
+
+    try:
+        emissions
+        fm = fires.EmissionsMerger(*args.file_sets)
+        fm.write(options.output_file)
+    except Exception, e:
+        print traceback.format_exc()
+        utils.exit_with_msg(e)
+
+if __name__ == "__main__":
+    main()
