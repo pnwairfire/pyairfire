@@ -66,6 +66,9 @@ dsdho123,Fire XX,37.22,-112.3423,201405310000Z,,CA,barbar,bazbaz,
 sdfdsf,Fire L,44.22,-116.342,201405310000Z,,CA,bary,bazy,aaaaa
 """
 
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
+
 def error_and_exit(msg):
     print "\n** Error: " + str(msg) + " **\n\nUse '-h' for options and usage\n"
     sys.exit(1)

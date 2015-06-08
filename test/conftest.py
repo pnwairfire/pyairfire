@@ -1,3 +1,6 @@
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
+
 import sys, os
 
 # Hack to put the repo root dir at the front of sys.path so that
