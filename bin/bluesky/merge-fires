@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-"""pre-process-fires: script to combine and filter fires from one or more
+"""merge-fires: script to combine and filter fires from one or more
 BlueSky fire_locations.csv files
 
 See usage string, below, for examples calls
+
+TODO: ignore duplicate fires - i.e. repeated fire location + date combos
 """
 
 __author__      = "Joel Dubowy"
@@ -11,17 +13,19 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import sys
 import traceback
-from optparse import OptionValueError, OptionParser
+from argparse import ArgumentParser
 
 try:
     from pyairfire.bluesky.merge.fires import FiresMerger
+    from pyairfire.scripting import utils
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
     from pyairfire.bluesky.merge.fires import FiresMerger
+    from pyairfire.scripting import utils
 
-USAGE = """%prog filename[:countrycode[,countrycode]] ...
+USAGE = """%(prog)s filename[:countrycode[,countrycode]] ...
 
 where country codes, if specified, are used as a whitelist for filtering fires.
 
@@ -52,7 +56,7 @@ sdfdsf,Fire L,44.22,-116.342,201405310000Z,bary,bazy,aaaaa,CA
 
 Running the following:
 
- > pre-process-fires fire_locations_1.csv fire_locations_2.csv:CA,USA fire_locations_3.csv
+ > merge-fires fire_locations_1.csv fire_locations_2.csv:CA,USA fire_locations_3.csv
 
 Would produce:
 
@@ -65,26 +69,22 @@ dsdho123,Fire XX,37.22,-112.3423,201405310000Z,,CA,barbar,bazbaz,
 sdfdsf,Fire L,44.22,-116.342,201405310000Z,,CA,bary,bazy,aaaaa
 """
 
-
-def error_and_exit(msg):
-    print "\n** Error: " + str(msg) + " **\n\nUse '-h' for options and usage\n"
-    sys.exit(1)
-
-
 def main():
-    parser = OptionParser(usage=USAGE)
-    parser.add_option('-o', '--output-file', #meta=FILE,
+    parser = ArgumentParser(usage=USAGE)
+    parser.add_argument('-o', '--output-file', #meta=FILE,
         help='output file to contain new set of fires; by default, writes to stdout')
-    options, fire_files = parser.parse_args()
-    if not fire_files:
-        error_and_exit("Specify one or more fire locations csv files")
+    parser.add_argument('fire_files', nargs='*')
+
+    args = parser.parse_args()
+    if not args.fire_files:
+        utils.exit_with_msg("Specify one or more fire locations csv files")
 
     try:
-        fm = FiresMerger(*fire_files)
-        fm.write(options.output_file)
+        fm = FiresMerger(*args.fire_files)
+        fm.write(args.output_file)
     except Exception, e:
         print traceback.format_exc()
-        error_and_exit(e)
+        utils.exit_with_msg(e)
 
 if __name__ == "__main__":
     main()
