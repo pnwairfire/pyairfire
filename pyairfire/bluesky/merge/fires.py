@@ -12,7 +12,7 @@ import sys
 
 class FiresMerger(object):
 
-    class FireFile(object):
+    class FileSpecifier(object):
         def __init__(self, file_specifier):
             a = file_specifier.split(':')
             if len(a) > 2:
@@ -26,15 +26,15 @@ class FiresMerger(object):
                 self.country_code_whitelist = None
 
     def __init__(self, *fire_files):
-        self._fire_files = [FiresMerger.FireFile(f) for f in fire_files]
+        self._fire_files = [FiresMerger.FileSpecifier(f) for f in fire_files]
         self._merge()
 
     def _merge(self):
         self._fire_headers = None
         self._fires = reduce(lambda a,b: a+b,
-            [self._process_fire_file(f) for f in self._fire_files])
+            [self._process_file(f) for f in self._fire_files])
 
-    def _process_fire_file(self, f):
+    def _process_file(self, f, filter=None):
         rows = []
         with open(f.file_name, 'r') as input_file:
             headers = []
