@@ -16,13 +16,13 @@ import traceback
 from argparse import ArgumentParser
 
 try:
-    from pyairfire.bluesky.merge.fires import FiresMerger
+    from pyairfire.bluesky.merge import FiresMerger
     from pyairfire.scripting import utils
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
-    from pyairfire.bluesky.merge.fires import FiresMerger
+    from pyairfire.bluesky.merge import FiresMerger
     from pyairfire.scripting import utils
 
 USAGE = """%(prog)s filename[:countrycode[,countrycode]] ...

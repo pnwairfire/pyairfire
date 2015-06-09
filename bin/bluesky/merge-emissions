@@ -14,13 +14,13 @@ import traceback
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 try:
-    from pyairfire.bluesky.merge.emissions import EmissionsMerger
+    from pyairfire.bluesky.merge import EmissionsMerger
     from pyairfire.scripting import utils
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
-    from pyairfire.bluesky.merge.emissions import EmissionsMerger
+    from pyairfire.bluesky.merge import EmissionsMerger
     from pyairfire.scripting import utils
 
 USAGE = """%(prog)s <FILE SET> [<FILE SET> ...] \\
