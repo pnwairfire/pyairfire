@@ -35,11 +35,8 @@ Each file set is of the form:
 
 where the country codes, if specified, are used as a whitelist for filtering
 fires.
-
-Note that the headers in the first emissions / fire locations input file set
-will show up in the output files as is. Any headers in subsequent files that
-haven't yet been encountered will be sorted and appended to the current
-headers.
+Note: the headers in the output will be the union of the headers in the
+infividual files, sorted.
 """
 
 def main():

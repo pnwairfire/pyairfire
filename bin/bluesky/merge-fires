@@ -29,9 +29,8 @@ USAGE = """%(prog)s filename[:countrycode[,countrycode]] ...
 
 where country codes, if specified, are used as a whitelist for filtering fires.
 
-Note that the headers in the first input file will show up in the output as is.
-Any headers in subsequent files that haven't yet been encountered will be sorted
-and appended to the current headers.
+Note: the headers in the output will be the union of the headers in the
+infividual files, sorted.
 
 Example:
 
