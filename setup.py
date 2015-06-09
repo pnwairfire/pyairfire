@@ -15,7 +15,7 @@ setup(
     packages=find_packages(),
     scripts=[
         'bin/bluesky/extract-point-pm25-time-series.py',
-        'bin/bluesky/pre-process-fires',
+        'bin/bluesky/merge-fires',
         'bin/bluesky/run-bluesky',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
