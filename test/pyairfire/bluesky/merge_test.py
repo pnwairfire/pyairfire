@@ -40,7 +40,7 @@ sldj2343,Fire YY,42.22,-109.3423,201405310000Z,zab,rab,MX
 dsdho123,Fire XX,37.22,-112.3423,201405310000Z,bazbaz,barbar,CA
 """
 EMISSIONS_2 = """\
-fire_id, foo, bar, baz
+fire_id, foo, baz
 sldj2343,foo123,baz434
 sldj2343,foo232,baz345d
 sdkfjsldkfj,foo343,baz434
@@ -74,8 +74,6 @@ bar3,,dsdho123,foo23
 bar2,,dsdho123,foo3
 bar3,,sldj2343,foo545
 bar46,,12ho123,foo454
-bar345,,blahblah,foo65234
-bar3423,,sdfdsf,foo34
 ,baz434,sldj2343,foo123
 ,baz345d,sldj2343,foo232
 ,baz43342,sldj2343,foo34
@@ -90,8 +88,7 @@ aaaaa,bary,bazy,CA,201405310000Z,,sdfdsf,44.22,-116.342,Fire L
 """
 MERGED_EMISSIONS_ALL_FIRE_LOCATIONS_CA_MX_ONLY = """\
 bar,baz,fire_id,foo
-bar345,,blahblah,foo65234
-bar3423,,sdfdsf,foo34
+bar3,,sldj2343,foo545
 ,baz434,sldj2343,foo123
 ,baz345d,sldj2343,foo232
 ,baz43342,sldj2343,foo34
@@ -105,13 +102,11 @@ MX,201405310000Z,oof,sldj2343,47.22,-118.3423,Fire C
 """
 MERGED_EMISSIONS_1_FIRE_LOCATION = """\
 bar,fire_id,foo
-bar3434,foo12,12ho123
+bar3434,12ho123,foo12
 bar3,dsdho123,foo23
 bar2,dsdho123,foo3
 bar3,sldj2343,foo545
 bar46,12ho123,foo454
-bar345,blahblah,foo65234
-bar3423,sdfdsf,foo34
 """
 
 MERGED_1_FIRE_LOCATION_CA_MX_ONLY = """\
@@ -182,9 +177,9 @@ class TestEmissionsMerger(MergerTestBase):
         fl1 = self._file(tmpdir, "fire_locations_1.csv", FIRE_LOCATIONS_1)
         e1 = self._file(tmpdir, "emissions_1.csv", EMISSIONS_1)
         fl2 = self._file(tmpdir, "fire_locations_2.csv", FIRE_LOCATIONS_2)
-        e2 = self._file(tmpdir, "emissions_1.csv", EMISSIONS_2)
+        e2 = self._file(tmpdir, "emissions_2.csv", EMISSIONS_2)
         fl3 = self._file(tmpdir, "fire_locations_3.csv", FIRE_LOCATIONS_3)
-        e3 = self._file(tmpdir, "emissions_1.csv", EMISSIONS_3)
+        e3 = self._file(tmpdir, "emissions_3.csv", EMISSIONS_3)
         merger = merge.EmissionsMerger(
             "{}:{}".format(e1,fl1),
             "{}:{}".format(e2,fl2),
@@ -201,9 +196,9 @@ class TestEmissionsMerger(MergerTestBase):
         fl1 = self._file(tmpdir, "fire_locations_1.csv", FIRE_LOCATIONS_1)
         e1 = self._file(tmpdir, "emissions_1.csv", EMISSIONS_1)
         fl2 = self._file(tmpdir, "fire_locations_2.csv", FIRE_LOCATIONS_2)
-        e2 = self._file(tmpdir, "emissions_1.csv", EMISSIONS_2)
+        e2 = self._file(tmpdir, "emissions_2.csv", EMISSIONS_2)
         fl3 = self._file(tmpdir, "fire_locations_3.csv", FIRE_LOCATIONS_3)
-        e3 = self._file(tmpdir, "emissions_1.csv", EMISSIONS_3)
+        e3 = self._file(tmpdir, "emissions_3.csv", EMISSIONS_3)
         merger = merge.EmissionsMerger(
             "{}:{}:CA,MX".format(e1,fl1),
             "{}:{}:CA,MX".format(e2,fl2),
