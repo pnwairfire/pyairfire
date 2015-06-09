@@ -2,9 +2,6 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import datetime
-import time
-import timecop
-import unittest
 from pytest import raises
 
 # TODO: nosetests should take crae of updating sys path appropriately; figure
