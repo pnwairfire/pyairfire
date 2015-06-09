@@ -85,12 +85,14 @@ class EmissionsMerger(MergerBase):
         def __init__(self, file_set_specifier):
             a = file_set_specifier.split(':')
             if len(a) not in (2,3):
-                raise RuntimeError("Invalid file set specifier: %s" % (file_set_specifier))
+                raise RuntimeError("Invalid file set specifier: %s" % (
+                    file_set_specifier))
             self.emissions_file = EmissionsMerger.FileSpecifier(a[0])
             self.fire_file = EmissionsMerger.FileSpecifier(':'.join(a[1:]))
 
-    def __init__(self, *file_sets):
+    def __init__(self, *file_sets, **options):
         self._file_sets = [EmissionsMerger.FileSet(fs) for fs in file_sets]
+        self._fire_id_key = options.get('fire_id_key', 'fire_id')
         self._merge()
 
     def _merge(self):
@@ -107,7 +109,7 @@ class EmissionsMerger(MergerBase):
                 self._fire_headers |= set(fires[0].keys())
                 fire_ids = set([fire['id'] for fire in fires])
                 emissions = self._process_file(file_set.emissions_file,
-                    lambda row: row['fire_id'] in fire_ids)
+                    lambda row: row.get(self._fire_id_key) in fire_ids)
                 if emissions:
                     self._emissions.extend(emissions)
                     self._emissions_headers |= set(emissions[0].keys())
