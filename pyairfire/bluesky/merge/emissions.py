@@ -31,19 +31,20 @@ class EmissionsMerger(FiresMerger):
     def _merge(self):
         """Overrides FiresMerger._merge
         """
-        self._fire_headers = None
-        self._emissions_headers = None
+        self._fire_headers = []
+        self._emissions_headers = []
         self._fires = []
         self._emissions = []
         for file_set in self._file_sets:
-            fires = self._process_file(file_set.fire_file)
-            emissions = self._process_file(file_set.emissions_file,
-                set([fire['id'] for fire in fires]))
+            fire_headers, fires = self._process_file(file_set.fire_file)
+            fire_ids = set([fire['id'] for fire in fires])
+            emissions_headers, emissions = self._process_file(file_set.emissions_file,
+                lambda row: row['fire_id'] not in fire_ids)
             self._fires.extend(fires)
             self._emissions.extend(emissions)
 
     def write(self, emissions_file, fire_locations_file):
-        FiresMerger(self).write(fire_locations_file)
+        super(EmissionsMerger, self).write(fire_locations_file)
 
         stream = open(emissions_file, 'w')
         csvfile = csv.writer(stream, lineterminator='\n')
