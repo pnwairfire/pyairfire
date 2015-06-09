@@ -8,9 +8,11 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import csv
 import sys
+import abc
 
+class MergerBase(object):
 
-class FiresMerger(object):
+    __metaclass__ = abc.ABCMeta
 
     class FileSpecifier(object):
         def __init__(self, file_specifier):
@@ -24,19 +26,6 @@ class FiresMerger(object):
                 self.country_code_whitelist = set(a[1].split(','))
             else:
                 self.country_code_whitelist = None
-
-    def __init__(self, *fire_files):
-        self._fire_files = [FiresMerger.FileSpecifier(f) for f in fire_files]
-        self._merge()
-
-    def _merge(self):
-        self._fire_headers = set()
-        self._fires = []
-        for f in self._fire_files:
-            fires = self._process_file(f)
-            if fires:
-                self._fire_headers |= set(fires[0].keys())
-                self._fires.extend(fires)
 
     def _process_file(self, f, do_keep=None):
         """
@@ -58,10 +47,6 @@ class FiresMerger(object):
                         rows.append(row_dict)
         return rows
 
-    def write(self, output_file=None):
-        stream = open(output_file, 'w') if output_file else sys.stdout
-        self._write(stream, self._fire_headers, self._fires)
-
     def _write(self, stream, headers, rows):
         csvfile = csv.writer(stream, lineterminator='\n')
         headers = sorted(list(headers))
@@ -69,8 +54,32 @@ class FiresMerger(object):
         for r in rows:
             csvfile.writerow([r.get(h, '') for h in headers])
 
+    @abc.abstractmethod
+    def write(*output_files):
+        pass
 
-class EmissionsMerger(FiresMerger):
+
+class FiresMerger(MergerBase):
+
+    def __init__(self, *fire_files):
+        self._fire_files = [FiresMerger.FileSpecifier(f) for f in fire_files]
+        self._merge()
+
+    def _merge(self):
+        self._fire_headers = set()
+        self._fires = []
+        for f in self._fire_files:
+            fires = self._process_file(f)
+            if fires:
+                self._fire_headers |= set(fires[0].keys())
+                self._fires.extend(fires)
+
+    def write(self, output_file=None):
+        stream = open(output_file, 'w') if output_file else sys.stdout
+        self._write(stream, self._fire_headers, self._fires)
+
+
+class EmissionsMerger(MergerBase):
 
     class FileSet(object):
         def __init__(self, file_set_specifier):
