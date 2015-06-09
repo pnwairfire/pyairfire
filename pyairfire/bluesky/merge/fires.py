@@ -30,12 +30,13 @@ class FiresMerger(object):
         self._merge()
 
     def _merge(self):
-        self._fire_headers = []
+        self._fire_headers = set()
         self._fires = []
         for f in self._fire_files:
-            headers, fires = self._process_file(f)
-            self._fire_headers.extend(headers)
-            self._fires.extend(fires)
+            fires = self._process_file(f)
+            if fires:
+                self._fire_headers |= set(fires[0].keys())
+                self._fires.extend(fires)
 
     def _process_file(self, f, do_keep=None):
         """
@@ -43,16 +44,11 @@ class FiresMerger(object):
         TODO: rename do_keep
         """
         rows = []
-        all_headers = None
         with open(f.file_name, 'r') as input_file:
             headers = []
             for row in csv.reader(input_file):
                 if not headers:
                     headers = [e.strip(' ') for e in row]
-                    if not all_headers:
-                        all_headers = headers
-                    else:
-                        all_headers.extend(sorted(set(headers).difference(all_headers)))
                     headers = dict([(headers[i], i) for i in xrange(len(headers))])
                 else:
                     row_dict = {h:row[headers[h]] for h in headers}
@@ -60,11 +56,15 @@ class FiresMerger(object):
                             row_dict['country'] in f.country_code_whitelist)
                             and (not do_keep or do_keep(row_dict))):
                         rows.append(row_dict)
-        return all_headers, rows
+        return rows
 
     def write(self, output_file=None):
         stream = open(output_file, 'w') if output_file else sys.stdout
+        self._write(stream, self._fire_headers, self._fires)
+
+    def _write(self, stream, headers, rows):
         csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(self._fire_headers)
-        for f in self._fires:
-            csvfile.writerow([f.get(h, '') for h in self._fire_headers])
+        headers = sorted(list(headers))
+        csvfile.writerow(headers)
+        for r in rows:
+            csvfile.writerow([r.get(h, '') for h in headers])

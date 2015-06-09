@@ -31,23 +31,24 @@ class EmissionsMerger(FiresMerger):
     def _merge(self):
         """Overrides FiresMerger._merge
         """
-        self._fire_headers = []
-        self._emissions_headers = []
+        self._fire_headers = set()
+        self._emissions_headers = set()
         self._fires = []
         self._emissions = []
         for file_set in self._file_sets:
-            fire_headers, fires = self._process_file(file_set.fire_file)
-            fire_ids = set([fire['id'] for fire in fires])
-            emissions_headers, emissions = self._process_file(file_set.emissions_file,
-                lambda row: row['fire_id'] not in fire_ids)
-            self._fires.extend(fires)
-            self._emissions.extend(emissions)
+            fires = self._process_file(file_set.fire_file)
+            if fires:
+                self._fires.extend(fires)
+                self._fire_headers |= set(fires[0].keys())
+                fire_ids = set([fire['id'] for fire in fires])
+                emissions = self._process_file(file_set.emissions_file,
+                    lambda row: row['fire_id'] in fire_ids)
+                if emissions:
+                    self._emissions.extend(emissions)
+                    self._emissions_headers |= set(emissions[0].keys())
 
     def write(self, emissions_file, fire_locations_file):
-        super(EmissionsMerger, self).write(fire_locations_file)
-
-        stream = open(emissions_file, 'w')
-        csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(self._emissions_headers)
-        for f in self._emissions:
-            csvfile.writerow([f.get(h, '') for h in self._emissions_headers])
+        f_stream = open(fire_locations_file, 'w')
+        self._write(f_stream, self._fire_headers, self._fires)
+        e_stream = open(emissions_file, 'w')
+        self._write(e_stream, self._emissions_headers, self._emissions)
