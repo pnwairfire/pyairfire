@@ -100,7 +100,7 @@ class ExtractAndSetKeyValueAction(Action):
         """Splits value into key/value, and set in destination dict
 
         Note: Expects value to be of the format 'key=value'.  Also expects
-        destination (i.e. parser.value's option.dest attribute), to be
+        destination (i.e. parser.value's self.dest attribute), to be
         initialized as an empty dict.
         """
         m = self.KEY_VALUE_EXTRACTER.search(value.strip())
@@ -108,7 +108,7 @@ class ExtractAndSetKeyValueAction(Action):
             msg = "Invalid value '%s' for option '%s' - value must be of the form 'key=value'" % (
                 value, opt)
             raise ArgumentError(msg)
-        d = getattr(namespace, option.dest)
+        d = getattr(namespace, self.dest)
         d[m.group(1)] = m.group(2)
 
 class ParseDatetimeAction(Action):
@@ -137,7 +137,7 @@ def append_or_split_with_delimiter_and_extend(dilimiter):
     """
     class C(Action):
         def __call__(self, parser, namespace, values, option_string=None):
-            d = getattr(namespace, option.dest)
+            d = getattr(namespace, self.dest)
             d.extend(value.split(dilimiter))
     return C
 AppendOrAplitAndExtendAction = append_or_split_with_delimiter_and_extend(',')
