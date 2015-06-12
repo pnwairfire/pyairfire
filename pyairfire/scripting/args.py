@@ -5,7 +5,9 @@ import ConfigParser
 import datetime
 import logging
 import re
-from argparse import ArgumentError, ArgumentParser, Action
+from argparse import (
+    ArgumentError, ArgumentParser, Action, RawTextHelpFormatter
+)
 
 from .utils import exit_with_msg
 
@@ -26,26 +28,29 @@ __all__ = [
 
 ##  Argument Parsing Methods
 
-def parse_args(required_args, optional_args, positional_args=None,
-        usage=None, pre_validation=None, post_args_outputter=None):
+def parse_args(required_args, optional_args, positional_args=None, usage=None,
+        epilog=None, post_args_outputter=None, pre_validation=None):
     """....
 
     Arguments:
      - required_args --
      - optional_args --
     Kwargs
-     - usage --
-     - pre_validation --
-     - extra_help_output -- callable that generates text to be output after
-        args are listed
+     - usage -- usage text to replace default
+     - epilog -- additional help text to display after list of args
+     - post_args_outputter -- callable object that generates epilog
+        (for when itneeds to be dynamically generated)
+     - pre_validation -- callable object that performs any tasks that
+        should be done before outputing the parsed args
 
     TODO:
      - support custom positional args
     """
     parser = ArgumentParser(usage=usage)
 
-    if post_args_outputter:
-        parser.format_epilog = lambda formatter: post_args_outputter()
+    if epilog or post_args_outputter:
+        parser.epilog = epilog or post_args_outputter()
+        parser.formatter_class = RawTextHelpFormatter
 
     add_arguments(parser, required_args, required=True)
     add_arguments(parser, optional_args)
