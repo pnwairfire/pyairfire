@@ -23,25 +23,25 @@ except:
     from pyairfire.bluesky.merge import EmissionsMerger
     from pyairfire.scripting import utils
 
-USAGE = """%(prog)s <FILE_SET> [<FILE_SET> ...] \\
-        -e <OUTPUT_EMISSIONS_FILE> -f <OUTPUT_FIRE_LOCATIONS_FILE>
+USAGE = """%(prog)s <FILE_SET> [<FILE_SET> ...] -e <OUTPUT_EMISSIONS_FILE> \\
+         -v <OUTPUT_EVENTS_FILE> -f <OUTPUT_FIRE_LOCATIONS_FILE>
 """
 
 DESCRIPTION = """
 
 Each <FILE_SET> is of the form:
 
-    <EMISSIONS_FILE>:<FIRE_LOCATIONS_FILE>[:COUNTRY_CODE[,COUNTRY_CODE]]
+    <EMISSIONS_FILE>:<FIRE_EVENTS_FILE>:<FIRE_LOCATIONS_FILE>[:COUNTRY_CODE[,COUNTRY_CODE]]
 
 where the country codes, if specified, are used as a whitelist for filtering
 fires.
 
 Example:
  > merge-emissions \\
-    fire_emissions_1.csv:fire_locations_1.csv \\
-    fire_emissions_2.csv:fire_locations_2.csv:CA,USA \\
-    fire_emissions_3.csv:fire_locations_3.csv \\
-    -e fire_emissions_merged.csv -f fire_locations_merged.csv
+    fire_emissions_1.csv:fire_events_1.csv:fire_locations_1.csv \\
+    fire_emissions_2.csv:fire_events_2.csv:fire_locations_2.csv:CA,USA \\
+    fire_emissions_3.csv:fire_events_3.csv:fire_locations_3.csv \\
+    -e fire_emissions_merged.csv -v fire_events_merged.csv -f fire_locations_merged.csv
 
 
 Note: the headers in the output will be the union of the headers in the
@@ -57,15 +57,19 @@ def main():
     parser.add_argument('-e', '--output-emissions-file', #meta=FILE,
         help='output file to contain new, merged set of emissions',
         required=True)
+    parser.add_argument('-v', '--output-events-file', #meta=FILE,
+        help='output file to contain new, merged set of fire events',
+        required=True)
     parser.add_argument('file_sets', nargs='+')
 
     args  = parser.parse_args()
     if not args.file_sets:
-        utils.exit_with_msg("Specify one or more fire locations / emissions csv file sets")
+        utils.exit_with_msg("Specify one or more fire locations, events, and"
+            " emissions csv file sets")
 
     try:
         fm = EmissionsMerger(*args.file_sets)
-        fm.write(args.output_emissions_file, args.output_fire_locations_file)
+        fm.write(args.output_emissions_file, args.output_events_file, args.output_fire_locations_file)
     except Exception, e:
         print traceback.format_exc()
         utils.exit_with_msg(e)
