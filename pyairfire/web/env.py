@@ -19,7 +19,7 @@ __all__ = [
 def python_version():
     try:
         return subprocess.Popen(['python', '--version'],
-            stdout=subprocess.PIPE).stdout.read()
+            stderr=subprocess.PIPE).stderr.read()
     except:
         pass
 
