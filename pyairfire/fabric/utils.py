@@ -7,13 +7,16 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 import os
 import re
 from fabric import api
+from fabric.contrib import files
 
 __all__ = [
     'kill_processes',
     'run_in_background',
     'already_running',
     'create_ssh_tunnel',
-    'destroy_ssh_tunnel'
+    'destroy_ssh_tunnel',
+    'install_pyenv',
+    'install_pyenv_environment'
 ]
 
 
@@ -68,6 +71,11 @@ def wrapped_run(command, skip_if_already_running=False, silence_system_exit=Fals
             if not silence_system_exit:
                 raise
 
+
+##
+##  ssh tunneling
+##
+
 LOOPBACK_ADDRESSES_RE = re.compile('^(localhost|172.0.0.[1-8]|::1)$')
 
 def _ssh_tunnel_command(local_port, remote_port, remote_host, remote_user,
@@ -121,3 +129,29 @@ def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
         remote_user, local_host, ssh_port)
     if already_running(command):
         api.run("pkill -f '%s'" % (command))
+
+
+##
+##  pyenv
+##
+
+def install_pyenv(user, dot_file=".bash_profile"):
+    pyenv_root = "/usr/local/lib/.pyenv"
+    if not files.exists("/usr/local/lib/.pyenv"):
+        api.sudo("git clone https://github.com/yyuu/pyenv.git {}".format(pyenv_root))
+        api.sudo("git clone https://github.com/yyuu/pyenv-virtualenv.git "
+            "{}/plugins/pyenv-virtualenv".format(pyenv_root))
+
+    # TODO: don't add these lines if they're already there
+    api.sudo("echo 'export PYENV_ROOT=\"{}\"' >> ~/{}".format(pyenv_root, dot_file), user=user)
+    api.sudo("echo 'export PATH=\"$PYENV_ROOT/bin:$PATH\"' >> ~/{}".format(dot_file), user=user)
+    api.sudo("echo 'eval \"$(pyenv init -)\"' >> ~/{}".format(dot_file), user=user)
+
+def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
+    if replace_existing:
+        # TODO: Remove old
+        pass
+    api.sudo("pyenv install {}".format(version))
+    api.sudo("pyenv rehash".format(version))
+    api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
+    api.sudo("pyenv rehash".format(version))  # TODO: is this necessary ???
