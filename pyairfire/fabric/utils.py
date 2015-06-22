@@ -4,14 +4,39 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
+import os
 import re
 from fabric import api
 
 __all__ = [
+    'kill_processes',
+    'run_in_background',
     'already_running',
     'create_ssh_tunnel',
     'destroy_ssh_tunnel'
 ]
+
+
+##
+##  Managing (Running & Killing) Processes
+##
+
+def kill_processes(pattern):
+    with api.settings(warn_only=True):
+        api.sudo("pkill -f '%s'" % (pattern))
+    #api.sudo("! pgrep -f '%s' || pkill -f '%s'" % (pattern, pattern))
+
+def run_in_background(command, role, kill_first=False, sudo_as=None):
+    """
+    From: http://stackoverflow.com/questions/8775598/start-a-background-process-with-nohup-using-fabric
+    """
+    if kill_first:
+        kill_processes(command)
+
+    sudo_as_key = "%s_SUDO_AS" % (role.upper())
+    sudo_as = os.environ.get(sudo_as_key) or sudo_as
+    command = 'nohup %s &> /dev/null &' % (command)
+    api.sudo(command, pty=False, user=sudo_as)
 
 def already_running(command):
     command = command.strip('&').strip(' ')
