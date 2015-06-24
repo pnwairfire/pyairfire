@@ -142,16 +142,34 @@ def install_pyenv(user, dot_file=".bash_profile"):
         api.sudo("git clone https://github.com/yyuu/pyenv-virtualenv.git "
             "{}/plugins/pyenv-virtualenv".format(pyenv_root))
 
-    # TODO: don't add these lines if they're already there
-    api.sudo("echo 'export PYENV_ROOT=\"{}\"' >> ~/{}".format(pyenv_root, dot_file), user=user)
-    api.sudo("echo 'export PATH=\"$PYENV_ROOT/bin:$PATH\"' >> ~/{}".format(dot_file), user=user)
-    api.sudo("echo 'eval \"$(pyenv init -)\"' >> ~/{}".format(dot_file), user=user)
+    with api.settings(warn_only=True):
+        to_add_to_dot_file = []
+
+        if not api.sudo("grep 'export PYENV_ROOT' ~/{}".format(dot_file), user=user):
+            to_add_to_dot_file.append(
+                'export PYENV_ROOT="{}"'.format(pyenv_root, dot_file))
+
+        if not api.sudo("grep 'export PATH=\"$PYENV_ROOT/bin' ~/{}".format(dot_file), user=user):
+            to_add_to_dot_file.append(
+                'export PATH="$PYENV_ROOT/bin:$PATH"'.format(dot_file))
+
+        if not api.sudo("grep 'pyenv init -' ~/{}".format(dot_file), user=user):
+            to_add_to_dot_file.append(
+                'eval "$(pyenv init -)"'.format(dot_file))
+
+        if to_add_to_dot_file:
+            api.sudo("printf '\n{}\n' >> ~/{}".format(
+                '\n'.join(to_add_to_dot_file), dot_file), user=user)
 
 def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
     if replace_existing:
         # TODO: Remove old
         pass
-    api.sudo("pyenv install {}".format(version))
+    api.sudo("pyenv install -s {}".format(version))
     api.sudo("pyenv rehash".format(version))
-    api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
+    # If virtualenv_name is already installed, you get a prompt; if you
+    # respond with 'N' to not install if already installed, the command returns
+    # and error code.  So, use warn_only=True
+    with api.settings(warn_only=True):
+        api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
     api.sudo("pyenv rehash".format(version))  # TODO: is this necessary ???
