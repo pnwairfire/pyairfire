@@ -52,7 +52,8 @@ def already_running(command):
             return False
         return True
 
-def wrapped_run(command, skip_if_already_running=False, silence_system_exit=False):
+def wrapped_run(command, skip_if_already_running=False,
+        silence_system_exit=False, use_sudo=False):
     """Runs the command if there isn't already a live processes started with
     that command.
 
@@ -66,7 +67,10 @@ def wrapped_run(command, skip_if_already_running=False, silence_system_exit=Fals
     """
     if not skip_if_already_running or not already_running(command):
         try:
-            api.run(command)
+            if use_sudo:
+                api.sudo(command)
+            else:
+                api.run(command)
         except SystemExit, e:
             if not silence_system_exit:
                 raise
@@ -110,7 +114,7 @@ def create_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
     if api.env.host != remote_host and not LOOPBACK_ADDRESSES_RE.match(remote_host):
         command = _ssh_tunnel_command(local_port, remote_port, remote_host,
             remote_user, local_host, ssh_port)
-        wrapped_run(command, skip_if_already_running=True)
+        wrapped_run(command, skip_if_already_running=True, use_sudo=True)
 
 def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
         local_host='localhost', ssh_port=22):
