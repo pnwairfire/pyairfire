@@ -139,31 +139,37 @@ def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
 ##  pyenv
 ##
 
-def install_pyenv(user, dot_file=".bash_profile"):
+def install_pyenv(home_dir="~", dot_file=".bash_profile"):
     pyenv_root = "/usr/local/lib/.pyenv"
     if not files.exists("/usr/local/lib/.pyenv"):
         api.sudo("git clone https://github.com/yyuu/pyenv.git {}".format(pyenv_root))
         api.sudo("git clone https://github.com/yyuu/pyenv-virtualenv.git "
             "{}/plugins/pyenv-virtualenv".format(pyenv_root))
 
+    dot_file = os.path.join(home_dir,dot_file)
+    dot_file_exists = files.exists(dot_file)
+
     with api.settings(warn_only=True):
         to_add_to_dot_file = []
 
-        if not api.sudo("grep 'export PYENV_ROOT' ~/{}".format(dot_file), user=user):
+        if (not dot_file_exists or
+                not api.sudo("grep 'export PYENV_ROOT' {}".format(dot_file))):
             to_add_to_dot_file.append(
                 'export PYENV_ROOT="{}"'.format(pyenv_root, dot_file))
 
-        if not api.sudo("grep 'export PATH=\"$PYENV_ROOT/bin' ~/{}".format(dot_file), user=user):
+        if (not dot_file_exists or
+                not api.sudo("grep 'export PATH=\"$PYENV_ROOT/bin' {}".format(dot_file))):
             to_add_to_dot_file.append(
                 'export PATH="$PYENV_ROOT/bin:$PATH"'.format(dot_file))
 
-        if not api.sudo("grep 'pyenv init -' ~/{}".format(dot_file), user=user):
+        if (not dot_file_exists or
+                not api.sudo("grep 'pyenv init -' {}".format(dot_file))):
             to_add_to_dot_file.append(
                 'eval "$(pyenv init -)"'.format(dot_file))
 
         if to_add_to_dot_file:
-            api.sudo("printf '\n{}\n' >> ~/{}".format(
-                '\n'.join(to_add_to_dot_file), dot_file), user=user)
+            api.sudo("printf '\n{}\n' >> {}".format(
+                '\n'.join(to_add_to_dot_file), dot_file))
 
 def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
     if replace_existing:
