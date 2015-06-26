@@ -139,14 +139,19 @@ def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
 ##  pyenv
 ##
 
-def install_pyenv(home_dir="~", dot_file=".bash_profile"):
-    pyenv_root = "/usr/local/lib/.pyenv"
-    if not files.exists("/usr/local/lib/.pyenv"):
-        api.sudo("git clone https://github.com/yyuu/pyenv.git {}".format(pyenv_root))
-        api.sudo("git clone https://github.com/yyuu/pyenv-virtualenv.git "
-            "{}/plugins/pyenv-virtualenv".format(pyenv_root))
+PYENV_ROOT = "/usr/local/lib/.pyenv"
 
-    dot_file = os.path.join(home_dir,dot_file)
+def install_pyenv():
+
+    if not files.exists("/usr/local/lib/.pyenv"):
+        api.sudo("git clone https://github.com/yyuu/pyenv.git {}".format(PYENV_ROOT))
+        api.sudo("git clone https://github.com/yyuu/pyenv-virtualenv.git "
+            "{}/plugins/pyenv-virtualenv".format(PYENV_ROOT))
+        api.sudo("git clone https://github.com/yyuu/pyenv-pip-rehash.git "
+            "{}/plugins/pyenv-pip-rehash".format(PYENV_ROOT))
+
+def add_pyenv_to_dot_file(home_dir="~", dot_file=".bash_profile", user=None):
+    dot_file = os.path.join(home_dir, dot_file)
     dot_file_exists = files.exists(dot_file)
 
     with api.settings(warn_only=True):
@@ -155,7 +160,7 @@ def install_pyenv(home_dir="~", dot_file=".bash_profile"):
         if (not dot_file_exists or
                 not api.sudo("grep 'export PYENV_ROOT' {}".format(dot_file))):
             to_add_to_dot_file.append(
-                'export PYENV_ROOT="{}"'.format(pyenv_root, dot_file))
+                'export PYENV_ROOT="{}"'.format(PYENV_ROOT, dot_file))
 
         if (not dot_file_exists or
                 not api.sudo("grep 'export PATH=\"$PYENV_ROOT/bin' {}".format(dot_file))):
@@ -170,6 +175,8 @@ def install_pyenv(home_dir="~", dot_file=".bash_profile"):
         if to_add_to_dot_file:
             api.sudo("printf '\n{}\n' >> {}".format(
                 '\n'.join(to_add_to_dot_file), dot_file))
+            if user:
+                api.sudo("chown {user}:{user} {dot_file}".format(user=user, dot_file=dot_file))
 
 def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
     if replace_existing:
