@@ -134,7 +134,7 @@ def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
     command =  _ssh_tunnel_command(local_port, remote_port, remote_host,
         remote_user, local_host, ssh_port)
     if already_running(command):
-        api.run("pkill -f '%s'" % (command))
+        api.sudo("pkill -f '%s'" % (command))
 
 
 ##
