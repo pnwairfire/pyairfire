@@ -17,7 +17,8 @@ __all__ = [
     'destroy_ssh_tunnel',
     'install_pyenv',
     'add_pyenv_to_dot_file',
-    'install_pyenv_environment'
+    'install_pyenv_environment',
+    'uninstall_pyenv_environment'
 ]
 
 
@@ -191,3 +192,7 @@ def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
     with api.settings(warn_only=True):
         api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
     api.sudo("pyenv rehash".format(version))  # TODO: is this necessary ???
+
+def uninstall_pyenv_environment(virtualenv_name):
+    with api.settings(warn_only=True):
+        api.sudo("pyenv uninstall {}".format(virtualenv_name))
