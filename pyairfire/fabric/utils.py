@@ -181,17 +181,32 @@ def add_pyenv_to_dot_file(home_dir="~", dot_file=".bash_profile", user=None):
                 api.sudo("chown {user}:{user} {dot_file}".format(user=user, dot_file=dot_file))
 
 def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
-    if replace_existing:
-        # TODO: Remove old
-        pass
-    api.sudo("pyenv install -s {}".format(version))
-    api.sudo("pyenv rehash".format(version))
-    # If virtualenv_name is already installed, you get a prompt; if you
-    # respond with 'N' to not install if already installed, the command returns
-    # and error code.  So, use warn_only=True
+    """Installs virtual environment, first installing python version if necessary.
+
+    Args:
+     - version -- python version (ex. '2.7.8')
+     - virtualenv_name -- name of pyenv version (ex. 'my-app-2.7.8')
+    Kwargs:
+     - replace_existing -- whether or not to uninstall and then reinstall
+       virtual environment if it alredy exists -- ** NOT YET IMPLEMENTED **
+    """
     with api.settings(warn_only=True):
-        api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
-    api.sudo("pyenv rehash".format(version))  # TODO: is this necessary ???
+        version_exists = not not api.sudo('pyenv versions | grep "^[ ]*{}$"'.format(version))
+    if not version_exists:
+        api.sudo("pyenv install -s {}".format(version))
+
+    with api.settings(warn_only=True):
+        virtual_env_exists = not not api.sudo('pyenv versions | grep "^[ ]*{}$"'.format(virtualenv_name))
+    if not virtual_env_exists or replace_existing:
+        if virtual_env_exists and replace_existing:
+            # TODO: Remove old
+            pass
+
+        # If virtualenv_name is already installed, you get a prompt; if you
+        # respond with 'N' to not install if already installed, the command returns
+        # and error code.  So, use warn_only=True
+        with api.settings(warn_only=True):
+            api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
 
 def uninstall_pyenv_environment(virtualenv_name):
     with api.settings(warn_only=True):
