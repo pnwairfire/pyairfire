@@ -16,6 +16,7 @@ __all__ = [
     'create_ssh_tunnel',
     'destroy_ssh_tunnel',
     'install_pyenv',
+    'add_pyenv_to_dot_file',
     'install_pyenv_environment'
 ]
 
