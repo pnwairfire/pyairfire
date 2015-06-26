@@ -199,8 +199,7 @@ def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
         virtual_env_exists = not not api.sudo('pyenv versions | grep "^[ ]*{}$"'.format(virtualenv_name))
     if not virtual_env_exists or replace_existing:
         if virtual_env_exists and replace_existing:
-            # TODO: Remove old
-            pass
+            raise NotImplementedError("The 'replace_existing' option is not yet implemented")
 
         # If virtualenv_name is already installed, you get a prompt; if you
         # respond with 'N' to not install if already installed, the command returns
