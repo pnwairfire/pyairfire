@@ -161,8 +161,7 @@ def add_pyenv_to_dot_file(home_dir="~", dot_file=".bash_profile", user=None):
 
         if (not dot_file_exists or
                 not api.sudo("grep 'export PYENV_ROOT' {}".format(dot_file))):
-            to_add_to_dot_file.append(
-                'export PYENV_ROOT="{}"'.format(PYENV_ROOT))
+            to_add_to_dot_file.append('export PYENV_ROOT="{}"'.format(PYENV_ROOT))
 
         if (not dot_file_exists or
                 not api.sudo("grep 'export PATH=\"$PYENV_ROOT/bin' {}".format(dot_file))):
