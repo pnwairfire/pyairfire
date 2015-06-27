@@ -174,6 +174,11 @@ def add_pyenv_to_dot_file(home_dir="~", dot_file=".bash_profile", user=None):
             to_add_to_dot_file.append(
                 'eval "$(pyenv init -)"')
 
+        if (not dot_file_exists or
+                not api.sudo("grep 'pyenv virtualenv-init -' {}".format(dot_file))):
+            to_add_to_dot_file.append(
+                'eval "$(pyenv virtualenv-init -)"')
+
         if to_add_to_dot_file:
             api.sudo("printf '\n{}\n' >> {}".format(
                 '\n'.join(to_add_to_dot_file), dot_file))
