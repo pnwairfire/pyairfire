@@ -211,4 +211,5 @@ def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
 
 def uninstall_pyenv_environment(virtualenv_name):
     with api.settings(warn_only=True):
+        api.sudo("pyenv deactivate {}".format(virtualenv_name))
         api.sudo("pyenv uninstall -f {}".format(virtualenv_name))
