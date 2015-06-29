@@ -31,7 +31,7 @@ def kill_processes(pattern):
         api.sudo("pkill -f '%s'" % (pattern))
     #api.sudo("! pgrep -f '%s' || pkill -f '%s'" % (pattern, pattern))
 
-def run_in_background(command, role, kill_first=False, sudo_as=None):
+def run_in_background(command, role, kill_first=False, sudo_as=None, **env_vars):
     """
     From: http://stackoverflow.com/questions/8775598/start-a-background-process-with-nohup-using-fabric
     """
@@ -40,7 +40,10 @@ def run_in_background(command, role, kill_first=False, sudo_as=None):
 
     sudo_as_key = "%s_SUDO_AS" % (role.upper())
     sudo_as = os.environ.get(sudo_as_key) or sudo_as
-    command = 'nohup %s &> /dev/null &' % (command)
+
+    env_vars_str = " ".join(["{}={}".format(k,v) for k,v in env_vars.items()])
+
+    command = '{} nohup {} &> /dev/null &'.format(env_vars_str, command)
     api.sudo(command, pty=False, user=sudo_as)
 
 def already_running(command):
