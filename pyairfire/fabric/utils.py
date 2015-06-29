@@ -145,6 +145,7 @@ def destroy_ssh_tunnel(local_port, remote_port, remote_host, remote_user,
 ##
 
 PYENV_ROOT = "/usr/local/lib/.pyenv"
+PYENV_TMPDIR="{}/tmp/".format(PYENV_ROOT)
 
 def install_pyenv():
 
@@ -197,7 +198,12 @@ def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
     with api.settings(warn_only=True):
         version_exists = not not api.sudo('pyenv versions | grep "^[ ]*{}$"'.format(version))
     if not version_exists:
-        api.sudo("pyenv install -s {}".format(version))
+        api.sudo('apt-get install ca-certificates')
+        # install in ~/pyenv-tmp instead of in /tmp in case /tmp is restricted
+        if not files.exists(PYENV_TMPDIR):
+            api.sudo("mkdir {}".format(PYENV_TMPDIR))
+            api.sudo("chmod 777 {}".format(PYENV_TMPDIR))
+        api.sudo("TMPDIR={} pyenv install -s {}".format(PYENV_TMPDIR, version))
 
     with api.settings(warn_only=True):
         virtual_env_exists = not not api.sudo('pyenv versions | grep "^[ ]*{}$"'.format(virtualenv_name))
