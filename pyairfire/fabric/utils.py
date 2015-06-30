@@ -198,7 +198,8 @@ def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
     with api.settings(warn_only=True):
         version_exists = not not api.sudo('pyenv versions | grep "^[ ]*{}$"'.format(version))
     if not version_exists:
-        api.sudo('apt-get install ca-certificates')
+        with api.settings(warn_only=True):
+            api.sudo('apt-get install ca-certificates')
         # install in ~/pyenv-tmp instead of in /tmp in case /tmp is restricted
         if not files.exists(PYENV_TMPDIR):
             api.sudo("mkdir {}".format(PYENV_TMPDIR))
