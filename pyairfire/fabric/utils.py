@@ -217,6 +217,8 @@ def install_pyenv_environment(version, virtualenv_name, replace_existing=False):
         # and error code.  So, use warn_only=True
         with api.settings(warn_only=True):
             api.sudo("pyenv virtualenv {} {}".format(version, virtualenv_name))
+        api.sudo("PYENV_VERSION={} pip install --upgrade pip".format(virtualenv_name))
+
 
 def uninstall_pyenv_environment(virtualenv_name):
     with api.settings(warn_only=True):
