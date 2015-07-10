@@ -21,11 +21,25 @@ def main():
         filepathname = os.path.join(d, filename)
         if os.path.isfile(filepathname):
             with open(filepathname, 'r') as f:
-                j = json.loads(f.read())
+                try:
+                    j = json.loads(f.read())
+                except Exception, e:
+                    msg = " -- SKIPPED DAY -- ERROR: {}".format(e.message)
+                    sys.stdout.write(msg)
+                    sys.stderr.write(msg)
+                    continue
+
                 for log in j:
-                    line = "{} - {}:  {}\n".format(log['date'],
-                        log['from']['name'], log['message'])
-                    sys.stdout.write(line)
+                    try:
+                        line = "{} - {}:  {}\n".format(log['date'],
+                            log['from']['name'].encode('utf-8', 'ignore'),
+                            log['message'].encode('utf-8', 'ignore'))
+                        sys.stdout.write(line)
+                    except Exception, e:
+                        msg = " -- SKIPPED MESSAGE -- ERROR: {}".format(e.message)
+                        sys.stdout.write(msg)
+                        sys.stderr.write(msg)
+
         else:
             sys.stderr.write('Skipping {}'.format(filename))
 
