@@ -149,7 +149,7 @@ PYENV_TMPDIR="{}/tmp/".format(PYENV_ROOT)
 
 def install_pyenv():
 
-    if not files.exists("/usr/local/lib/.pyenv"):
+    if not files.exists(PYENV_ROOT):
         api.sudo("git clone https://github.com/yyuu/pyenv.git {}".format(PYENV_ROOT))
         api.sudo("git clone https://github.com/yyuu/pyenv-virtualenv.git "
             "{}/plugins/pyenv-virtualenv".format(PYENV_ROOT))
