@@ -59,6 +59,7 @@ def main():
     args  = parse_args()
     logging.basicConfig(level=getattr(logging, args.log_level))
     xml = read_feed(args.feed)
+    # strip logo and legend
     xml['kml']['Document'].pop('ScreenOverlay', None)
     with outstream(args.output) as o:
         o.write(xmltodict.unparse(xml))
