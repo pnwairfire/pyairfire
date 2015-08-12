@@ -33,7 +33,8 @@ setup(
     description='General toolbox of python utilities for AirFire team.',
     install_requires=[
         #"netcdf"  #"netcdf==0.0.28"
-        "requests==2.7.0"
+        "requests==2.7.0",
+        "xmltodict==0.9.2"
     ],
     tests_require=test_requirements
 )
