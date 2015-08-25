@@ -6,7 +6,10 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
+import datetime
+import filecmp
 import logging
+import os
 import sys
 import urllib2
 import xmltodict
@@ -18,18 +21,10 @@ Basic examples:
  $ get-hms-kml smoke -o smoke.kml
  $ get-hms-kml fire > fire.kml
 
-Example for a crontab entry that replaces and timestamps
+Example with archiving option that replaces and timestamps
 if different than previously cached file, and deletes otherwise
 
- $ get-hms-kml smoke -o smoke-tmp.kml; if diff smoke-tmp.kml smoke.kml &>/dev/null ; then rm smoke-tmp.kml; else mv smoke-tmp.kml smoke.kml && cp smoke.kml smoke-$(date +"%Y%m%d%H%M").kml; fi
-
-Slight variation that sym-links instead of keeping
-copy 'smoke.kml':
-
- $ get-hms-kml smoke -o smoke-tmp.kml; if diff smoke-tmp.kml smoke.kml &>/dev/null ; then rm smoke-tmp.kml; else DATE=$(date +"%Y%m%d%H%M") ; mv smoke-tmp.kml smoke-$DATE.kml; rm -f smoke.kml; ln -s smoke-$DATE.kml smoke.kml; fi
-
-Same, for fires:
- $ get-hms-kml fire -o fire-tmp.kml; if diff fire-tmp.kml fire.kml &>/dev/null ; then rm fire-tmp.kml; else DATE=$(date +"%Y%m%d%H%M") ; mv fire-tmp.kml fire-$DATE.kml; rm -f fire.kml; ln -s fire-$DATE.kml fire.kml; fi
+ $ get-hms-kml smoke -o smoke-tmp.kml -a
 """
 
 DEFAUlT_URL_ROOT = "http://www.ssd.noaa.gov/PS/FIRE/hms/"
@@ -65,8 +60,10 @@ def parse_args():
     parser.add_argument('feed', help="'fires', 'smoke', or kml url")
     parser.add_argument('-o', '--output', default=None,
         help="output file; default to stdout")
-    parser.add_argument('-l/', '--log-level', default="WARN",
+    parser.add_argument('-l', '--log-level', default="WARN",
         help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
+    parser.add_argument('-a', '--archive', action="store_true", default=False,
+        help="Timestamp and create sym-link; must be used with '-o-'")
     # TODO: add option to skip stripping of legend and logo
     parser.epilog = EXAMPLES
     return parser.parse_args()
@@ -79,14 +76,35 @@ def strip_extras(args, xml):
         xml['kml']['Document']['Placemark'] = [
             p for p in xml['kml']['Document']['Placemark'] if p.has_key('Polygon')]
 
+def output(args, xml):
+    output_file_name = args.output
+    if args.archive: # args.output will also be specified
+        # timestamp it
+        parts = args.output.split('.')
+        output_file_name = '-'.join([parts[0], datetime.datetime.now().strftime("%Y%m%d%H%M%S")])
+        if len(parts) > 1:
+            output_file_name = '.'.join([output_file_name, '.'.join(parts[1:])])
+
+    with outstream(output_file_name) as o:
+        o.write(xmltodict.unparse(xml))
+
+    if args.archive:
+        if os.path.exists(args.output) and filecmp.cmp(output_file_name, args.output):
+            os.remove(output_file_name)
+        else:
+            os.remove(args.output)
+            os.symlink(output_file_name, args.output)
+
 def main():
     args  = parse_args()
+    if args.archive and not args.output:
+        sys.stderr.write("Error:  '-o' must be specified if '-a' is specified.\n")
+        sys.exit(1)
+
     logging.basicConfig(level=getattr(logging, args.log_level))
     xml = read_feed(args.feed)
     strip_extras(args, xml)
-
-    with outstream(args.output) as o:
-        o.write(xmltodict.unparse(xml))
+    output(args, xml)
 
 if __name__ == "__main__":
     main()
