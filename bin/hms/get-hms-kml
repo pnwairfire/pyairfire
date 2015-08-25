@@ -55,12 +55,20 @@ def parse_args():
     parser.epilog = EXAMPLES
     return parser.parse_args()
 
+def strip_extras(args, xml):
+    # strip logo and legend
+    xml['kml']['Document'].pop('ScreenOverlay', None)
+    # strip placemarks out of smoke plumes
+    if args.feed.find('smoke') >= 0:
+        xml['kml']['Document']['Placemark'] = [
+            p for p in xml['kml']['Document']['Placemark'] if p.has_key('Polygon')]
+
 def main():
     args  = parse_args()
     logging.basicConfig(level=getattr(logging, args.log_level))
     xml = read_feed(args.feed)
-    # strip logo and legend
-    xml['kml']['Document'].pop('ScreenOverlay', None)
+    strip_extras(args, xml)
+
     with outstream(args.output) as o:
         o.write(xmltodict.unparse(xml))
 
