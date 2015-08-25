@@ -89,10 +89,12 @@ def output(args, xml):
         o.write(xmltodict.unparse(xml))
 
     if args.archive:
-        if os.path.exists(args.output) and filecmp.cmp(output_file_name, args.output):
+        old_exists = os.path.exists(args.output)
+        if old_exists and filecmp.cmp(output_file_name, args.output):
             os.remove(output_file_name)
         else:
-            os.remove(args.output)
+            if old_exists:
+                os.remove(args.output)
             os.symlink(output_file_name, args.output)
 
 def main():
