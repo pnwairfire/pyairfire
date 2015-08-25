@@ -13,7 +13,23 @@ import xmltodict
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 EXAMPLES = """
+Basic examples:
 
+ $ get-hms-kml smoke -o smoke.kml
+ $ get-hms-kml fire > fire.kml
+
+Example for a crontab entry that replaces and timestamps
+if different than previously cached file, and deletes otherwise
+
+ $ get-hms-kml smoke -o smoke-tmp.kml; if diff smoke-tmp.kml smoke.kml &>/dev/null ; then rm smoke-tmp.kml; else mv smoke-tmp.kml smoke.kml && cp smoke.kml smoke-$(date +"%Y%m%d%H%M").kml; fi
+
+Slight variation that sym-links instead of keeping
+copy 'smoke.kml':
+
+ $ get-hms-kml smoke -o smoke-tmp.kml; if diff smoke-tmp.kml smoke.kml &>/dev/null ; then rm smoke-tmp.kml; else DATE=$(date +"%Y%m%d%H%M") ; mv smoke-tmp.kml smoke-$DATE.kml; rm -f smoke.kml; ln -s smoke-$DATE.kml smoke.kml; fi
+
+Same, for fires:
+ $ get-hms-kml fire -o fire-tmp.kml; if diff fire-tmp.kml fire.kml &>/dev/null ; then rm fire-tmp.kml; else DATE=$(date +"%Y%m%d%H%M") ; mv fire-tmp.kml fire-$DATE.kml; rm -f fire.kml; ln -s fire-$DATE.kml fire.kml; fi
 """
 
 DEFAUlT_URL_ROOT = "http://www.ssd.noaa.gov/PS/FIRE/hms/"
@@ -45,7 +61,7 @@ class outstream(object):
         # else, nothing to do for stdout
 
 def parse_args():
-    parser = ArgumentParser()
+    parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('feed', help="'fires', 'smoke', or kml url")
     parser.add_argument('-o', '--output', default=None,
         help="output file; default to stdout")
