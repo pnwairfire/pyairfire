@@ -76,6 +76,34 @@ def strip_extras(args, xml):
         xml['kml']['Document']['Placemark'] = [
             p for p in xml['kml']['Document']['Placemark'] if p.has_key('Polygon')]
 
+# From KML:
+#  s['@id'] -> s['PolyStyle']['color']
+#    'transObsBluePoly'  ->  u'9900ffff'),
+#    'transF06RedPoly'  ->  u'990000ff'),
+#    'transF12GreenPoly'  ->  [u'ffffffff', u'9900ff00']),
+#    'transF18BrownPoly'  ->  u'66ff0bff')]
+# It looks like the code is AABBGGRR
+POLY_COLOR_MAP = {
+    '9900ff00': '33eeeeee', # 99eeeeee', # Green
+    '9900ffff': '88888888', # '99888888',  # Yellow
+    '990000ff': 'cc222222' # '99222222' # Red
+}
+def convert_color(color):
+    if hasattr(color, 'upper') and color in POLY_COLOR_MAP:
+        logging.debug("Converting {} to {}".format(color, POLY_COLOR_MAP[color]))
+        return POLY_COLOR_MAP[color]
+    return color
+
+def change_colors(args, xml):
+    # change color scheme of smoke plumes
+    if args.feed.find('smoke') >= 0:
+        for s in xml['kml']['Document']['Style']:
+            if hasattr(s['PolyStyle']['color'], 'append'):
+                for i in xrange(len(s['PolyStyle']['color'])):
+                    s['PolyStyle']['color'][i] = convert_color(s['PolyStyle']['color'][i])
+            else:
+                s['PolyStyle']['color'] = convert_color(s['PolyStyle']['color'])
+
 def output(args, xml):
     output_file_name = args.output
     if args.archive: # args.output will also be specified
@@ -106,6 +134,7 @@ def main():
     logging.basicConfig(level=getattr(logging, args.log_level))
     xml = read_feed(args.feed)
     strip_extras(args, xml)
+    change_colors(args, xml)
     output(args, xml)
 
 if __name__ == "__main__":
