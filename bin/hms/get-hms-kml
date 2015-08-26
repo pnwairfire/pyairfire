@@ -98,11 +98,14 @@ def change_colors(args, xml):
     # change color scheme of smoke plumes
     if args.feed.find('smoke') >= 0:
         for s in xml['kml']['Document']['Style']:
+            # change color of plume
             if hasattr(s['PolyStyle']['color'], 'append'):
                 for i in xrange(len(s['PolyStyle']['color'])):
                     s['PolyStyle']['color'][i] = convert_color(s['PolyStyle']['color'][i])
             else:
                 s['PolyStyle']['color'] = convert_color(s['PolyStyle']['color'])
+            # remove outline
+            s['LineStyle']['width'] = '0'
 
 def output(args, xml):
     output_file_name = args.output
