@@ -107,6 +107,15 @@ def change_colors(args, xml):
             # remove outline
             s['LineStyle']['width'] = '0'
 
+def order_plumes(args, xml):
+    if args.feed.find('smoke') >= 0:
+        # We want red on top of yellow on top of green.  In google maps, this is
+        # achieved by listing red first, then yellow, then green.  Google Earth
+        # expects it in the reverse order. This KML was generated for google earth,
+        # so we need to reverse the order
+        if 'Placemark' in xml['kml']['Document']:
+            xml['kml']['Document']['Placemark'].reverse()
+
 def output(args, xml):
     output_file_name = args.output
     if args.archive: # args.output will also be specified
@@ -138,6 +147,7 @@ def main():
     xml = read_feed(args.feed)
     strip_extras(args, xml)
     change_colors(args, xml)
+    order_plumes(args, xml)
     output(args, xml)
 
 if __name__ == "__main__":
