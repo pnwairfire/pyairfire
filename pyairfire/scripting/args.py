@@ -56,8 +56,6 @@ def parse_args(required_args, optional_args, positional_args=None, usage=None,
     add_arguments(parser, optional_args)
     if positional_args:
         add_arguments(parser, positional_args)
-    else:
-        parser.add_argument('args', nargs='*')
 
     add_logging_options(parser)
 
