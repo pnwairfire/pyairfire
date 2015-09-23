@@ -86,7 +86,7 @@ def strip_extras(args, xml):
 POLY_COLOR_MAP = {
     '9900ff00': '55999999', # 99eeeeee', # Green (aka 'transF12GreenPoly')
     '9900ffff': '88666666', # '99888888',  # Yellow (aka 'transObsBluePoly')
-    '990000ff': 'cc000000' # '99222222' # Red (aka 'transF06RedPoly')
+    '990000ff': 'bb333333' # '99222222' # Red (aka 'transF06RedPoly')
 }
 def convert_color(color):
     if hasattr(color, 'upper') and color in POLY_COLOR_MAP:
