@@ -10,13 +10,15 @@ RECOGNIZED_DATETIME_FORMATS = [
     '%Y/%m/%dT%H:%M:%SZ',
     '%Y%m%dT%H%M%S',
     '%Y%m%dT%H%M%SZ',
+    '%Y%m%d%H%M%S',
+    '%Y%m%d%H%M%SZ',
     '%Y-%m-%d',
     '%Y/%m/%d',
     '%Y%m%d'
 ]
 
-def parse(datetime_str):
-    for format in RECOGNIZED_DATETIME_FORMATS:
+def parse(datetime_str, extra_formats=[]):
+    for format in RECOGNIZED_DATETIME_FORMATS + extra_formats:
         try:
             return datetime.datetime.strptime(datetime_str, format)
         except ValueError:
