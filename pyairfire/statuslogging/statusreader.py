@@ -29,7 +29,7 @@ class StatusReader(StatusLogClient):
 
     DATETIME_FORMAT = '%Y%m%dT%H%M%SZ'
 
-    def read(self, **query):
+    def read(self, timeout=None, **query):
         """Queries status entries
 
         Arguments
@@ -54,5 +54,5 @@ class StatusReader(StatusLogClient):
         url = '%s?%s' % (self.api_endpoint, query_string)
         logging.debug("Querying status log: %s", (url))
         req = urllib2.Request(url)
-        resp = urllib2.urlopen(req, None, self.TIMEOUT)
+        resp = urllib2.urlopen(req, None, timeout or self.TIMEOUT)
         return json.loads(resp.read())
