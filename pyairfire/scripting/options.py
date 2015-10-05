@@ -8,6 +8,7 @@ import warnings
 from optparse import OptionValueError, OptionParser
 
 from .utils import exit_with_msg
+from pyairfire.datetime.parsing import parse as _parse_datetime
 
 __all__ = [
     'add_options',
@@ -123,7 +124,7 @@ def parse_datetime(option, opt, value, parser):
     RECOGNIZED_DATETIME_FORMATS
     """
     try:
-        dt = datetime.datetime.strptime(value, format)
+        dt = _parse_datetime(value)
     except ValueError:
         # If we got here, none of them matched, so raise error
         raise OptionValueError("Invalid datetime format '%s' for option %s" % (

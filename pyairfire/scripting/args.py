@@ -9,6 +9,7 @@ from argparse import (
     ArgumentTypeError, ArgumentParser, Action, RawTextHelpFormatter
 )
 
+from pyairfire.datetime.parsing import parse as parse_datetime
 from .utils import exit_with_msg
 
 __all__ = [
@@ -118,7 +119,7 @@ class ParseDatetimeAction(Action):
         RECOGNIZED_DATETIME_FORMATS
         """
         try:
-            dt = datetime.datetime.strptime(value, format)
+            dt = parse_datetime(value)
         except ValueError:
             # If we got here, none of them matched, so raise error
             raise ArgumentTypeError("Invalid datetime format '%s' for option %s" % (
