@@ -206,6 +206,6 @@ def configure_logging_from_args(args, parser):
                 'Invalid log level: %s' % (log_level))
         level = getattr(logging, log_level)
 
-    format = args.log_message_format or '%(asctime)s %(levelname)s: %(message)s'
+    log_message_format = args.log_message_format or '%(asctime)s %(levelname)s: %(message)s'
 
-    logging.basicConfig(format=format, level=level, filename=args.log_file)
+    logging.basicConfig(format=log_message_format, level=level, filename=args.log_file)
