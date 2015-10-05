@@ -116,7 +116,7 @@ class ParseDatetimeAction(Action):
         """Parses datetime from string value
 
         Note: Expects value to be of one of the formats listed in
-        RECOGNIZED_DATETIME_FORMATS
+        pyairfire.datetime.parsing.RECOGNIZED_DATETIME_FORMATS
         """
         try:
             dt = parse_datetime(value)
