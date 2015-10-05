@@ -6,7 +6,7 @@ import datetime
 import logging
 import re
 from argparse import (
-    ArgumentError, ArgumentParser, Action, RawTextHelpFormatter
+    ArgumentTypeError, ArgumentParser, Action, RawTextHelpFormatter
 )
 
 from .utils import exit_with_msg
@@ -105,7 +105,7 @@ class ExtractAndSetKeyValueAction(Action):
         if not m:
             msg = "Invalid value '%s' for option '%s' - value must be of the form 'key=value'" % (
                 value, opt)
-            raise ArgumentError(msg)
+            raise ArgumentTypeError(msg)
         d = getattr(namespace, self.dest)
         d[m.group(1)] = m.group(2)
 
@@ -121,7 +121,7 @@ class ParseDatetimeAction(Action):
             dt = datetime.datetime.strptime(value, format)
         except ValueError:
             # If we got here, none of them matched, so raise error
-            raise ArgumentError("Invalid datetime format '%s' for option %s" % (
+            raise ArgumentTypeError("Invalid datetime format '%s' for option %s" % (
                 value, option_string))
         setattr(namespace, self.dest, dt)
 
