@@ -8,6 +8,7 @@ import datetime
 import json
 import logging
 import os
+import re
 import requests
 import StringIO
 import zipfile
@@ -100,13 +101,15 @@ class HipChatArchiver(object):
         history.reverse()
         return history
 
+    FILENAME_CLEANER = re.compile('[^\w\-_]')
     def _zip(self, histories):
         logging.info("Zipping up files")
         in_memory_zip = StringIO.StringIO()
         z =  zipfile.ZipFile(in_memory_zip, 'a', zipfile.ZIP_DEFLATED, False)
         for h in histories:
-            z.writestr('{}/{}.json'.format(self._archive_name, h['name']),
-                json.dumps(h['history']))
+            filename = '{}/{}.json'.format(self._archive_name,
+                self.FILENAME_CLEANER.sub('_', h['name']))
+            z.writestr(filename, json.dumps(h['history']))
         return in_memory_zip
 
     def _write(self, in_memory_zip):
