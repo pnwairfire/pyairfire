@@ -67,6 +67,7 @@ class HipChatArchiver(object):
         headers = {
            'Accept': 'application/json'
         }
+        logging.debug("Requesting {}".format(url))
         r = requests.get(url, headers=headers)
         if r.status_code != 200:
             # TODO: retry
@@ -99,6 +100,8 @@ class HipChatArchiver(object):
                     "name": r['name'],
                     "history": self._get_history(r['id'])
                 })
+                logging.debug('Received {} messages from {}'.format(
+                    len(histories[-1]['history']), r['name']))
             except Exception, e:
                 logging.error("Failed to query history for room {} - {}."
                     " Skipping".format(r['name'], e.message))
