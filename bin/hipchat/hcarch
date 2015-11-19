@@ -41,9 +41,19 @@ OPTIONAL_ARGS = [
     },
     {
         'short': '-e',
-        'long': '--email-recipients',
+        'long': '--email-recipient',
         'dest': 'email_recipients',
         'help': 'email address to recieve archive',
+         # TODO: use action that appends to array but also splits if specified
+         #  as comma dlimited list (this action exists somewhere)
+        'action': 'append',
+        'default': []
+    },
+    {
+        'short': '-r',
+        'long': '--room-id',
+        'dest': 'room_id',
+        'help': 'id of specific room to archive',
         'action': 'store'
     }
     # TODO: add options for smtp config settings
@@ -56,5 +66,5 @@ if __name__ == "__main__":
     # TODO: set smtp settings in constuction
     archiver = HipChatArchiver(args.auth_token, args.num_days,
         dest_dir=args.dest_dir, email_recipients=args.email_recipients)
-    archiver.archive()
+    archiver.archive(room_id=args.room_id)
 
