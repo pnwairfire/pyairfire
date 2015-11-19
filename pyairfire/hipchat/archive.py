@@ -119,7 +119,7 @@ class HipChatArchiver(object):
             data = self._send(url, join_char='&')
             if not data['items']:
                 break
-            history.append(data['items'])
+            history.extend(data['items'])
             start_index += len(data['items'])
         history.reverse()
         return history
