@@ -8,18 +8,21 @@ import datetime
 import json
 import requests
 
+from pyairfire.scripting.utils import exit_with_msg
+
 __all__ = [
     'HipChatArchiver'
 ]
 
 class HipChatArchiver(object):
 
-    def __init__(self, auth_token, num_days, dest_dir=None,
-            email_recipients=[]):
+    def __init__(self, auth_token, num_days, **options):
         self._auth_token = auth_token
-        self._end_date = datetime.datetime.utc_now() - datetime.timedelta(num_days)
-        self._dest_dir = dest_dir
-        self._email_recipients = email_recipients
+        self._end_date = datetime.datetime.utcnow() - datetime.timedelta(num_days)
+        self._dest_dir = options.get('dest_dir')
+        self._email_recipients = options.get('email_recipients')
+        if not self._dest_dir and not self._email_recipients:
+            exit_with_msg("Specify either dest_dir or email_recipients, or both.")
 
     def archive(self):
         rooms = self._get_rooms()
@@ -33,18 +36,15 @@ class HipChatArchiver(object):
         if self._email_recipients:
             self._email(tarball, email_recipients)
 
-
-
     def _get_rooms(self):
         # TODO: get rooms with:
         #  https://www.hipchat.com/docs/apiv2/method/get_all_rooms
-        url = "https://api.hipchat.com/v2/rooms?auth_token={}".format(auth_token)
+        url = "https://api.hipchat.com/v2/rooms?auth_token={}".format(self._auth_token)
         headers = {
            'Content-type': 'application/json',
            'Accept': 'text/plain'
         }
         r = requests.get(url, headers=headers)
-        import pdb; pdb.set_trace()
         return r # TODO: extract necessary data from r
 
     def _get_history(self, room):

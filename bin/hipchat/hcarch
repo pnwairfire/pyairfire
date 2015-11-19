@@ -16,7 +16,8 @@ from pyairfire.hipchat.archive import HipChatArchiver
 REQUIRED_ARGS = [
     {
         'short': '-n',
-        'long': '--num-days'
+        'long': '--num-days',
+        'type': int,
         'dest': 'num_days',
         'help': 'number of days in the past (from now)',
         'action': 'store'
@@ -26,32 +27,34 @@ REQUIRED_ARGS = [
         'long': '--auth-token',
         'dest': 'auth_token',
         'help': 'API Auth token',
-        'action': store
+        'action': 'store'
     }
 ]
 
 OPTIONAL_ARGS = [
     {
         'short': '-d',
-        'long': '--dest-dir'
+        'long': '--dest-dir',
         'dest': 'dest_dir',
         'help': 'directory to store archive',
         'action': 'store'
     },
     {
         'short': '-e',
-        'long': '--email-recipients'
+        'long': '--email-recipients',
         'dest': 'email_recipients',
         'help': 'email address to recieve archive',
         'action': 'store'
     }
-
+    # TODO: add options for smtp config settings
 ]
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, [])
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS)
+    # TODO: add validation (e.g. either -d or -e must be specified, or both)
 
+    # TODO: set smtp settings in constuction
     archiver = HipChatArchiver(args.auth_token, args.num_days,
         dest_dir=args.dest_dir, email_recipients=args.email_recipients)
-    arciver.archive()
+    archiver.archive()
 
