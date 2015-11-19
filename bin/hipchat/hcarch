@@ -57,6 +57,7 @@ OPTIONAL_ARGS = [
         'action': 'store'
     }
     # TODO: add options for smtp config settings
+    # TODO: add options for archive name
 ]
 
 if __name__ == "__main__":
