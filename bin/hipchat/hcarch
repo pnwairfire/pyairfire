@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""hcarch: archives recent hipchat room histories
+"""hcarch: archives hipchat room histories
 
-Queries all rooms, and then queries the recent history for each of them.
+Queries all rooms, and then queries the history for each of them.
 
 TODO: rename this script?
 """

@@ -18,6 +18,9 @@ setup(
         'bin/bluesky/merge-emissions',
         'bin/bluesky/merge-fires',
         'bin/bluesky/run-bluesky',
+        'bin/hipchat/hcarch',
+        'bin/hipchat/hcarch2log',
+        'bin/hms/get-hms-kml',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
