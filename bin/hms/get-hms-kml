@@ -33,7 +33,7 @@ if different than previously cached file, and deletes otherwise
 DEFAUlT_URL_ROOT = "http://www.ssd.noaa.gov/PS/FIRE/hms/"
 
 def read_feed(feed):
-    if os.path.exists(feed):
+    if os.path.isfile(feed):
         logging.debug('Reading feed from file: %s', feed)
         with open(feed, 'r') as f:
             data = f.read()
