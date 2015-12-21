@@ -64,9 +64,11 @@ def parse_args():
         help="output file to write raw feed data (i.e. with original styling)")
     parser.add_argument('-l', '--log-level', default="WARN",
         help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
-    parser.add_argument('-a', '--archive', action="store_true", default=False,
-        help="Timestamp and create sym-link; must be used with '-o'; "
-        "applies to '-r' as well")
+    parser.add_argument('-a', '--archive', action="store_true",
+        default=False, help="Timestamp and create sym-link; must be used "
+        "with '-o'; applies to '-r' as well")
+    parser.add_argument('-c', '--change-colors', action="store_true",
+        default=False, help="Change color scheme")
     # TODO: add option to skip stripping of legend and logo
     parser.epilog = EXAMPLES
     return parser.parse_args()
@@ -151,7 +153,8 @@ def main():
     if args.raw_output:
         output(args.raw_output, args.archive, xml)
     strip_extras(args, xml)
-    change_colors(args, xml)
+    if args.change_colors:
+        change_colors(args, xml)
     order_plumes(args, xml)
     output(args.output, args.archive, xml)
 
