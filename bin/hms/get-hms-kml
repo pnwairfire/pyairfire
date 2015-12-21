@@ -16,7 +16,9 @@ import os
 import sys
 import urllib2
 import xmltodict
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser, RawTextHelpFormatter, Action, ArgumentTypeError
+)
 
 EXAMPLES = """
 Basic examples:
@@ -63,6 +65,17 @@ class outstream(object):
             self._file.close()
         # else, nothing to do for stdout
 
+class ParseColorMap(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        d = getattr(namespace, self.dest)
+        for m in values.split(','):
+            try:
+                b, a = m.split(':')
+                d[b] = a
+            except ValueError:
+                raise ArgumentTypeError(
+                    "Invalid --color-map value '{}'".format(values))
+
 def parse_args():
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('feed', help="'fires', 'smoke', or kml url")
@@ -79,6 +92,10 @@ def parse_args():
         default=False, help="Change smoke plume color scheme")
     parser.add_argument('-r', '--reverse-smoke-plumes', action="store_true",
         default=False, help="Reverse order of smoke plumes (for google maps in browser)")
+    parser.add_argument('-m', '--color-map', default={}, action=ParseColorMap,
+        help="Custom color map to use with '-c' option. "
+        "Ex. '-m 9900ff00:44999999,9900ffff:77666666' or '-m 9900ff00:44999999 -m 9900ffff:77666666'")
+
     # TODO: add option to skip stripping of legend and logo
     parser.epilog = EXAMPLES
     return parser.parse_args()
@@ -104,23 +121,24 @@ POLY_COLOR_MAP = {
     '9900ffff': '88666666', # '99888888',  # Yellow (aka 'transObsBluePoly')
     '990000ff': 'bb333333' # '99222222' # Red (aka 'transF06RedPoly')
 }
-def convert_color(color):
-    if hasattr(color, 'upper') and color in POLY_COLOR_MAP:
-        logging.debug("Converting {} to {}".format(color, POLY_COLOR_MAP[color]))
-        return POLY_COLOR_MAP[color]
+def convert_color(color_map, color):
+    if hasattr(color, 'upper') and color in color_map:
+        logging.debug("Converting {} to {}".format(color, color_map[color]))
+        return color_map[color]
     return color
 
 def change_smoke_colors(args, xml):
     # change color scheme of smoke plumes
     if args.feed.find('smoke') >= 0:
+        color_map = args.color_map or POLY_COLOR_MAP
         logging.debug('Changing smoke colors')
         for s in xml['kml']['Document']['Style']:
             # change color of plume
             if hasattr(s['PolyStyle']['color'], 'append'):
                 for i in xrange(len(s['PolyStyle']['color'])):
-                    s['PolyStyle']['color'][i] = convert_color(s['PolyStyle']['color'][i])
+                    s['PolyStyle']['color'][i] = convert_color(color_map, s['PolyStyle']['color'][i])
             else:
-                s['PolyStyle']['color'] = convert_color(s['PolyStyle']['color'])
+                s['PolyStyle']['color'] = convert_color(color_map, s['PolyStyle']['color'])
             # remove outline
             s['LineStyle']['width'] = '0'
 
@@ -159,6 +177,10 @@ def main():
     args  = parse_args()
     if args.archive and not args.output:
         sys.stderr.write("Error:  '-o' must be specified if '-a' is specified.\n")
+        sys.exit(1)
+
+    if args.color_map and not args.change_smoke_colors:
+        sys.stderr.write("Error:  '-c' must be specified if '-m' is specified.\n")
         sys.exit(1)
 
     logging.basicConfig(level=getattr(logging, args.log_level))
