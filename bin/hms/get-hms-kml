@@ -60,10 +60,13 @@ def parse_args():
     parser.add_argument('feed', help="'fires', 'smoke', or kml url")
     parser.add_argument('-o', '--output', default=None,
         help="output file; default to stdout")
+    parser.add_argument('-r', '--raw-output', default=None,
+        help="output file to write raw feed data (i.e. with original styling)")
     parser.add_argument('-l', '--log-level', default="WARN",
         help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
     parser.add_argument('-a', '--archive', action="store_true", default=False,
-        help="Timestamp and create sym-link; must be used with '-o-'")
+        help="Timestamp and create sym-link; must be used with '-o'; "
+        "applies to '-r' as well")
     # TODO: add option to skip stripping of legend and logo
     parser.epilog = EXAMPLES
     return parser.parse_args()
@@ -116,11 +119,11 @@ def order_plumes(args, xml):
         if 'Placemark' in xml['kml']['Document']:
             xml['kml']['Document']['Placemark'].reverse()
 
-def output(args, xml):
-    output_file_name = args.output
-    if args.archive: # args.output will also be specified
+def output(base_name, do_archive, xml):
+    output_file_name = base_name
+    if do_archive: # base_name must also be specified
         # timestamp it
-        parts = args.output.split('.')
+        parts = base_name.split('.')
         output_file_name = '-'.join([parts[0], datetime.datetime.now().strftime("%Y%m%d%H%M%S")])
         if len(parts) > 1:
             output_file_name = '.'.join([output_file_name, '.'.join(parts[1:])])
@@ -128,14 +131,14 @@ def output(args, xml):
     with outstream(output_file_name) as o:
         o.write(xmltodict.unparse(xml))
 
-    if args.archive:
-        old_exists = os.path.exists(args.output)
-        if old_exists and filecmp.cmp(output_file_name, args.output):
+    if do_archive:
+        old_exists = os.path.exists(base_name)
+        if old_exists and filecmp.cmp(output_file_name, base_name):
             os.remove(output_file_name)
         else:
             if old_exists:
-                os.remove(args.output)
-            os.symlink(output_file_name, args.output)
+                os.remove(base_name)
+            os.symlink(output_file_name, base_name)
 
 def main():
     args  = parse_args()
@@ -145,10 +148,12 @@ def main():
 
     logging.basicConfig(level=getattr(logging, args.log_level))
     xml = read_feed(args.feed)
+    if args.raw_output:
+        output(args.raw_output, args.archive, xml)
     strip_extras(args, xml)
     change_colors(args, xml)
     order_plumes(args, xml)
-    output(args, xml)
+    output(args.output, args.archive, xml)
 
 if __name__ == "__main__":
     main()
