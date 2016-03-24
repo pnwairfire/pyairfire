@@ -3,6 +3,8 @@
 This is a general toolbox to hold python packages and scripts for the Airfire
 Team.
 
+***This software is provided for research purposes only. Use at own risk.***
+
 ## Non-python Dependencies
 
 Whether cloning the repo or installing with pip, if you'll be using pyairfire
