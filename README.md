@@ -69,7 +69,7 @@ that contains libhdf5_hl.7.dylib, needed by netCDF4.  That can be set on
 the command line, such as in the following:
 
     DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/ ./bin/bluesky/extract_point_pm25_time_series.py
-    DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/ nosetests
+    DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/
 
 ## Running tests
 
