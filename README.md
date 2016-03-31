@@ -25,6 +25,13 @@ On ubuntu, the following should be sufficient:
     sudo apt-get install python-gdal
     sudo apt-get install libgdal1-1.7.0
 
+
+### met
+
+The met package relies on the fortran arl profile utility. It is
+expected to reside in a directory in the search path. To obtain `profile`,
+contact NOAA.
+
 ## Development
 
 ### Clone Repo

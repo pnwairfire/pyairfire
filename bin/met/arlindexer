@@ -73,8 +73,8 @@ EXAMPLES_STR = """This script updates the arl index with the availability of
 a particular domain on the current server.
 
 Examples:
-  $ bsp-arlindexer -d DRI2km -r /DRI_6km/
-  $ bsp-arlindexer -d DRI2km -r /DRI_6km/ \\
+  $ arlindexer -d DRI2km -r /DRI_6km/
+  $ arlindexer -d DRI2km -r /DRI_6km/ \\
       -m mongodb://localhost:27017/arlindex
  """
 

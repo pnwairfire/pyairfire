@@ -40,8 +40,8 @@ EXAMPLES_STR = """This script queries the arl index for the availability
 of arl files and the dates represented by them.
 
 Examples:
-  $ bsp-arlquery -m mongodb://localhost:27017/arlindex
-  $ bsp-arlqyert -m mongodb://localhost:27017/arlindex -q domain=DRI2km
+  $ arlquery -m mongodb://localhost:27017/arlindex
+  $ arlqyert -m mongodb://localhost:27017/arlindex -q domain=DRI2km
  """
 
 if __name__ == "__main__":
