@@ -4,16 +4,7 @@ __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 import datetime
 from pytest import raises
 
-# TODO: nosetests should take crae of updating sys path appropriately; figure
-#  out what's wrong
-try:
-    from pyairfire.bluesky.dispersionnc import PointExtractor
-except:
-    import os
-    import sys
-    root_dir = os.path.abspath(os.path.join(sys.path[0], '../../../'))
-    sys.path.insert(0, root_dir)
-    from pyairfire.bluesky.dispersionnc import PointExtractor
+from pyairfire.bluesky.dispersionnc import PointExtractor
 
 
 def new_initialize(self, nc_file_pathname):
