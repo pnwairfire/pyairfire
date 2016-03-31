@@ -2,12 +2,11 @@
 
 # TODO: rename this module and move it?
 """
+# to import standard dateimt package instead of local one
+from __future__ import absolute_import
 
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
-
-# to import standard dateimt package instead of local one
-from __future__ import absolute_import
 
 import datetime
 
