@@ -41,7 +41,8 @@ setup(
         #"netcdf"  #"netcdf==0.0.28"
         "requests>=2.7.0",
         "xmltodict==0.9.2",
-        "Fabric==1.10.2"
+        "Fabric==1.10.2",
+        "pymongo>=3.1.1"
     ],
     tests_require=test_requirements
 )
