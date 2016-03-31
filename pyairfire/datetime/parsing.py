@@ -1,7 +1,18 @@
 __author__      = "Joel Dubowy"
-__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
+__copyright__   = "Copyright (c) 2016 AirFire, PNW, USFS"
 
 import datetime
+import re
+
+__all__ = [
+    'parse',
+    'parse_time_and_date',
+    'fill_in_date',
+    'parse_datetime',
+    'parse_datetimes',
+    'parse_utc_offset',
+    'is_round_hour'
+]
 
 RECOGNIZED_DATETIME_FORMATS = [
     '%Y-%m-%dT%H:%M:%S',
@@ -69,3 +80,71 @@ def fill_in_date(dt):
         d = n.date() + ONE_DAY
 
     return datetime.datetime(d.year, d.month, d.day, t.hour, t.minute, t.second)
+
+##
+## Moved originally in bluesky package
+##
+
+def parse_datetime(v, k):
+    # TODO: make 'k' optional kwargs
+    try:
+        return parse(v, extra_formats=['%Y-%m-%d %H:%M:%S'])
+    except ValueError, e:
+        # datetime_parsing will raise ValueError if invalid format; re-raise
+        # wih specific msg
+        raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
+    except TypeError, e:
+        # TypeError will e raised if v is not a string; re-raise wih specific msg
+        raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
+
+def parse_datetimes(d, *keys):
+    r = {}
+    for k in keys:
+        try:
+            r[k] = parse_datetime(d[k], k)
+        except KeyError, e:
+            raise ValueError("Missing '{}' datetime field".format(k))
+    return r
+
+OFFSET_MATCHER = re.compile('([+-]?\d{2}):(\d{2})')
+def parse_utc_offset(utc_offset_str):
+    """Parses iso8601 formmated utc offset to float value
+
+    Examples:
+     > parse_utc_offset('+00:00')
+     0.0
+     > parse_utc_offset('+04:00')
+     4.0
+     > parse_utc_offset('-03:30')
+     -3.5
+
+
+    TODO: look at other options:
+     - https://bitbucket.org/micktwomey/pyiso8601/
+     - https://github.com/dateutil/dateutil/
+     - http://labix.org/python-dateutil
+     - http://arrow.readthedocs.org/en/latest/
+    """
+    if isinstance(utc_offset_str, (float, int)):
+        return float(utc_offset_str)
+
+    if not utc_offset_str:
+        raise ValueError("UTC offset not defined")
+
+    m = OFFSET_MATCHER.match(utc_offset_str)
+    if not m:
+        raise ValueError("Invalid UTC offset string format: {}".format(utc_offset_str))
+
+    hours = float(m.group(1))
+    minutes = float(m.group(2))
+    if hours < -13 or hours > 13 or minutes < 0 or minutes > 59:
+        raise ValueError("Invalid UTC offset: {}".format(utc_offset_str))
+    hour_fraction = minutes / 60.0
+    return (hours - hour_fraction) if (hours < 0) else (hours + hour_fraction)
+
+def is_round_hour(dt):
+    """Returns true if datetime object is a round our
+
+    TODO: move to different module
+    """
+    return dt.minute == dt.second == dt.microsecond == 0
