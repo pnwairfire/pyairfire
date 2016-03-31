@@ -1,4 +1,4 @@
-"""bluesky.process
+"""pyairfire.process
 
 # TODO: rename this module and move it?
 """

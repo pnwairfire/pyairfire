@@ -1,4 +1,4 @@
-"""bluesky.sun
+"""pyairfire.sun
 
 # TODO: nest this module under a subpackage?
 """
