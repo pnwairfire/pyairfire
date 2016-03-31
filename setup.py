@@ -37,7 +37,8 @@ setup(
     install_requires=[
         #"netcdf"  #"netcdf==0.0.28"
         "requests>=2.7.0",
-        "xmltodict==0.9.2"
+        "xmltodict==0.9.2",
+        "Fabric==1.10.2"
     ],
     tests_require=test_requirements
 )

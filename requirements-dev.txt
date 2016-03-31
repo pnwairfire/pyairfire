@@ -1,3 +1,2 @@
 ipython
 maildump
-fabric
