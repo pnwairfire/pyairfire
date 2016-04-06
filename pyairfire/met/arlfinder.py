@@ -129,8 +129,8 @@ class ArlFinder(object):
             self.DEFAULT_INDEX_FILENAME_PATTERN)
         logging.debug("Looking for index filenames mathing pattern '%s'",
             self._index_filename_matcher.pattern)
-        self._max_days_out = int(config.get("max_days_out",
-            self.DEFAULT_MAX_DAYS_OUT))
+        self._max_days_out = (self.DEFAULT_MAX_DAYS_OUT
+            if config.get("max_days_out") is None else int(config["max_days_out"]))
         self._ignore_matcher = (config.get('ignore_pattern')
             and re.compile('.*{}.*'.format(config['ignore_pattern'])))
 
