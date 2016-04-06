@@ -3,53 +3,27 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import json
 import logging
+import sys
 import traceback
 
 try:
     from pyairfire import scripting
-    from pyairfire.met import arlindexer
+    from pyairfire.met import arlfinder
 except:
     import os
     import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from pyairfire import scripting
-    from pyairfire.met import arlindexer
+    from pyairfire.met import arlfinder
 
 REQUIRED_ARGS = [
-    {
-        'short': '-d',
-        'long': '--domain',
-        'help': "domain identifier (e.g. 'DRI2km')"
-    },
     {
         'short': '-r',
         'long': '--root-dir',
         'help': "domain root directory (e.g. '/DRI_2km/')"
-    }
-]
-
-OPTIONAL_ARGS = [
-    {
-        'short': '-m',
-        'long': '--mongodb-url',
-        'help': "mongodb url: format 'mongodb://[username:password@]host[:port][/[database][?options]]'"
-    },
-    {
-        'short': '-o',
-        'long': '--output-file', # TODO: or --output-file-prefix?
-        'help': "output file to dump index json"
-    },
-    {
-        'short': '-p',
-        'long': '--index-filename-pattern',
-        'help': "index filename pattern; default 'arl12hrindex.csv'"
-    },
-    {
-        'short': '-i',
-        'long': '--ignore-pattern',
-        'help': "pattern of dirs/files to ignore; e.g. '/MOVED/'"
     },
     {
         'short': '-s',
@@ -62,20 +36,34 @@ OPTIONAL_ARGS = [
         'long': '--end',
         'help': "Ignore all data after this time",
         'action': scripting.args.ParseDatetimeAction
-    },
-    {
-        'long': '--server-name',
-        'help': "name to identify server in index data"
     }
 ]
 
-EXAMPLES_STR = """This script updates the arl index with the availability of
-a particular domain on the current server.
+OPTIONAL_ARGS = [
+    {
+        'short': '-p',
+        'long': '--index-filename-pattern',
+        'help': "index filename pattern; default 'arl12hrindex.csv'"
+    },
+    {
+        'short': '-i',
+        'long': '--ignore-pattern',
+        'help': "pattern of dirs/files to ignore; e.g. '/MOVED/'"
+    },
+    {
+        'short': '-m',
+        'long': '--max-days-out',
+        'help': "max number of days out predicted in met data",
+        'type': int
+    }
+]
+
+EXAMPLES_STR = """This script returns arl ata
 
 Examples:
-  $ arlindexer -d DRI6km -r /DRI_6km/
-  $ arlindexer -d DRI6km -r /DRI_6km/ \\
-      -m mongodb://localhost:27017/arlindex
+  $ arlfinder -r /DRI_6km/ -s 2016-04-01T00:00:00 -e 2016-04-02T12:00:00
+  $ arlfinder -r /NAM84/ -s 2015-09-19T00:00:00 -e 2015-09-20T12:00:00 \
+        -p NAM84_ARL_index.csv --log-level=DEBUG
  """
 
 if __name__ == "__main__":
@@ -85,14 +73,13 @@ if __name__ == "__main__":
     try:
         start = args.__dict__.pop('start')
         end = args.__dict__.pop('end')
-        indexer = arlindexer.ArlIndexer(
+        indexer = arlfinder.ArlFinder(
             # Pop reqired args so that they're not passed in as 'config'
             # TODO: not really necessary, so maybe just use
             #   `args.domain` and `args.root_dir`
-            args.__dict__.pop('domain'),
             args.__dict__.pop('root_dir'),
             **args.__dict__)
-        indexer.index(start, end)
+        sys.stdout.write(json.dumps(indexer.find(start, end)))
 
     except Exception, e:
         logging.error(e)
