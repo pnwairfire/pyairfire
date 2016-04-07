@@ -296,6 +296,7 @@ class TestARLFinder(object):
             datetime.datetime(2014,12,1,1,0,0), datetime.datetime(2015,1,4,23,0,0))
         assert expected == self.arl_finder._prune_and_sort(arl_files,
             datetime.datetime(2015,1,1,5,0,0), datetime.datetime(2015,1,4,4,0,0))
+        assert expected == self.arl_finder._prune_and_sort(arl_files, None, None)
 
         expected = [
             {
@@ -401,6 +402,7 @@ class TestARLFinder(object):
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2014,12,31,0,0,0), datetime.datetime(2015,1,3,23,0,0)))
         assert expected == actual
+        assert expected == self.arl_finder._prune_and_sort(arl_files, None, None)
 
         expected = [
             {

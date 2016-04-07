@@ -387,7 +387,7 @@ class ArlFinder(object):
         # group by first hour
         by_first_hour = defaultdict(lambda: [])
         for f in arl_files:
-            if f['first_hour'] <= end and f['last_hour'] >= start:
+            if (not end or f['first_hour'] <= end) and (not start or f['last_hour'] >= start):
                 by_first_hour[f['first_hour']].append(f)
             # else, not in time window
 
@@ -402,9 +402,9 @@ class ArlFinder(object):
         # iterate from most recent to oldest.  this ensures that, if there are
         # two files that both span start to end, the more recent one is used
         for i in reversed(range(num_arl_files)):
-            if arl_files[i]['last_hour'] >= end:
+            if end and arl_files[i]['last_hour'] >= end:
                 e_idx = i + 1
-            if arl_files[i]['first_hour'] <= start:
+            if start and arl_files[i]['first_hour'] <= start:
                 s_idx = i
                 break
 
@@ -447,8 +447,9 @@ class ArlFinder(object):
 
         files_per_hour = {}
         for f_dict in sorted_arl_files:
-            dt = max(f_dict['first_hour'], start)
-            while dt <= min(f_dict['last_hour'], end):
+            dt = max(f_dict['first_hour'], start) if start else f_dict['first_hour']
+            end_dt = min(f_dict['last_hour'], end) if end else f_dict['last_hour']
+            while dt <= end_dt:
                 if not files_per_hour.get(dt) or not self._fewer_arl_files:
                     files_per_hour[dt] = f_dict
                 dt += ONE_HOUR

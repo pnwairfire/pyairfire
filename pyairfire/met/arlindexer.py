@@ -64,7 +64,7 @@ class ArlIndexer(ArlFinder):
         date_matcher = self._create_date_matcher(start, end)
         index_files = self._find_index_files(date_matcher)
         arl_files = self._parse_index_files(index_files)
-        files_per_hour = self._determine_files_per_hour(arl_files)
+        files_per_hour = self._determine_files_per_hour(arl_files, start, end)
         files = self._determine_file_time_windows(files_per_hour)
         files_per_hour, files = self._filter(files_per_hour, files, start, end)
         index_data = self._analyse(files_per_hour, files)
