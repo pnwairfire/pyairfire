@@ -325,7 +325,7 @@ class TestARLFinderWindowDetermination(object):
     ##    24 hr predictions over two 12-hr files every 12 hours.
     ##
 
-    ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS = [
+    ARL_FILES_24_HR_OVER_12_HR_FILES_EVERY_12_HRS = [
         # 2015-1-1 00Z - 12 hours
         {
             'file': '2015010100/a',
@@ -373,7 +373,7 @@ class TestARLFinderWindowDetermination(object):
     ]
 
     def test_no_overlap_larger_time_window(self):
-        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS)
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12_HR_FILES_EVERY_12_HRS)
 
         expected = [
             {
@@ -409,7 +409,7 @@ class TestARLFinderWindowDetermination(object):
         assert expected == self.arl_finder._prune_and_sort(arl_files, None, None)
 
     def test_no_overlap_larger_time_window_fewer_arl_files(self):
-        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS)
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12_HR_FILES_EVERY_12_HRS)
 
         # fewer_arl_files True/False should be the same here as previous test
         expected = [
@@ -447,7 +447,7 @@ class TestARLFinderWindowDetermination(object):
         assert expected == self.arl_finder._prune_and_sort(arl_files, None, None)
 
     def test_no_overlap_restricted_time_window(self):
-        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS)
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12_HR_FILES_EVERY_12_HRS)
 
         expected = [
             {

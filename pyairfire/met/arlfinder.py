@@ -441,13 +441,21 @@ class ArlFinder(object):
         the most recent.  (Note: This assumes that the prediction time is in
         the pathname.)
         """
-
-        #if self._fewer_arl_files:
         sorted_arl_files = self._prune_and_sort(arl_files, start, end)
 
         files_per_hour = {}
-        for f_dict in sorted_arl_files:
+        num_arl_files = len(sorted_arl_files)
+        for i in range(num_arl_files):
+            f_dict = sorted_arl_files[i]
             dt = max(f_dict['first_hour'], start) if start else f_dict['first_hour']
+
+            # skip to next file if there aren't any hours in this file that
+            # aren't covered by the next file
+            if i < (num_arl_files - 1): # not at last file
+                next_dt = max(files_per_hour.keys() + [dt]) if files_per_hour else dt
+                if next_dt > sorted_arl_files[i+1]['first_hour']:
+                    continue
+
             end_dt = min(f_dict['last_hour'], end) if end else f_dict['last_hour']
             while dt <= end_dt:
                 if not files_per_hour.get(dt) or not self._fewer_arl_files:
