@@ -214,7 +214,7 @@ class ArlFinder(object):
         arl_files = self._parse_index_files(index_files)
         files_per_hour = self._determine_files_per_hour(arl_files, start, end)
         files = self._determine_file_time_windows(files_per_hour)
-        files = self._filter_files(files, start, end)
+        # files = self._filter_files(files, start, end)
         files = datautils.format_datetimes(files)
 
         return {'files': files}
@@ -466,18 +466,3 @@ class ArlFinder(object):
                 files[-1]['last_hour'] = dt
         return files
 
-    ##
-    ## Filtering and Formating
-    ##
-
-    def _filter_files(self, files, start, end):
-        # By this point start and end will either both be defined or not
-        if not (start and end):
-            return files
-
-        def in_tw(t):
-            return t >= start and t <= end
-
-        return [
-            f for f in files if in_tw(f['first_hour']) or in_tw(f['last_hour'])
-        ]
