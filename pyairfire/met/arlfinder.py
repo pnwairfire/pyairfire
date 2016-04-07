@@ -359,18 +359,18 @@ class ArlFinder(object):
     def _determine_files_per_hour(self, arl_files):
         """Determines which arl file has the most recent data for each hour
 
-        Note: This method assumes that the files, when listed chronolofically,
-        are also ordered alphabetically, since the pathnames should be
-        identical other than datetime information embedded in them.
+        File recency is determined by looking at the first hours - more recent
+        files (i.e. more up to date meteorology) will have more recent first hour.
         """
         files_per_hour = {}
         for f_dict in arl_files:
             dt = f_dict['first_hour']
             while dt <= f_dict['last_hour']:
-                if not files_per_hour.get(dt) or files_per_hour[dt] < f_dict['file']:
-                    files_per_hour[dt] = f_dict['file']
+                if not files_per_hour.get(dt) or (
+                        files_per_hour[dt]['first_hour'] < f_dict['first_hour']):
+                    files_per_hour[dt] = f_dict
                 dt += ONE_HOUR
-        return files_per_hour
+        return {dt: f['file'] for dt, f in files_per_hour.items()}
 
     def _determine_file_time_windows(self, files_per_hour):
         """Determines time windows for which each arl file should be used.
