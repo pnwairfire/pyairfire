@@ -433,8 +433,9 @@ class TestARLFinder(object):
             datetime.datetime(2015,1,1,19,0,0), datetime.datetime(2015,1,2,15,0,0)))
         assert expected == actual
 
+        ## With 'fewer_arl_files' option set to True
 
-        # With 'fewer_arl_files' option set to True
+
 
     def test_from_arl_files_to_time_windows_case_2(self):
         """Tests both _determine_file* methods, in cases where met
@@ -488,7 +489,36 @@ class TestARLFinder(object):
         ]
 
         expected = [
-
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,11,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,12,0,0),
+                'last_hour': datetime.datetime(2015,1,4,11,0,0)
+            }
         ]
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
@@ -497,6 +527,26 @@ class TestARLFinder(object):
 
         self.arl_finder._fewer_arl_files = True
         expected = [
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,23,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,4,0,0,0),
+                'last_hour': datetime.datetime(2015,1,4,11,0,0)
+            }
 
         ]
         actual = self.arl_finder._determine_file_time_windows(
@@ -505,7 +555,21 @@ class TestARLFinder(object):
         assert expected == actual
 
         expected = [
-
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,19,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,15,0,0)
+            }
         ]
         self.arl_finder._fewer_arl_files = False
         actual = self.arl_finder._determine_file_time_windows(
@@ -515,7 +579,16 @@ class TestARLFinder(object):
 
         self.arl_finder._fewer_arl_files = True
         expected = [
-
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,19,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,15,0,0)
+            },
         ]
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
