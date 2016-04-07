@@ -307,63 +307,73 @@ class TestARLFinder(object):
         ]
         assert expected == self.arl_finder._prune_and_sort(arl_files,
             datetime.datetime(2015,1,2,2,0,0), datetime.datetime(2015,1,2,4,0,0))
-    ##
-    ## Determining Windows
-    ##
 
     # Note: removed test for _determine_files_per_hour
     # Note: removed test for _determine_file_time_windows
 
-    def test_from_arl_files_to_time_windows_case_1(self):
-        """Tests both _determine_file* methods, in cases where met
-        data is 24 hr predictions over two 12-hr files every 12 hours.
-        """
-        arl_files = [
-            # 2015-1-1 00Z - 12 hours
-            {
-                'file': '2015010100/a',
-                'first_hour': datetime.datetime(2015,1,1,0,0,0),
-                'last_hour': datetime.datetime(2015,1,1,11,0,0)
-            },
-            {
-                'file': '2015010100/b',
-                'first_hour': datetime.datetime(2015,1,1,12,0,0),
-                'last_hour': datetime.datetime(2015,1,1,23,0,0)
-            },
-            # 2015-1-1 12Z - 12 hours
-            {
-                'file': '2015010112/a',
-                'first_hour': datetime.datetime(2015,1,1,12,0,0),
-                'last_hour': datetime.datetime(2015,1,1,23,0,0)
-            },
-            {
-                'file': '2015010112/b',
-                'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,11,0,0)
-            },
-            # 2015-1-2 00Z - 12 hours
-            {
-                'file': '2015010200/a',
-                'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,11,0,0)
-            },
-            {
-                'file': '2015010200/b',
-                'first_hour': datetime.datetime(2015,1,2,12,0,0),
-                'last_hour': datetime.datetime(2015,1,2,23,0,0)
-            },
-            # 2015-1-2 12Z - 12 hours
-            {
-                'file': '2015010212/a',
-                'first_hour': datetime.datetime(2015,1,2,12,0,0),
-                'last_hour': datetime.datetime(2015,1,2,23,0,0)
-            },
-            {
-                'file': '2015010212/b',
-                'first_hour': datetime.datetime(2015,1,3,0,0,0),
-                'last_hour': datetime.datetime(2015,1,3,11,0,0)
-            }
-        ]
+
+class TestARLFinderWindowDetermination(object):
+    """Contains higher level tests, starting with parsed file data
+    and ending with file time window assignments
+    """
+
+    def setup(self):
+        self.arl_finder = arlfinder.ArlFinder(tempfile.mkdtemp())
+
+    ##
+    ## Tests cases where met data is
+    ##    24 hr predictions over two 12-hr files every 12 hours.
+    ##
+
+    ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS = [
+        # 2015-1-1 00Z - 12 hours
+        {
+            'file': '2015010100/a',
+            'first_hour': datetime.datetime(2015,1,1,0,0,0),
+            'last_hour': datetime.datetime(2015,1,1,11,0,0)
+        },
+        {
+            'file': '2015010100/b',
+            'first_hour': datetime.datetime(2015,1,1,12,0,0),
+            'last_hour': datetime.datetime(2015,1,1,23,0,0)
+        },
+        # 2015-1-1 12Z - 12 hours
+        {
+            'file': '2015010112/a',
+            'first_hour': datetime.datetime(2015,1,1,12,0,0),
+            'last_hour': datetime.datetime(2015,1,1,23,0,0)
+        },
+        {
+            'file': '2015010112/b',
+            'first_hour': datetime.datetime(2015,1,2,0,0,0),
+            'last_hour': datetime.datetime(2015,1,2,11,0,0)
+        },
+        # 2015-1-2 00Z - 12 hours
+        {
+            'file': '2015010200/a',
+            'first_hour': datetime.datetime(2015,1,2,0,0,0),
+            'last_hour': datetime.datetime(2015,1,2,11,0,0)
+        },
+        {
+            'file': '2015010200/b',
+            'first_hour': datetime.datetime(2015,1,2,12,0,0),
+            'last_hour': datetime.datetime(2015,1,2,23,0,0)
+        },
+        # 2015-1-2 12Z - 12 hours
+        {
+            'file': '2015010212/a',
+            'first_hour': datetime.datetime(2015,1,2,12,0,0),
+            'last_hour': datetime.datetime(2015,1,2,23,0,0)
+        },
+        {
+            'file': '2015010212/b',
+            'first_hour': datetime.datetime(2015,1,3,0,0,0),
+            'last_hour': datetime.datetime(2015,1,3,11,0,0)
+        }
+    ]
+
+    def test_no_overlap_larger_time_window(self):
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS)
 
         expected = [
             {
@@ -395,14 +405,49 @@ class TestARLFinder(object):
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2014,12,31,0,0,0), datetime.datetime(2015,1,3,23,0,0)))
-        assert  expected == actual
-        # fewer_arl_files True/False should be the same here
+        assert expected == actual
+        assert expected == self.arl_finder._prune_and_sort(arl_files, None, None)
+
+    def test_no_overlap_larger_time_window_fewer_arl_files(self):
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS)
+
+        # fewer_arl_files True/False should be the same here as previous test
+        expected = [
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,11,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            }
+        ]
         self.arl_finder._fewer_arl_files = True
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2014,12,31,0,0,0), datetime.datetime(2015,1,3,23,0,0)))
         assert expected == actual
         assert expected == self.arl_finder._prune_and_sort(arl_files, None, None)
+
+    def test_no_overlap_restricted_time_window(self):
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12HR_FILES_EVERY_12_HRS)
 
         expected = [
             {
@@ -426,8 +471,31 @@ class TestARLFinder(object):
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2015,1,1,19,0,0), datetime.datetime(2015,1,2,15,0,0)))
         assert expected == actual
-        # fewer_arl_files True/False should be the same here
+
+    def test_no_overlap_restricted_time_window_fewer_arl_files(self):
         self.arl_finder._fewer_arl_files = True
+
+        arl_files = copy.deepcopy(self.ARL_FILES_24_HR_OVER_12_HR_FILES_EVERY_12_HRS)
+
+        # fewer_arl_files True/False should be the same here as previous test
+        expected = [
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,19,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,15,0,0)
+            }
+        ]
+
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2015,1,1,19,0,0), datetime.datetime(2015,1,2,15,0,0)))
@@ -437,56 +505,60 @@ class TestARLFinder(object):
 
 
 
-    def test_from_arl_files_to_time_windows_case_2(self):
-        """Tests both _determine_file* methods, in cases where met
-        data is 48-hr predictions over two 24-hr files every 12 hours.
-        """
-        arl_files = [
-            # 2015-1-1 00Z - 48 hours over two files
-            {
-                'file': '2015010100/a',
-                'first_hour': datetime.datetime(2015,1,1,0,0,0),
-                'last_hour': datetime.datetime(2015,1,1,23,0,0)
-            },
-            {
-                'file': '2015010100/b',
-                'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,23,0,0)
-            },
-            # 2015-1-1 12Z - 48 hours over two files
-            {
-                'file': '2015010112/a',
-                'first_hour': datetime.datetime(2015,1,1,12,0,0),
-                'last_hour': datetime.datetime(2015,1,2,11,0,0)
-            },
-            {
-                'file': '2015010112/b',
-                'first_hour': datetime.datetime(2015,1,2,12,0,0),
-                'last_hour': datetime.datetime(2015,1,3,11,0,0)
-            },
-            # 2015-1-2 00Z - 48 hours over two files
-            {
-                'file': '2015010200/a',
-                'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,23,0,0)
-            },
-            {
-                'file': '2015010200/b',
-                'first_hour': datetime.datetime(2015,1,3,0,0,0),
-                'last_hour': datetime.datetime(2015,1,3,23,0,0)
-            },
-            # 2015-1-2 12Z - 48 hours over two files
-            {
-                'file': '2015010212/a',
-                'first_hour': datetime.datetime(2015,1,2,12,0,0),
-                'last_hour': datetime.datetime(2015,1,3,11,0,0)
-            },
-            {
-                'file': '2015010212/b',
-                'first_hour': datetime.datetime(2015,1,3,12,0,0),
-                'last_hour': datetime.datetime(2015,1,4,11,0,0)
-            }
-        ]
+    ##
+    ## Tests cases where met data is
+    ##    48-hr predictions over two 24-hr files every 12 hours.
+    ##
+
+    ARL_FILES_48_HR_OVER_24_HR_FILES_EVERY_12_HRS = [
+        # 2015-1-1 00Z - 48 hours over two files
+        {
+            'file': '2015010100/a',
+            'first_hour': datetime.datetime(2015,1,1,0,0,0),
+            'last_hour': datetime.datetime(2015,1,1,23,0,0)
+        },
+        {
+            'file': '2015010100/b',
+            'first_hour': datetime.datetime(2015,1,2,0,0,0),
+            'last_hour': datetime.datetime(2015,1,2,23,0,0)
+        },
+        # 2015-1-1 12Z - 48 hours over two files
+        {
+            'file': '2015010112/a',
+            'first_hour': datetime.datetime(2015,1,1,12,0,0),
+            'last_hour': datetime.datetime(2015,1,2,11,0,0)
+        },
+        {
+            'file': '2015010112/b',
+            'first_hour': datetime.datetime(2015,1,2,12,0,0),
+            'last_hour': datetime.datetime(2015,1,3,11,0,0)
+        },
+        # 2015-1-2 00Z - 48 hours over two files
+        {
+            'file': '2015010200/a',
+            'first_hour': datetime.datetime(2015,1,2,0,0,0),
+            'last_hour': datetime.datetime(2015,1,2,23,0,0)
+        },
+        {
+            'file': '2015010200/b',
+            'first_hour': datetime.datetime(2015,1,3,0,0,0),
+            'last_hour': datetime.datetime(2015,1,3,23,0,0)
+        },
+        # 2015-1-2 12Z - 48 hours over two files
+        {
+            'file': '2015010212/a',
+            'first_hour': datetime.datetime(2015,1,2,12,0,0),
+            'last_hour': datetime.datetime(2015,1,3,11,0,0)
+        },
+        {
+            'file': '2015010212/b',
+            'first_hour': datetime.datetime(2015,1,3,12,0,0),
+            'last_hour': datetime.datetime(2015,1,4,11,0,0)
+        }
+    ]
+
+    def test_overlapping_larger_time_window(self):
+        arl_files = copy.deepcopy(self.ARL_FILES_48_HR_OVER_24_HR_FILES_EVERY_12_HRS)
 
         expected = [
             {
@@ -525,7 +597,12 @@ class TestARLFinder(object):
             datetime.datetime(2014,12,31,0,0,0), datetime.datetime(2015,1,4,23,0,0)))
         assert expected == actual
 
+
+    def test_overlapping_larger_time_window_fewer_files(self):
         self.arl_finder._fewer_arl_files = True
+
+        arl_files = copy.deepcopy(self.ARL_FILES_48_HR_OVER_24_HR_FILES_EVERY_12_HRS)
+
         expected = [
             {
                 'file': '2015010100/a',
@@ -554,6 +631,9 @@ class TestARLFinder(object):
             datetime.datetime(2014,12,31,0,0,0), datetime.datetime(2015,1,4,23,0,0)))
         assert expected == actual
 
+    def test_overlapping_restricted_time_window(self):
+        arl_files = copy.deepcopy(self.ARL_FILES_48_HR_OVER_24_HR_FILES_EVERY_12_HRS)
+
         expected = [
             {
                 'file': '2015010112/a',
@@ -577,7 +657,11 @@ class TestARLFinder(object):
             datetime.datetime(2015,1,1,19,0,0), datetime.datetime(2015,1,2,15,0,0)))
         assert expected == actual
 
+    def test_overlapping_restricted_time_window_fewer_files(self):
         self.arl_finder._fewer_arl_files = True
+
+        arl_files = copy.deepcopy(self.ARL_FILES_48_HR_OVER_24_HR_FILES_EVERY_12_HRS)
+
         expected = [
             {
                 'file': '2015010112/a',
