@@ -83,6 +83,10 @@ class ArlIndexer(ArlFinder):
             # because some files may cross the start and/or end times
             #logging.debug("files (BEFORE): %s", files)
             #logging.debug("files_per_hour (BEFORE): %s", files_per_hour)
+
+            # TODO: self._filter_files shouldn't be necessary; remove call,
+            #   method, and unit test
+
             files = self._filter_files(files, start, end)
             files_per_hour = {k:v for k, v in files_per_hour.items()
                 if k >= start and k <= end}

@@ -375,36 +375,40 @@ class ArlFinder(object):
     ## Mapping hours to arl files and vice versa
     ##
 
-    def _sort(self, arl_files):
-        """Sorts chronologically by first_hour and then reverse alphabetically
-        byt file name
+    def _prune_and_sort(self, arl_files, start, end):
+        """Removes files that have no chance of being used
 
-        If we wanted the secondary sort to be alphabetically by file name, then
-        we could use the simpler:
+        This includes files whose time windows are outside of start/end
+        as well as as older files within even group of files with the
+        same first hour.
 
-            > sorted(arl_files, key=lambda f: (f['first_hour'], f['file']))
+        Assumes that all files contain the same prediction time window size.
         """
+        # group by first hour
         by_first_hour = defaultdict(lambda: [])
         for f in arl_files:
-            by_first_hour[f['first_hour']].append(f)
+            if f['first_hour'] <= end and f['last_hour'] >= start:
+                by_first_hour[f['first_hour']].append(f)
+            # else, not in time window
 
-        sorted_arl_files = []
-        for fh, files in sorted(by_first_hour.items(), key=lambda e: e[0]):
-            sorted_arl_files.extend(reversed(sorted(files, key=lambda f: f['file'])))
-        return sorted_arl_files
+        # get most recent of each group
+        arl_files = [sorted(files)[-1] for first_hour, files in
+            sorted(by_first_hour.items(), key=lambda e: e[0])]
 
-    def _prune(self, sorted_arl_files, start, end):
-        num_arl_files = len(sorted_arl_files)
+        # remove unecessary at beginning and end
+        num_arl_files = len(arl_files)
         s_idx = 0
         e_idx = num_arl_files
-        for i in range(num_arl_files):
-            if sorted_arl_files[i]['first_hour'] <= start:
+        # iterate from most recent to oldest.  this ensures that, if there are
+        # two files that both span start to end, the more recent one is used
+        for i in reversed(range(num_arl_files)):
+            if arl_files[i]['last_hour'] >= end:
+                e_idx = i + 1
+            if arl_files[i]['first_hour'] <= start:
                 s_idx = i
-            elif sorted_arl_files[i]['first_hour'] > end:
-                e_idx = i
                 break
 
-        return sorted_arl_files[s_idx:e_idx]
+        return arl_files[s_idx:e_idx]
 
         # num_early_enough = len([f for f in arl_files if f['first_hour'] <= start])
         # num_late_enough = len([f for f in arl_files if f['last_hour'] >= end])
@@ -438,10 +442,8 @@ class ArlFinder(object):
         the pathname.)
         """
 
-        sorted_arl_files = self._sort(arl_files)
-
         #if self._fewer_arl_files:
-        sorted_arl_files = self._prune(sorted_arl_files, start, end)
+        sorted_arl_files = self._prune_and_sort(arl_files, start, end)
 
         files_per_hour = {}
         for f_dict in sorted_arl_files:

@@ -78,10 +78,78 @@ class TestARLIndexer(object):
                 'last_hour': datetime.datetime(2015,1,2,3,0,0)
             }
         ]
-        assert expected_fph, expected_f == self.arl_finder._filter_files(
+        assert expected_fph, expected_f == self.arl_indexer._filter_files(
             files, files_per_hour, s, e)
 
+    def test_filter_files(self):
+        files = [
+            {
+                'file': 'a',
+                'first_hour': datetime.datetime(2015,1,1,23,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour': datetime.datetime(2015,1,2,6,0,0)
+            }
+        ]
 
+        n = datetime.datetime.utcnow()
+        assert files == self.arl_indexer._filter_files(files, None, None)
+        assert files == self.arl_indexer._filter_files(files, n, None)
+        assert files == self.arl_indexer._filter_files(files, None, n)
+
+        expected = [
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            }
+        ]
+        assert expected == self.arl_indexer._filter_files(files,
+            datetime.datetime(2015,1,2,1,0,0), datetime.datetime(2015,1,2,3,0,0))
+
+        expected = [
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour': datetime.datetime(2015,1,2,6,0,0)
+            }
+        ]
+        assert expected == self.arl_indexer._filter_files(files,
+            datetime.datetime(2015,1,2,1,0,0),
+            datetime.datetime(2015,1,2,5,0,0))
+
+
+        assert files == self.arl_indexer._filter_files(files,
+            datetime.datetime(2015,1,1,20,0,0),
+            datetime.datetime(2015,1,2,10,0,0))
 
     def test_fill_in_start_end(self):
         # case where neither start nor end is defined; they are returned
