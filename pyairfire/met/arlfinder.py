@@ -83,6 +83,7 @@ import datetime
 import logging
 import os
 import re
+from collections import defaultdict
 
 from pyairfire.data import utils as datautils
 from pyairfire.datetime.parsing import parse_datetimes, parse_utc_offset
@@ -374,15 +375,45 @@ class ArlFinder(object):
     ## Mapping hours to arl files and vice versa
     ##
 
-    def _prune(self, arl_files, start, end):
-        num_early_enough = len([f for f in arl_files if f['first_hour'] <= start])
-        num_late_enough = len([f for f in arl_files if f['last_hour'] >= end])
-        s_idx = max(num_early_enough - 1, 0)
-        num_files = len(arl_files)
-        e_idx = min(num_files, num_files - num_late_enough + 1)
-        if s_idx == e_idx:
-            e_idx += 1
-        return sorted(arl_files, key=lambda f: f['first_hour'])[s_idx: e_idx]
+    def _sort(self, arl_files):
+        """Sorts chronologically by first_hour and then reverse alphabetically
+        byt file name
+
+        If we wanted the secondary sort to be alphabetically by file name, then
+        we could use the simpler:
+
+            > sorted(arl_files, key=lambda f: (f['first_hour'], f['file']))
+        """
+        by_first_hour = defaultdict(lambda: [])
+        for f in arl_files:
+            by_first_hour[f['first_hour']].append(f)
+
+        sorted_arl_files = []
+        for fh, files in sorted(by_first_hour.items(), key=lambda e: e[0]):
+            sorted_arl_files.extend(reversed(sorted(files, key=lambda f: f['file'])))
+        return sorted_arl_files
+
+    def _prune(self, sorted_arl_files, start, end):
+        num_arl_files = len(sorted_arl_files)
+        s_idx = 0
+        e_idx = num_arl_files
+        for i in range(num_arl_files):
+            if sorted_arl_files[i]['first_hour'] <= start:
+                s_idx = i
+            elif sorted_arl_files[i]['first_hour'] > end:
+                e_idx = i
+                break
+
+        return sorted_arl_files[s_idx:e_idx]
+
+        # num_early_enough = len([f for f in arl_files if f['first_hour'] <= start])
+        # num_late_enough = len([f for f in arl_files if f['last_hour'] >= end])
+        # s_idx = max(num_early_enough - 1, 0)
+        # num_files = len(arl_files)
+        # e_idx = min(num_files, num_files - num_late_enough + 1)
+        # if s_idx == e_idx:
+        #     e_idx += 1
+        # return sorted(arl_files, key=lambda f: f['first_hour'])[s_idx: e_idx]
 
     def _determine_files_per_hour(self, arl_files, start, end):
         """Determines which arl file to use for each hour in the time window.
@@ -392,13 +423,28 @@ class ArlFinder(object):
         other hand, the goal is to use as few arl files as possible, in which
         case this method uses each arl file for as long as it can.
 
-        File recency is determined by looking at the first hours - more recent
-        files (i.e. more up to date meteorology) will have more recent first hour.
+        File recency is determined by looking at the first hours and file
+        pathnames - more recent files (i.e. more up to date meteorology) will
+        have more recent first hour, and filename is used as a tie breaker.
+        For example, with NAM84 12km data, where you have one file for every
+        prediction time, and where files overlap (since the predictions
+        happen every 12 hours but go out 84 hours), first hour is enough to
+        tell which file is more recent.  On the otherhand, with DRI data, where
+        you have multiple files per prediction time, each file containing 12
+        hours worth of data, and where predictions happen every 12 hours, you
+        end up with files from different prediction times with the same first
+        hour.  In this case, the file whose name is alphabetically last is the
+        the most recent.  (Note: This assumes that the prediction time is in
+        the pathname.)
         """
-        if self._fewer_arl_files:
-            arl_files = self._prune(arl_files, start, end)
+
+        sorted_arl_files = self._sort(arl_files)
+
+        #if self._fewer_arl_files:
+        sorted_arl_files = self._prune(sorted_arl_files, start, end)
+
         files_per_hour = {}
-        for f_dict in sorted(arl_files, key=lambda f: f['first_hour']):
+        for f_dict in sorted_arl_files:
             dt = max(f_dict['first_hour'], start)
             while dt <= min(f_dict['last_hour'], end):
                 if not files_per_hour.get(dt) or not self._fewer_arl_files:

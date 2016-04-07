@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import copy
 import datetime
 import tempfile
 import StringIO # for monkeypatching
@@ -112,73 +113,254 @@ class TestARLFinder(object):
     # TODO: test _get_file_pathnam, monkeypatching os.path.abspath,
     #    os.path.isfile, etc. appropriately
 
-    def test_prune_old(self):
+    ##
+    ## Sorting and Pruning
+    ##
+
+    def test_sort_case_1(self):
+        # 24 hr predictions over 2 12-hr files every 12 hours
         arl_files = [
             {
-                'file': 'c',
-                'first_hour': datetime.datetime(2015,1,2,3,0,0),
-                'last_hour': datetime.datetime(2015,1,2,5,0,0)
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
             },
             {
-                'file': 'z',
+                'file': '2015010100/b',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010112/b',
                 'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
             },
             {
-                'file': 'd',
-                'first_hour': datetime.datetime(2015,1,2,4,0,0),
-                'last_hour':  datetime.datetime(2015,1,2,7,0,0)
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,11,0,0)
             },
             {
-                'file': 'a',
-                'first_hour': datetime.datetime(2015,1,1,22,0,0),
-                'last_hour': datetime.datetime(2015,1,2,1,0,0)
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            }
+        ]
+        expected = [
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,11,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010100/b',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010112/b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            }
+        ]
+        assert expected == self.arl_finder._sort(arl_files)
+
+    def test_sort_case_2(self):
+        # 48 hr predictions over 2 24-hr files every 12 hours
+        arl_files = [
+            {
+                'file': '2015010112/b',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010100/b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,0,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            },
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,12,0,0),
+                'last_hour': datetime.datetime(2015,1,4,11,0,0)
+            }
+        ]
+        expected = [
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010100/b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            },
+            {
+                'file': '2015010112/b',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
+            },
+            {
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,0,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,12,0,0),
+                'last_hour': datetime.datetime(2015,1,4,11,0,0)
+            }
+        ]
+        assert expected == self.arl_finder._sort(arl_files)
+
+    def test_prune_case_1(self):
+        sorted_arl_files = [
+            {
+                'file': '2015010100/a',
+                'first_hour': datetime.datetime(2015,1,1,0,0,0),
+                'last_hour': datetime.datetime(2015,1,1,11,0,0)
+            },
+            {
+                'file': '2015010112/a',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010100/b',
+                'first_hour': datetime.datetime(2015,1,1,12,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': '2015010200/a',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010112/b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
+            },
+            {
+                'file': '2015010212/a',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010200/b',
+                'first_hour': datetime.datetime(2015,1,2,12,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            },
+            {
+                'file': '2015010212/b',
+                'first_hour': datetime.datetime(2015,1,3,0,0,0),
+                'last_hour': datetime.datetime(2015,1,3,11,0,0)
             }
         ]
 
-        expected = [
-            {
-                'file': 'a',
-                'first_hour': datetime.datetime(2015,1,1,22,0,0),
-                'last_hour': datetime.datetime(2015,1,2,1,0,0)
-            },
-            {
-                'file': 'z',
-                'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,3,0,0)
-            },
-            {
-                'file': 'c',
-                'first_hour': datetime.datetime(2015,1,2,3,0,0),
-                'last_hour': datetime.datetime(2015,1,2,5,0,0)
-            },
-            {
-                'file': 'd',
-                'first_hour': datetime.datetime(2015,1,2,4,0,0),
-                'last_hour':  datetime.datetime(2015,1,2,7,0,0)
-            }
-        ]
-        assert expected == self.arl_finder._prune(arl_files,
-            datetime.datetime(2015,1,1,1,0,0), datetime.datetime(2015,1,2,12,0,0))
-        assert expected == self.arl_finder._prune(arl_files,
-            datetime.datetime(2015,1,1,22,0,0), datetime.datetime(2015,1,2,7,0,0))
-        assert expected == self.arl_finder._prune(arl_files,
-            datetime.datetime(2015,1,1,23,0,0), datetime.datetime(2015,1,2,6,0,0))
+        expected = copy.deepcopy(sorted_arl_files)
+        assert expected == self.arl_finder._prune(sorted_arl_files,
+            datetime.datetime(2015,1,12,1,0,0), datetime.datetime(2015,1,4,23,0,0))
+        assert expected == self.arl_finder._prune(sorted_arl_files,
+            datetime.datetime(2015,1,1,5,0,0), datetime.datetime(2015,1,3,4,0,0))
 
         expected = [
             {
-                'file': 'z',
+                'file': '2015010200/a',
                 'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
             },
             {
-                'file': 'c',
-                'first_hour': datetime.datetime(2015,1,2,3,0,0),
-                'last_hour': datetime.datetime(2015,1,2,5,0,0)
+                'file': '2015010112/b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,11,0,0)
             }
         ]
-        assert expected == self.arl_finder._prune(arl_files,
-            datetime.datetime(2015,1,2,0,0,0), datetime.datetime(2015,1,2,4,0,0))
+        assert expected == self.arl_finder._prune(sorted_arl_files,
+            datetime.datetime(2015,1,2,2,0,0), datetime.datetime(2015,1,2,4,0,0))
+
+    ##
+    ## Determining Windows
+    ##
 
     def test_determine_files_per_hour(self):
         arl_files = [
@@ -253,7 +435,6 @@ class TestARLFinder(object):
         }
         assert expected == self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2015,1,2,0,0,0), datetime.datetime(2015,1,2,4,0,0))
-
 
     def test_determine_file_time_windows(self):
         files_per_hour = {
