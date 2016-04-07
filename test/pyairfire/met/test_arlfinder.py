@@ -214,9 +214,23 @@ class TestARLFinder(object):
             datetime.datetime(2015,1,2,5,0,0): 'd',
             datetime.datetime(2015,1,2,6,0,0): 'd'
         }
-        assert expected == self.arl_finder._determine_files_per_hour(arl_files)
+        assert expected == self.arl_finder._determine_files_per_hour(arl_files,
+            datetime.datetime(2015,1,1,23,0,0), datetime.datetime(2015,1,2,6,0,0))
+
+        expected = {
+            datetime.datetime(2015,1,2,1,0,0): 'z',
+            datetime.datetime(2015,1,2,2,0,0): 'z',
+            datetime.datetime(2015,1,2,3,0,0): 'c',
+            datetime.datetime(2015,1,2,4,0,0): 'd',
+        }
+        assert expected == self.arl_finder._determine_files_per_hour(arl_files,
+            datetime.datetime(2015,1,2,1,0,0), datetime.datetime(2015,1,2,4,0,0))
+
+
+        # With 'fewer_arl_files' option set to True
 
         self.arl_finder._fewer_arl_files = True
+
         expected = {
             datetime.datetime(2015,1,1,23,0,0): 'a',
             datetime.datetime(2015,1,2,0,0,0): 'a',
@@ -227,7 +241,18 @@ class TestARLFinder(object):
             datetime.datetime(2015,1,2,5,0,0): 'c',
             datetime.datetime(2015,1,2,6,0,0): 'd'
         }
-        assert expected == self.arl_finder._determine_files_per_hour(arl_files)
+        assert expected == self.arl_finder._determine_files_per_hour(arl_files,
+            datetime.datetime(2015,1,1,23,0,0), datetime.datetime(2015,1,2,6,0,0))
+
+        expected = {
+            datetime.datetime(2015,1,2,0,0,0): 'z', # use z since a is no longer necessary
+            datetime.datetime(2015,1,2,1,0,0): 'z', # use z since a is no longer necessary
+            datetime.datetime(2015,1,2,2,0,0): 'z',
+            datetime.datetime(2015,1,2,3,0,0): 'z',
+            datetime.datetime(2015,1,2,4,0,0): 'c'
+        }
+        assert expected == self.arl_finder._determine_files_per_hour(arl_files,
+            datetime.datetime(2015,1,2,0,0,0), datetime.datetime(2015,1,2,4,0,0))
 
 
     def test_determine_file_time_windows(self):
