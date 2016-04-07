@@ -398,17 +398,14 @@ class ArlFinder(object):
         # remove unecessary at beginning and end
         num_arl_files = len(arl_files)
         s_idx = 0
-        e_idx = num_arl_files
         # iterate from most recent to oldest.  this ensures that, if there are
         # two files that both span start to end, the more recent one is used
         for i in reversed(range(num_arl_files)):
-            if end and arl_files[i]['last_hour'] >= end:
-                e_idx = i + 1
             if start and arl_files[i]['first_hour'] <= start:
                 s_idx = i
                 break
 
-        return arl_files[s_idx:e_idx]
+        return arl_files[s_idx:num_arl_files]
 
         # num_early_enough = len([f for f in arl_files if f['first_hour'] <= start])
         # num_late_enough = len([f for f in arl_files if f['last_hour'] >= end])
@@ -449,8 +446,8 @@ class ArlFinder(object):
             f_dict = sorted_arl_files[i]
             dt = max(f_dict['first_hour'], start) if start else f_dict['first_hour']
 
-            # skip to next file if there aren't any hours in this file that
-            # aren't covered by the next file
+            # skip to next file if there aren't any hours in this file that aren't
+            # already in files_per_hour and that aren't covered by the next file
             if i < (num_arl_files - 1): # not at last file
                 next_dt = max(files_per_hour.keys() + [dt]) if files_per_hour else dt
                 if next_dt > sorted_arl_files[i+1]['first_hour']:
