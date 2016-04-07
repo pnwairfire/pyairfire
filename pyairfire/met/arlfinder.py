@@ -112,6 +112,23 @@ class ArlFinder(object):
          - max_days_out -- max number of days out predicted in met data
          - ignore_pattern -- path pattern to ignore when looking for arl
             index files; e.g. '/MOVED/'
+         - fewer_arl_files -- sacrifice recency of data for fewer numer of files
+
+        e.g. fewer_arl_files:
+          Suppose there's one arl file with 84 hours starting at
+          2015-08-01T00:00:00, and another with 84 hours starting at
+          2015-08-01T12:00:00. And supposed you're doing a 24 hour run starting
+          at 2015-08-01T00:00:00.  With fewer_arl_files set to True,
+          you'll get the one arl file starting at 00Z, to be used for all 24
+          hours.  With fewer_arl_files not set or set to False, you'll get
+          the arl file starting at 00Z for the first 12 hours and the arl file
+          starting at 12Z for the second 12 hours. So, with fewer_arl_files set
+          to True, you're missing out on more recent data from 12Z-23Z.
+          (The reason for supporting this option is because HYSPLIT sometimes
+          fails when you specify two arl files with overlapping times)
+
+        TODO: rename 'fewer_arl_files' option as 'minimize_num_files',
+          'no_overlaps', 'minimize_overlaps', or something else.
         """
         # make sure met_root_dir is an existing directory
         try:
@@ -133,6 +150,7 @@ class ArlFinder(object):
             if config.get("max_days_out") is None else int(config["max_days_out"]))
         self._ignore_matcher = (config.get('ignore_pattern')
             and re.compile('.*{}.*'.format(config['ignore_pattern'])))
+        self._fewer_arl_files = not not config.get('fewer_arl_files')
 
     def find(self, start, end):
         """finds met data spanning start/end time window
@@ -357,17 +375,21 @@ class ArlFinder(object):
     ##
 
     def _determine_files_per_hour(self, arl_files):
-        """Determines which arl file has the most recent data for each hour
+        """Determines which arl file to use for each hour in the time window.
+
+        If self._fewer_arl_files isn't specified, this method picks the most
+        recent data for each hour.  If self._fewer_arl_files is True, on the
+        other hand, the goal is to use as few arl files as possible, in which
+        case this method uses each arl file for as long as it can.
 
         File recency is determined by looking at the first hours - more recent
         files (i.e. more up to date meteorology) will have more recent first hour.
         """
         files_per_hour = {}
-        for f_dict in arl_files:
+        for f_dict in sorted(arl_files, key=lambda f: f['first_hour']):
             dt = f_dict['first_hour']
             while dt <= f_dict['last_hour']:
-                if not files_per_hour.get(dt) or (
-                        files_per_hour[dt]['first_hour'] < f_dict['first_hour']):
+                if not files_per_hour.get(dt) or not self._fewer_arl_files:
                     files_per_hour[dt] = f_dict
                 dt += ONE_HOUR
         return {dt: f['file'] for dt, f in files_per_hour.items()}
