@@ -211,7 +211,7 @@ class ArlFinder(object):
         date_matcher = self._create_date_matcher(start, end)
         index_files = self._find_index_files(date_matcher)
         arl_files = self._parse_index_files(index_files)
-        files_per_hour = self._determine_files_per_hour(arl_files)
+        files_per_hour = self._determine_files_per_hour(arl_files, start, end)
         files = self._determine_file_time_windows(files_per_hour)
         files = self._filter_files(files, start, end)
         files = datautils.format_datetimes(files)
@@ -374,7 +374,17 @@ class ArlFinder(object):
     ## Mapping hours to arl files and vice versa
     ##
 
-    def _determine_files_per_hour(self, arl_files):
+    def _prune(self, arl_files, start, end):
+        num_early_enough = len([f for f in arl_files if f['first_hour'] <= start])
+        num_late_enough = len([f for f in arl_files if f['last_hour'] >= end])
+        s_idx = max(num_early_enough - 1, 0)
+        num_files = len(arl_files)
+        e_idx = min(num_files, num_files - num_late_enough + 1)
+        if s_idx == e_idx:
+            e_idx += 1
+        return sorted(arl_files, key=lambda f: f['first_hour'])[s_idx: e_idx]
+
+    def _determine_files_per_hour(self, arl_files, start, end):
         """Determines which arl file to use for each hour in the time window.
 
         If self._fewer_arl_files isn't specified, this method picks the most
@@ -385,10 +395,12 @@ class ArlFinder(object):
         File recency is determined by looking at the first hours - more recent
         files (i.e. more up to date meteorology) will have more recent first hour.
         """
+        if self._fewer_arl_files:
+            arl_files = self._prune(arl_files, start, end)
         files_per_hour = {}
         for f_dict in sorted(arl_files, key=lambda f: f['first_hour']):
-            dt = f_dict['first_hour']
-            while dt <= f_dict['last_hour']:
+            dt = max(f_dict['first_hour'], start)
+            while dt <= min(f_dict['last_hour'], end):
                 if not files_per_hour.get(dt) or not self._fewer_arl_files:
                     files_per_hour[dt] = f_dict
                 dt += ONE_HOUR

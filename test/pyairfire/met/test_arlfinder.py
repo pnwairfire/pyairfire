@@ -112,6 +112,74 @@ class TestARLFinder(object):
     # TODO: test _get_file_pathnam, monkeypatching os.path.abspath,
     #    os.path.isfile, etc. appropriately
 
+    def test_prune_old(self):
+        arl_files = [
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,5,0,0)
+            },
+            {
+                'file': 'z',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour':  datetime.datetime(2015,1,2,7,0,0)
+            },
+            {
+                'file': 'a',
+                'first_hour': datetime.datetime(2015,1,1,22,0,0),
+                'last_hour': datetime.datetime(2015,1,2,1,0,0)
+            }
+        ]
+
+        expected = [
+            {
+                'file': 'a',
+                'first_hour': datetime.datetime(2015,1,1,22,0,0),
+                'last_hour': datetime.datetime(2015,1,2,1,0,0)
+            },
+            {
+                'file': 'z',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,5,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour':  datetime.datetime(2015,1,2,7,0,0)
+            }
+        ]
+        assert expected == self.arl_finder._prune(arl_files,
+            datetime.datetime(2015,1,1,1,0,0), datetime.datetime(2015,1,2,12,0,0))
+        assert expected == self.arl_finder._prune(arl_files,
+            datetime.datetime(2015,1,1,22,0,0), datetime.datetime(2015,1,2,7,0,0))
+        assert expected == self.arl_finder._prune(arl_files,
+            datetime.datetime(2015,1,1,23,0,0), datetime.datetime(2015,1,2,6,0,0))
+
+        expected = [
+            {
+                'file': 'z',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,5,0,0)
+            }
+        ]
+        assert expected == self.arl_finder._prune(arl_files,
+            datetime.datetime(2015,1,2,0,0,0), datetime.datetime(2015,1,2,4,0,0))
+
     def test_determine_files_per_hour(self):
         arl_files = [
             {
