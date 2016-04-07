@@ -115,14 +115,14 @@ class TestARLFinder(object):
     def test_determine_files_per_hour(self):
         arl_files = [
             {
-                'file': 'b',
-                'first_hour': datetime.datetime(2015,1,2,0,0,0),
-                'last_hour': datetime.datetime(2015,1,2,3,0,0)
-            },
-            {
                 'file': 'c',
                 'first_hour': datetime.datetime(2015,1,2,3,0,0),
                 'last_hour': datetime.datetime(2015,1,2,5,0,0)
+            },
+            {
+                'file': 'z',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
             },
             {
                 'file': 'd',
@@ -138,15 +138,14 @@ class TestARLFinder(object):
 
         expected = {
             datetime.datetime(2015,1,1,23,0,0): 'a',
-            datetime.datetime(2015,1,2,0,0,0): 'b',
-            datetime.datetime(2015,1,2,1,0,0): 'b',
-            datetime.datetime(2015,1,2,2,0,0): 'b',
+            datetime.datetime(2015,1,2,0,0,0): 'z',
+            datetime.datetime(2015,1,2,1,0,0): 'z',
+            datetime.datetime(2015,1,2,2,0,0): 'z',
             datetime.datetime(2015,1,2,3,0,0): 'c',
             datetime.datetime(2015,1,2,4,0,0): 'd',
             datetime.datetime(2015,1,2,5,0,0): 'd',
             datetime.datetime(2015,1,2,6,0,0): 'd'
         }
-
         assert expected == self.arl_finder._determine_files_per_hour(arl_files)
 
     def test_determine_file_time_windows(self):
