@@ -1,7 +1,5 @@
 """pyairfire.data.utils"""
 
-import numpy
-
 __all__ = [
     'deepmerge',
     'summarize',
@@ -91,7 +89,11 @@ def _is_num(v):
     return isinstance(v, (int, float, long))
 
 def _is_array(v):
-    return isinstance(v, (list, numpy.ndarray))
+    try:
+        import numpy
+        return isinstance(v, (list, numpy.ndarray))
+    except ImportError, e:
+        return isinstance(v, list)
 
 def _is_dict(v):
     return isinstance(v, dict) # TODO: catch other dict types?
