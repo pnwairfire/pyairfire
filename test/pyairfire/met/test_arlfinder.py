@@ -466,7 +466,6 @@ class TestARLFinderWindowDetermination(object):
                 'last_hour': datetime.datetime(2015,1,2,15,0,0)
             }
         ]
-        self.arl_finder._fewer_arl_files = False
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2015,1,1,19,0,0), datetime.datetime(2015,1,2,15,0,0)))
@@ -624,7 +623,6 @@ class TestARLFinderWindowDetermination(object):
                 'first_hour': datetime.datetime(2015,1,4,0,0,0),
                 'last_hour': datetime.datetime(2015,1,4,11,0,0)
             }
-
         ]
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
@@ -651,7 +649,6 @@ class TestARLFinderWindowDetermination(object):
                 'last_hour': datetime.datetime(2015,1,2,15,0,0)
             }
         ]
-        self.arl_finder._fewer_arl_files = False
         actual = self.arl_finder._determine_file_time_windows(
             self.arl_finder._determine_files_per_hour(arl_files,
             datetime.datetime(2015,1,1,19,0,0), datetime.datetime(2015,1,2,15,0,0)))

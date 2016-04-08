@@ -448,10 +448,11 @@ class ArlFinder(object):
 
             # skip to next file if there aren't any hours in this file that aren't
             # already in files_per_hour and that aren't covered by the next file
-            if i < (num_arl_files - 1): # not at last file
-                next_dt = max(files_per_hour.keys() + [dt]) if files_per_hour else dt
-                if next_dt > sorted_arl_files[i+1]['first_hour']:
-                    continue
+            if self._fewer_arl_files:
+                if i < (num_arl_files - 1): # not at last file
+                    latest_dt = max(files_per_hour.keys() + [dt]) if files_per_hour else dt
+                    if latest_dt + ONE_HOUR >= sorted_arl_files[i+1]['first_hour']:
+                        continue
 
             end_dt = min(f_dict['last_hour'], end) if end else f_dict['last_hour']
             while dt <= end_dt:
