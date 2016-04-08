@@ -214,7 +214,6 @@ class ArlFinder(object):
         arl_files = self._parse_index_files(index_files)
         files_per_hour = self._determine_files_per_hour(arl_files, start, end)
         files = self._determine_file_time_windows(files_per_hour)
-        # files = self._filter_files(files, start, end)
         files = datautils.format_datetimes(files)
 
         return {'files': files}
