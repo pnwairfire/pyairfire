@@ -15,6 +15,7 @@ import datetime
 import json
 import logging
 import sys
+import traceback
 
 try:
     from pyairfire.bluesky.dispersionnc import PointExtractor
@@ -67,6 +68,7 @@ def main():
         print json.dumps(point_time_series)
 
     except Exception, e:
+        logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
