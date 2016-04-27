@@ -17,6 +17,7 @@ setup(
         'bin/bluesky/extract-point-pm25-time-series.py',
         'bin/bluesky/merge-emissions',
         'bin/bluesky/merge-fires',
+        'bin/bluesky/process-bluesky-kmz',
         'bin/bluesky/run-bluesky',
         'bin/hipchat/hcarch',
         'bin/hipchat/hcarch2log',

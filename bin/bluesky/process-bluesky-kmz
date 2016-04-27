@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+
+"""process-bluesky-kmz
+
+Note: This script is avoids importing from the pyairfire package
+so that it is easily distributable.
+"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
+
+import datetime
+import filecmp
+import logging
+import os
+import sys
+import urllib2
+import xmltodict
+from argparse import (
+    ArgumentParser, RawTextHelpFormatter, Action, ArgumentTypeError
+)
+
+EXAMPLES = """
+Basic examples:
+
+ $ process-bluesky-kmz -i /path/to/NAM84/ -o /path/to/data/
+"""
+
+
+class ParseColorMap(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        d = getattr(namespace, self.dest)
+        for m in values.split(','):
+            try:
+                b, a = m.split(':')
+                d[b] = a
+            except ValueError:
+                raise ArgumentTypeError(
+                    "Invalid --color-map value '{}'".format(values))
+
+def parse_args():
+    parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-i', '--input-dir', help="e.g. /path/to/NAM/4km/")
+    parser.add_argument('-o', '--output-dir', help="e.g. /path/to/data/dir/")
+    parser.add_argument('-n', '--filename', help="e.g. foobar.kmz")
+    parser.add_argument('-l', '--log-level', default="WARN",
+        help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
+
+    # TODO: add option to skip stripping of legend and logo
+    parser.epilog = EXAMPLES
+    return parser.parse_args()
+
+def configure_logging(args):
+    logging.basicConfig(level=getattr(logging, args.log_level))
+    for k, v in args.__dict__.items():
+        logging.debug('%s: %s', k, v)
+
+def validate_args(args):
+    # TODO: make sure input dir exists
+    # TODO: make sure output dir exists
+    pass
+
+def find_latest(input_dir):
+    # TODO: find latest smoke_information.kmz under output dir;
+    # TODO: return filename (full pathname) and timestamp (
+    #   extracted from path, or back up to file timestamp)
+    pass
+
+def is_already_archived(timestamp):
+    # TODO: check if it's the latest by looking at init time in pathname
+    #  and checking output dir for file with that timestamp (using glob)
+    pass
+
+def process(input_filename):
+    # TODO: parse xml
+    # TODO: process xml
+    # TODO: return processed xml
+    pass
+
+def output(output_dir, filename, xml):
+
+    # TODO: form timestamp from run's initialization time,
+    #   extracted from pathname; back up to file's timestamp
+    ts = ""
+    parts = filename.split('.')
+    timestamped_file_name = '-'.join([parts[0], ts)])
+    if len(parts) > 1:
+        timestamped_file_name = '.'.join([
+           timestamped_file_name, '.'.join(parts[1:])])
+
+    # TODO: output to file
+    # TODO: create sym link
+
+    # with outstream(timestamped_file_name) as o:
+    #     o.write(xmltodict.unparse(xml))
+
+    # if do_archive:
+    #     old_exists = os.path.exists(base_name)
+    #     if old_exists and filecmp.cmp(output_file_name, base_name):
+    #         os.remove(output_file_name)
+    #     else:
+    #         if old_exists:
+    #             os.remove(base_name)
+    #         os.symlink(output_file_name, base_name)
+
+    pass
+
+def main():
+    args  = parse_args()
+    configure_logging(args)
+    validate_args(args)
+    input_filename, timestamps = find_latest(args.input_dir)
+    if not is_already_archived(timestamp):
+        xml = process(input_filename)
+        output(args.output_dir, args.filename,  xml)
+
+if __name__ == "__main__":
+    main()
