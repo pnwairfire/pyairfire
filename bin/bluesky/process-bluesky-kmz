@@ -49,7 +49,8 @@ def parse_args():
     parser.add_argument('--output-filename', default='egp.kmz',
         help="base name of timestamped output file, and name of sym link; "
         "defaults to 'egp.kmz'")
-    # TODO: option to override sym link name, with default to output file base name ?
+    # TODO: option to override sym link name, with default to output file
+    #    base name ?
     parser.add_argument('-l', '--log-level', default="WARN",
         help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
 
@@ -63,10 +64,13 @@ def configure_logging(args):
         logging.debug('%s: %s', k, v)
 
 def validate_args(args):
-
-    # TODO: make sure input dir exists
-    # TODO: make sure output dir exists
-    pass
+    if not os.path.isdir(args.input_dir):
+        logging.error("Input root dir %s does not exist", args.input_dir)
+        sys.exit(1)
+    if not os.path.isdir(args.output_dir):
+        # TODO: should we just create it if it doesn't exist?
+        logging.error("Out dir %s does not exist", args.output_dir)
+        sys.exit(1)
 
 def find_latest(input_dir, input_filename):
     input_file_pathname = timestamp = None
@@ -109,15 +113,25 @@ def main():
     args  = parse_args()
     configure_logging(args)
     validate_args(args)
-    input_file_pathname, timestamp = find_latest(args.input_dir, args.input_filename)
+
+    input_file_pathname, timestamp = find_latest(args.input_dir,
+        args.input_filename)
+    if not input_file_pathname:
+        logging.warn("Failed to find any input files matching %s under %s.",
+            args.input_filename, args.input_dir)
+        sys.exit(0) # not really an error, so exit with 0
 
     output_file_pathname = generate_output_file_pathname(args.output_dir,
         args.output_filename, timestamp)
+
     if not os.path.isfile(output_file_pathname):
         xml = intput(input_file_pathname)
         xml = process(xml)
         output(output_file_pathname,  xml, os.path.join(output_dir,
             output_filename))
+    else:
+        logging.info("Latest file, %s, was already processed",
+            output_file_pathname)
 
 if __name__ == "__main__":
     main()
