@@ -23,7 +23,7 @@ from argparse import (
 EXAMPLES = """
 Basic examples:
 
- $ process-bluesky-kmz -i /path/to/NAM84/ -o /path/to/data/
+ $ process-bluesky-kmz --log-level=DEBUG -i /path/to/NAM84/ -o /path/to/data/
 """
 
 
@@ -40,9 +40,16 @@ class ParseColorMap(Action):
 
 def parse_args():
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
-    parser.add_argument('-i', '--input-dir', help="e.g. /path/to/NAM/4km/")
-    parser.add_argument('-o', '--output-dir', help="e.g. /path/to/data/dir/")
-    parser.add_argument('-n', '--filename', help="e.g. foobar.kmz")
+    parser.add_argument('-i', '--input-dir', required=True,
+        help="e.g. /path/to/NAM/4km/",)
+    parser.add_argument('-o', '--output-dir', required=True,
+        help="e.g. /path/to/data/dir/")
+    parser.add_argument('--input-filename', default='smoke_dispersion.kmz',
+        help="name of input file to find; defaults to 'smoke_dispersion.kmz'")
+    parser.add_argument('--output-filename', default='egp.kmz',
+        help="base name of timestamped output file, and name of sym link; "
+        "defaults to 'egp.kmz'")
+    # TODO: option to override sym link name, with default to output file base name ?
     parser.add_argument('-l', '--log-level', default="WARN",
         help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
 
@@ -56,63 +63,61 @@ def configure_logging(args):
         logging.debug('%s: %s', k, v)
 
 def validate_args(args):
+
     # TODO: make sure input dir exists
     # TODO: make sure output dir exists
     pass
 
-def find_latest(input_dir):
+def find_latest(input_dir, input_filename):
+    input_file_pathname = timestamp = None
+
     # TODO: find latest smoke_information.kmz under output dir;
-    # TODO: return filename (full pathname) and timestamp (
-    #   extracted from path, or back up to file timestamp)
-    pass
+    # TODO: extract timestamp from path - i.e. run's initialization
+    #    time - or back up to file timestamp)
 
-def is_already_archived(timestamp):
-    # TODO: check if it's the latest by looking at init time in pathname
-    #  and checking output dir for file with that timestamp (using glob)
-    pass
+    return input_file_pathname, timestamp
 
-def process(input_filename):
-    # TODO: parse xml
-    # TODO: process xml
-    # TODO: return processed xml
-    pass
-
-def output(output_dir, filename, xml):
-
-    # TODO: form timestamp from run's initialization time,
-    #   extracted from pathname; back up to file's timestamp
-    ts = ""
-    parts = filename.split('.')
-    timestamped_file_name = '-'.join([parts[0], ts)])
+def generate_output_file_pathname(output_dir, output_filename, timestamp):
+    # generate timestamped filename
+    parts = output_filename.split('.')
+    timestamped_file_name = '-'.join([parts[0], timestamp])
     if len(parts) > 1:
         timestamped_file_name = '.'.join([
            timestamped_file_name, '.'.join(parts[1:])])
+    return os.path.join(output_dir, timestamped_file_name)
 
-    # TODO: output to file
-    # TODO: create sym link
+def input(input_file_pathname):
+    with open(feed, 'r') as f:
+        data = f.read()
+    return xmltodict.parse(data)
 
-    # with outstream(timestamped_file_name) as o:
-    #     o.write(xmltodict.unparse(xml))
+def process(xml):
 
-    # if do_archive:
-    #     old_exists = os.path.exists(base_name)
-    #     if old_exists and filecmp.cmp(output_file_name, base_name):
-    #         os.remove(output_file_name)
-    #     else:
-    #         if old_exists:
-    #             os.remove(base_name)
-    #         os.symlink(output_file_name, base_name)
+    # TODO: process xml
 
-    pass
+    return xml
+
+def output(output_file_pathname, xml, sym_link_pathname):
+    with open(output_file_pathname, 'w') as f:
+        f.write(xmltodict.unparse(xml))
+
+    if os.path.exists(sym_link_pathname):
+        os.remove(sym_link_pathname)
+    os.symlink(output_file_pathname, sym_link_pathname)
 
 def main():
     args  = parse_args()
     configure_logging(args)
     validate_args(args)
-    input_filename, timestamps = find_latest(args.input_dir)
-    if not is_already_archived(timestamp):
-        xml = process(input_filename)
-        output(args.output_dir, args.filename,  xml)
+    input_file_pathname, timestamp = find_latest(args.input_dir, args.input_filename)
+
+    output_file_pathname = generate_output_file_pathname(args.output_dir,
+        args.output_filename, timestamp)
+    if not os.path.isfile(output_file_pathname):
+        xml = intput(input_file_pathname)
+        xml = process(xml)
+        output(output_file_pathname,  xml, os.path.join(output_dir,
+            output_filename))
 
 if __name__ == "__main__":
     main()
