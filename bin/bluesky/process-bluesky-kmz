@@ -55,6 +55,7 @@ def parse_args():
     parser.add_argument('--output-filename', default='egp.kmz',
         help="base name of timestamped output file, and name of sym link; "
         "defaults to 'egp.kmz'")
+    parser.add_argument('--output-timestamp-format', default="%Y%m%dT%H%M%S")
     parser.add_argument('--kml-root-name', help="e.g. '%Y%m%d BlueSky Forecast'")
     parser.add_argument('--ignore-existing-output', default=False,
         action="store_true", help="Ignore existing output and regenerate it")
@@ -104,12 +105,12 @@ def find_latest(input_dir, input_filename):
 
     return input_file_pathname, timestamp
 
-FILENAME_TS_FORMAT = "%Y%m%dT%H%M%S"
-def generate_output_file_pathname(output_dir, output_filename, timestamp):
+def generate_output_file_pathname(output_dir, output_filename, timestamp,
+        output_timestamp_format):
     # generate timestamped filename
     parts = output_filename.split('.')
     timestamped_file_name = '-'.join([
-        parts[0], timestamp.strftime(FILENAME_TS_FORMAT)])
+        parts[0], timestamp.strftime(output_timestamp_format)])
     if len(parts) > 1:
         timestamped_file_name = '.'.join([
            timestamped_file_name, '.'.join(parts[1:])])
@@ -264,7 +265,7 @@ def main():
         sys.exit(0) # not really an error, so exit with 0
 
     output_file_pathname = generate_output_file_pathname(args.output_dir,
-        args.output_filename, timestamp)
+        args.output_filename, timestamp, args.output_timestamp_format)
 
     if not os.path.isfile(output_file_pathname) or args.ignore_existing_output:
         kml_root_name = args.kml_root_name and timestamp.strftime(args.kml_root_name)
