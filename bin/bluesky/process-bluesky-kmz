@@ -4,6 +4,8 @@
 
 Note: This script is avoids importing from the pyairfire package
 so that it is easily distributable.
+
+TODO: rename this script
 """
 
 __author__      = "Joel Dubowy"
