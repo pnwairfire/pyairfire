@@ -147,10 +147,24 @@ def modify_doc_kml():
     #   'Unnamed fire in Tmiscamingue, Qc, Canada'
     # (note the deletion of '\xc3', which is an e with an accent over it)
     # TODO: keep encoding as 'utf-8' and somehow tell xmltodict.unparse
-    #   to expect 'utf-8'
+    #   to expect 'utf-8'. see:
+    #     - http://stackoverflow.com/questions/3224268/python-unicode-encode-error
+    #     - http://docs.plone.org/manage/troubleshooting/unicode.html#id1
+    #     - http://www.joelonsoftware.com/articles/Unicode.html
     xml_str = xml_str.decode('utf-8')
     #xml_str = ftfy.fix_text(xml_str) #, fix_entities=False, uncurl_quotes=False, fix_latin_ligatures=False)
     xml_str = xml_str.encode('ascii', 'ignore')
+
+    # TODO: fix ordering of dispersion image folders and colorbar overlays
+    #   In original, it goes hourly key, hourly pm25, three-hour key,
+    #   three-hour pm25, etc.  In the new, stripped down kml, it goes
+    #   hourly key, daily avg key, hourly pm25, daily avg pm25
+
+    # TODO: change xml['kml']['Document']['name'] from 'BSF_YYYYMMDD' to
+    #   something else?
+
+    # TODO: Preselect the key and dispersion images of *one* of the time
+    #   series, not the keys of both timeseriew without the dispersion images
 
     xml = xmltodict.parse(xml_str)
 
