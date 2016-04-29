@@ -132,10 +132,20 @@ class create_working_dir(object):
 ## ***** END Copied from osutils.py *****
 
 DOC_KML_FILENAME = 'doc.kml'
-
 PM25_FOLDER_NAME = 'PM25 from Wildland Fire'
-PM25_SUB_FOLDERS_TO_KEEP = ('Hourly PM25', 'Daily Average PM25')
-PM25_SCREEN_OVERLAYS_TO_KEEP = ('Hourly Key', 'Daily Average Key')
+FOLDERS_TO_KEEP = (PM25_FOLDER_NAME)
+HOURLY_PM25_FOLDER_NAME = 'Hourly PM25'
+PM25_SUB_FOLDERS_TO_KEEP = (
+    HOURLY_PM25_FOLDER_NAME,
+    'Daily Average PM25'
+)
+PM25_SUB_FOLDER_TO_SHOW = HOURLY_PM25_FOLDER_NAME
+HOURLY_KEY_NAME = 'Hourly Key'
+PM25_SCREEN_OVERLAYS_TO_KEEP = (
+    HOURLY_KEY_NAME,
+    'Daily Average Key'
+)
+PM25_SCREEN_OVERLAY_TO_SHOW = HOURLY_KEY_NAME
 
 def modify_doc_kml():
     with open(DOC_KML_FILENAME, 'r') as f:
@@ -163,22 +173,33 @@ def modify_doc_kml():
     #   hourly key, daily avg key, hourly pm25, daily avg pm25
 
     # TODO: change xml['kml']['Document']['name'] from 'BSF_YYYYMMDD' to
-    #   something else?
+    #   '20160426 BlueSky Forecast from 4km NAM Model'
 
     # TODO: Preselect the key and dispersion images of *one* of the time
     #   series, not the keys of both timeseriew without the dispersion images
 
     xml = xmltodict.parse(xml_str)
 
+    xml['kml']['Document']['Folder'] = [
+        folder for folder in xml['kml']['Document']['Folder']
+        if folder['name'] in FOLDERS_TO_KEEP
+    ]
     for folder in xml['kml']['Document']['Folder']:
         logging.debug('processing folder: %s', folder['name'])
         if folder['name'] == PM25_FOLDER_NAME:
             folder['Folder'] = [f for f in folder['Folder']
                 if f['name'] in PM25_SUB_FOLDERS_TO_KEEP]
+            for f in folder['Folder']:
+                visibility = str(int(f['name'] == PM25_SUB_FOLDER_TO_SHOW))
+                for go in f['GroundOverlay']:
+                    go['visibility'] = visibility
             logging.debug('subfolder kept: %s',
                 ', '.join([f['name'] for f in folder['Folder']]))
+
             folder['ScreenOverlay'] = [o for o in folder['ScreenOverlay']
                 if o['name'] in PM25_SCREEN_OVERLAYS_TO_KEEP]
+            for o in folder['ScreenOverlay']:
+                o['visibility'] = str(int(o['name'] == PM25_SCREEN_OVERLAY_TO_SHOW))
 
     # TODO: if we want to delete the disclaimer, it's under
     #    'ScreenOverlay' in the PM25 folder
