@@ -133,6 +133,7 @@ DOC_KML_FILENAME = 'doc.kml'
 
 PM25_FOLDER_NAME = 'PM25 from Wildland Fire'
 PM25_SUB_FOLDERS_TO_KEEP = ('Hourly PM25', 'Daily Average PM25')
+PM25_SCREEN_OVERLAYS_TO_KEEP = ('Hourly Key', 'Daily Average Key')
 
 def modify_doc_kml():
     with open(DOC_KML_FILENAME, 'r') as f:
@@ -160,6 +161,8 @@ def modify_doc_kml():
                 if f['name'] in PM25_SUB_FOLDERS_TO_KEEP]
             logging.debug('subfolder kept: %s',
                 ', '.join([f['name'] for f in folder['Folder']]))
+            folder['ScreenOverlay'] = [o for o in folder['ScreenOverlay']
+                if o['name'] in PM25_SCREEN_OVERLAYS_TO_KEEP]
 
     # TODO: if we want to delete the disclaimer, it's under
     #    'ScreenOverlay' in the PM25 folder
