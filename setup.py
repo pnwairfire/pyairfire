@@ -40,11 +40,13 @@ setup(
     url='https://github.com/pnwairfire/pyairfire',
     description='General toolbox of python utilities for AirFire team.',
     install_requires=[
-        #"netcdf"  #"netcdf==0.0.28"
+        #"netcdf",  #"netcdf==0.0.28",
+        #"ftfy==4.1.1",
         "requests>=2.7.0",
         "xmltodict==0.9.2",
         "Fabric==1.10.2",
         "pymongo>=3.1.1"
+
     ],
     tests_require=test_requirements
 )

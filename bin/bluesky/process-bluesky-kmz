@@ -9,12 +9,17 @@ so that it is easily distributable.
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
+import datetime
 import fnmatch
+#import ftfy
 import logging
 import os
+import re
+import shutil
 import sys
-import time
+import tempfile
 import xmltodict
+import zipfile
 from argparse import (
     ArgumentParser, RawTextHelpFormatter, Action, ArgumentTypeError
 )
@@ -48,6 +53,8 @@ def parse_args():
     parser.add_argument('--output-filename', default='egp.kmz',
         help="base name of timestamped output file, and name of sym link; "
         "defaults to 'egp.kmz'")
+    parser.add_argument('--ignore-existing-output', default=False,
+        action="store_true", help="Ignore existing output and regenerate it")
     # TODO: option to override sym link name, with default to output file
     #    base name ?
     parser.add_argument('-l', '--log-level', default="WARN",
@@ -74,7 +81,7 @@ def validate_args(args):
 def determine_timestamp(filename):
     # TODO: extract timestamp from path - i.e. run's initialization
     #    time - if possible
-    return time.ctime(os.path.getmtime(filename))
+    return datetime.datetime.fromtimestamp(os.path.getmtime(filename))
 
 def find_latest(input_dir, input_filename):
     input_file_pathname = timestamp = None
@@ -90,10 +97,12 @@ def find_latest(input_dir, input_filename):
 
     return input_file_pathname, timestamp
 
+FILENAME_TS_FORMAT = "%Y%m%dT%H%M%S"
 def generate_output_file_pathname(output_dir, output_filename, timestamp):
     # generate timestamped filename
     parts = output_filename.split('.')
-    timestamped_file_name = '-'.join([parts[0], timestamp])
+    timestamped_file_name = '-'.join([
+        parts[0], timestamp.strftime(FILENAME_TS_FORMAT)])
     if len(parts) > 1:
         timestamped_file_name = '.'.join([
            timestamped_file_name, '.'.join(parts[1:])])
@@ -126,30 +135,73 @@ class create_working_dir(object):
 
 ## ***** END Copied from osutils.py *****
 
-
 DOC_KML_FILENAME = 'doc.kml'
-IMAGE_NAME_MATCHER = re.compute('.*(hourly|daily_average).*\.png')
+
+PM25_FOLDER_NAME = 'PM25 from Wildland Fire'
+PM25_SUB_FOLDERS_TO_KEEP = ('Three Hour PM25', 'Daily Maximum PM25')
+
+def modify_doc_kml():
+    with open(DOC_KML_FILENAME, 'r') as f:
+        xml_str = f.read()
+
+    # encoding as ascii fixes an issue where unicode characters cause
+    # the encoding to xml (in xmltodict.unparse) to fail.  The consequence
+    # of ignoring unicode is that substring values like
+    #   'Unnamed fire in T\xc3miscamingue, Qc, Canada'
+    # get changed to
+    #   'Unnamed fire in Tmiscamingue, Qc, Canada'
+    # (note the deletion of '\xc3', which is an e with an accent over it)
+    # TODO: keep encoding as 'utf-8' and somehow tell xmltodict.unparse
+    #   to expect 'utf-8'
+    xml_str = xml_str.decode('utf-8')
+    #xml_str = ftfy.fix_text(xml_str) #, fix_entities=False, uncurl_quotes=False, fix_latin_ligatures=False)
+    xml_str = xml_str.encode('ascii', 'ignore')
+
+    xml = xmltodict.parse(xml_str)
+
+    for folder in xml['kml']['Document']['Folder']:
+        logging.debug('processing folder: %s', folder['name'])
+        folder['Folder'] = [f for f in folder['Folder']
+            if f['name'] in PM25_SUB_FOLDERS_TO_KEEP]
+
+    # TODO: if we want to delete the disclaimer, it's in
+    #    xml['kml']['Document']['ScreenOverlay']
+
+    os.remove(DOC_KML_FILENAME)
+    with open(DOC_KML_FILENAME, 'w') as f:
+        f.write(xmltodict.unparse(xml))
+
+FILES_TO_KEEP = (
+    DOC_KML_FILENAME, 'disclaimer.png', 'fire_event.png', 'fire_location.png'
+)
+IMAGE_NAME_MATCHER = re.compile('.*(hourly|daily_average).*\.png')
 
 def process(input_file_pathname, output_file_pathname):
     with create_working_dir() as w_dir:
+        logging.debug('created tmp working dir %s', w_dir)
+
+        tmp_output_file_pathname = os.path.join(w_dir,
+            os.path.basename(output_file_pathname))
+        logging.debug('tmp output file pathname %s', tmp_output_file_pathname)
+
         zip_file = zipfile.ZipFile(input_file_pathname, 'r')
-        new_file_pathname = os.path.join(w_dir, os.path.basename(output_file_pathname))
-        new_zip_file = zipfile.ZipFile(new_file_pathname, 'w')
-        for zip_info in zip_info.infolist():
-            if zip_info.orig_filename == DOC_KML_FILENAME:
-                    IMAGE_NAME_MATCHER.test(zip_info.orig_filename)):
-                # TODO: make sure this doesn't affect originall
+        new_zip_file = zipfile.ZipFile(tmp_output_file_pathname, 'w')
+
+        for zip_info in zip_file.infolist():
+            if (zip_info.orig_filename in FILES_TO_KEEP or
+                    IMAGE_NAME_MATCHER.match(zip_info.orig_filename)):
+                logging.debug('Including %s', zip_info.orig_filename)
+                # TODO: make sure this doesn't affect original
                 zip_file.extract(zip_info.orig_filename)
                 if zip_info.orig_filename == DOC_KML_FILENAME:
-                    # TODO: modify xml
-                    # with open() as f:
-                    #     read it....
-                    # with open(, 'w') as f:
-                    #     f.write(xmltodict.unparse(xml))
-                    pass
+                    modify_doc_kml()
                 new_zip_file.write(zip_info.orig_filename)
+            else:
+                logging.debug('Excluding %s', zip_info.orig_filename)
 
-        shutil.copyfile(new_file_pathname, output_file_pathname)
+        new_zip_file.close()
+
+        shutil.copyfile(tmp_output_file_pathname, output_file_pathname)
 
 
 def create_sym_link(output_file_pathname, sym_link_pathname):
@@ -172,10 +224,10 @@ def main():
     output_file_pathname = generate_output_file_pathname(args.output_dir,
         args.output_filename, timestamp)
 
-    if not os.path.isfile(output_file_pathname):
+    if not os.path.isfile(output_file_pathname) or args.ignore_existing_output:
         process(input_file_pathname, output_file_pathname)
         create_sym_link(output_file_pathname,
-            os.path.join(output_dir, output_filename)
+            os.path.join(args.output_dir, args.output_filename))
     else:
         logging.info("Latest file, %s, was already processed",
             output_file_pathname)
