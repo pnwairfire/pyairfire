@@ -55,6 +55,7 @@ def parse_args():
     parser.add_argument('--output-filename', default='egp.kmz',
         help="base name of timestamped output file, and name of sym link; "
         "defaults to 'egp.kmz'")
+    parser.add_argument('--kml-root-name', help="e.g. '%Y%m%d BlueSky Forecast'")
     parser.add_argument('--ignore-existing-output', default=False,
         action="store_true", help="Ignore existing output and regenerate it")
     # TODO: option to override sym link name, with default to output file
@@ -147,7 +148,7 @@ PM25_SCREEN_OVERLAYS_TO_KEEP = (
 )
 PM25_SCREEN_OVERLAY_TO_SHOW = HOURLY_KEY_NAME
 
-def modify_doc_kml():
+def modify_doc_kml(kml_root_name):
     with open(DOC_KML_FILENAME, 'r') as f:
         xml_str = f.read()
 
@@ -179,6 +180,9 @@ def modify_doc_kml():
     #   series, not the keys of both timeseriew without the dispersion images
 
     xml = xmltodict.parse(xml_str)
+
+    if kml_root_name:
+        xml['kml']['Document']['name'] = kml_root_name
 
     xml['kml']['Document']['Folder'] = [
         folder for folder in xml['kml']['Document']['Folder']
@@ -213,7 +217,7 @@ FILES_TO_KEEP = (
 )
 IMAGE_NAME_MATCHER = re.compile('.*(hourly|daily_average).*\.png')
 
-def process(input_file_pathname, output_file_pathname):
+def process(input_file_pathname, output_file_pathname, kml_root_name):
     with create_working_dir() as w_dir:
         logging.debug('created tmp working dir %s', w_dir)
 
@@ -231,7 +235,7 @@ def process(input_file_pathname, output_file_pathname):
                 # TODO: make sure this doesn't affect original
                 zip_file.extract(zip_info.orig_filename)
                 if zip_info.orig_filename == DOC_KML_FILENAME:
-                    modify_doc_kml()
+                    modify_doc_kml(kml_root_name)
                 new_zip_file.write(zip_info.orig_filename)
             else:
                 logging.debug('Excluding %s', zip_info.orig_filename)
@@ -262,7 +266,8 @@ def main():
         args.output_filename, timestamp)
 
     if not os.path.isfile(output_file_pathname) or args.ignore_existing_output:
-        process(input_file_pathname, output_file_pathname)
+        kml_root_name = args.kml_root_name and timestamp.strftime(args.kml_root_name)
+        process(input_file_pathname, output_file_pathname, kml_root_name)
         create_sym_link(output_file_pathname,
             os.path.join(args.output_dir, args.output_filename))
     else:
