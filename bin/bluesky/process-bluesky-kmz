@@ -9,12 +9,11 @@ so that it is easily distributable.
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
-import datetime
-import filecmp
+import fnmatch
 import logging
 import os
 import sys
-import urllib2
+import time
 import xmltodict
 from argparse import (
     ArgumentParser, RawTextHelpFormatter, Action, ArgumentTypeError
@@ -72,12 +71,22 @@ def validate_args(args):
         logging.error("Out dir %s does not exist", args.output_dir)
         sys.exit(1)
 
+def determine_timestamp(filename):
+    # TODO: extract timestamp from path - i.e. run's initialization
+    #    time - if possible
+    return time.ctime(os.path.getmtime(filename))
+
 def find_latest(input_dir, input_filename):
     input_file_pathname = timestamp = None
 
-    # TODO: find latest smoke_information.kmz under output dir;
-    # TODO: extract timestamp from path - i.e. run's initialization
-    #    time - or back up to file timestamp)
+    for root, dirnames, filenames in os.walk(input_dir):
+        for filename in fnmatch.filter(filenames, input_filename):
+            pathname = os.path.join(root, filename)
+            ts = determine_timestamp(pathname)
+            logging.debug("Found %s (last modified %s)", pathname, ts)
+            if not input_file_pathname or timestamp < ts:
+                input_file_pathname = pathname
+                timestamp = ts
 
     return input_file_pathname, timestamp
 
@@ -91,20 +100,59 @@ def generate_output_file_pathname(output_dir, output_filename, timestamp):
     return os.path.join(output_dir, timestamped_file_name)
 
 def input(input_file_pathname):
-    with open(feed, 'r') as f:
+    # TODO: unzip before open
+    with open(input_file_pathname, 'r') as f:
         data = f.read()
     return xmltodict.parse(data)
 
-def process(xml):
 
-    # TODO: process xml
+## ***** BEGIN Copied from osutils.py *****
 
-    return xml
+## create_working_dir is copied here to avoid need to install
+## pyairfire where this script is installed
 
-def output(output_file_pathname, xml, sym_link_pathname):
-    with open(output_file_pathname, 'w') as f:
-        f.write(xmltodict.unparse(xml))
+class create_working_dir(object):
+    def __enter__(self):
+        self._original_dir = os.getcwd()
+        self._working_dir = tempfile.mkdtemp()
+        logging.debug('chdir to working directory %s', self._working_dir)
+        os.chdir(self._working_dir)
+        return self._working_dir
 
+    def __exit__(self, type, value, traceback):
+        logging.debug('chdir back to original directory %s', self._original_dir)
+        os.chdir(self._original_dir)
+        # TODO: delete self._working_dir or just let os clean it up ?
+
+## ***** END Copied from osutils.py *****
+
+
+DOC_KML_FILENAME = 'doc.kml'
+IMAGE_NAME_MATCHER = re.compute('.*(hourly|daily_average).*\.png')
+
+def process(input_file_pathname, output_file_pathname):
+    with create_working_dir() as w_dir:
+        zip_file = zipfile.ZipFile(input_file_pathname, 'r')
+        new_file_pathname = os.path.join(w_dir, os.path.basename(output_file_pathname))
+        new_zip_file = zipfile.ZipFile(new_file_pathname, 'w')
+        for zip_info in zip_info.infolist():
+            if zip_info.orig_filename == DOC_KML_FILENAME:
+                    IMAGE_NAME_MATCHER.test(zip_info.orig_filename)):
+                # TODO: make sure this doesn't affect originall
+                zip_file.extract(zip_info.orig_filename)
+                if zip_info.orig_filename == DOC_KML_FILENAME:
+                    # TODO: modify xml
+                    # with open() as f:
+                    #     read it....
+                    # with open(, 'w') as f:
+                    #     f.write(xmltodict.unparse(xml))
+                    pass
+                new_zip_file.write(zip_info.orig_filename)
+
+        shutil.copyfile(new_file_pathname, output_file_pathname)
+
+
+def create_sym_link(output_file_pathname, sym_link_pathname):
     if os.path.exists(sym_link_pathname):
         os.remove(sym_link_pathname)
     os.symlink(output_file_pathname, sym_link_pathname)
@@ -125,10 +173,9 @@ def main():
         args.output_filename, timestamp)
 
     if not os.path.isfile(output_file_pathname):
-        xml = intput(input_file_pathname)
-        xml = process(xml)
-        output(output_file_pathname,  xml, os.path.join(output_dir,
-            output_filename))
+        process(input_file_pathname, output_file_pathname)
+        create_sym_link(output_file_pathname,
+            os.path.join(output_dir, output_filename)
     else:
         logging.info("Latest file, %s, was already processed",
             output_file_pathname)
