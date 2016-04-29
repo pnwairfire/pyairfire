@@ -132,7 +132,7 @@ class create_working_dir(object):
 DOC_KML_FILENAME = 'doc.kml'
 
 PM25_FOLDER_NAME = 'PM25 from Wildland Fire'
-PM25_SUB_FOLDERS_TO_KEEP = ('Three Hour PM25', 'Daily Maximum PM25')
+PM25_SUB_FOLDERS_TO_KEEP = ('Hourly PM25', 'Daily Average PM25')
 
 def modify_doc_kml():
     with open(DOC_KML_FILENAME, 'r') as f:
@@ -155,11 +155,14 @@ def modify_doc_kml():
 
     for folder in xml['kml']['Document']['Folder']:
         logging.debug('processing folder: %s', folder['name'])
-        folder['Folder'] = [f for f in folder['Folder']
-            if f['name'] in PM25_SUB_FOLDERS_TO_KEEP]
+        if folder['name'] == PM25_FOLDER_NAME:
+            folder['Folder'] = [f for f in folder['Folder']
+                if f['name'] in PM25_SUB_FOLDERS_TO_KEEP]
+            logging.debug('subfolder kept: %s',
+                ', '.join([f['name'] for f in folder['Folder']]))
 
-    # TODO: if we want to delete the disclaimer, it's in
-    #    xml['kml']['Document']['ScreenOverlay']
+    # TODO: if we want to delete the disclaimer, it's under
+    #    'ScreenOverlay' in the PM25 folder
 
     os.remove(DOC_KML_FILENAME)
     with open(DOC_KML_FILENAME, 'w') as f:
