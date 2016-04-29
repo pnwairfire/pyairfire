@@ -81,10 +81,14 @@ def validate_args(args):
         logging.error("Out dir %s does not exist", args.output_dir)
         sys.exit(1)
 
+PATHNAME_DATE_EXTRACTOR = re.compile('.*\/([0-9]{10})\/.*')
 def determine_timestamp(filename):
-    # TODO: extract timestamp from path - i.e. run's initialization
-    #    time - if possible
-    return datetime.datetime.fromtimestamp(os.path.getmtime(filename))
+    # TODO: recognize BSF initialization time in other places in path name?
+    m = PATHNAME_DATE_EXTRACTOR.match(filename)
+    if m:
+        return datetime.datetime.strptime(m.group(1), '%Y%m%d%H')
+    else:
+        return datetime.datetime.fromtimestamp(os.path.getmtime(filename))
 
 def find_latest(input_dir, input_filename):
     input_file_pathname = timestamp = None
