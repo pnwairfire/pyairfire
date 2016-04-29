@@ -67,7 +67,6 @@ def parse_args():
     parser.add_argument('-l', '--log-level', default="WARN",
         help="Log level - 'DEBUG', 'INFO', 'WARN', 'ERROR'")
 
-    # TODO: add option to skip stripping of legend and logo
     parser.epilog = EXAMPLES
     return parser.parse_args()
 
