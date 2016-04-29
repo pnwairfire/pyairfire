@@ -46,6 +46,9 @@ class ParseColorMap(Action):
 
 def parse_args():
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
+    # TODO: support specifing multiple input dirs so that, for example, you
+    #   find the most recent from among variouts met domains (ex NAM4km and NAM12km)
+    #   (Though, this might not always have desired affect, so use with caution.)
     parser.add_argument('-i', '--input-dir', required=True,
         help="e.g. /path/to/NAM/4km/",)
     parser.add_argument('-o', '--output-dir', required=True,
