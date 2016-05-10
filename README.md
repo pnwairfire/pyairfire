@@ -25,6 +25,10 @@ On ubuntu, the following should be sufficient:
     sudo apt-get install python-gdal
     sudo apt-get install libgdal1-1.7.0
 
+You may also need to install libffi-dev on ubuntu:
+
+    sudo apt-get install libffi-dev
+
 
 ### met
 
