@@ -2,7 +2,6 @@
 """
 
 __author__      = "Joel Dubowy"
-__copyright__   = "Copyright (c) 2016 AirFire, PNW, USFS"
 
 import datetime
 import re

@@ -9,7 +9,6 @@ TODO: ignore duplicate fires - i.e. repeated fire location + date combos
 """
 
 __author__      = "Joel Dubowy"
-__copyright__   = "Copyright (c) 2015 AirFire, PNW, USFS"
 
 import sys
 import traceback
