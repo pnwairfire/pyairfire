@@ -257,18 +257,18 @@ class prepare_code:
             'Git tag, branch, or commit to deploy', 'master')
         repo_dir_name = uuid.uuid1()
 
-        with cd('/tmp/'):
+        with api.cd('/tmp/'):
             if files.exists(repo_dir_name): # this shouldn't happen
                 sudo('rm -rf %s*' % (repo_dir_name))
-            run('git clone %s %s' % (self.git_repo_url, repo_dir_name))
+            api.run('git clone %s %s' % (self.git_repo_url, repo_dir_name))
 
         self.repo_path_name = '/tmp/{}'.format(repo_dir_name)
-        with cd(self.repo_path_name):
-            run('git checkout %s' % (code_version))
-            run('rm -f .python-version')
+        with api.cd(self.repo_path_name):
+            api.run('git checkout %s' % (code_version))
+            api.run('rm -f .python-version')
         return self.repo_path_name
 
     def clean_up(self):
         """Removes repo
         """
-        sudo('rm -rf %s*' % (self.repo_path_name))
+        api.sudo('rm -rf %s*' % (self.repo_path_name))
