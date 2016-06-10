@@ -5,8 +5,11 @@ __author__      = "Joel Dubowy"
 
 import os
 import re
+import uuid
+
 from fabric import api
 from fabric.contrib import files
+from .input import env_var_or_prompt_for_input
 
 __all__ = [
     'kill_processes',
@@ -225,3 +228,47 @@ def uninstall_pyenv_environment(virtualenv_name):
     with api.settings(warn_only=True):
         api.sudo("pyenv deactivate {}".format(virtualenv_name))
         api.sudo("pyenv uninstall -f {}".format(virtualenv_name))
+
+##
+## Code
+##
+
+class prepare_code:
+    """Context manager that clones repo on enter and deletes it on exit.
+    """
+
+    def __init__(self, git_repo_url):
+        self.git_repo_url = git_repo_url
+
+    def __enter__(self):
+        self.repo_path_name = self.get_code()
+        return self.repo_path_name
+
+    def __exit__(self, type, value, traceback):
+        self.clean_up()
+
+        # TODO: suppress exception (or just certain exceptions) by returning
+        #  True no matter what (first outputting an error message) *or* by
+        #  calling error function.  (type, value, and traceback are undefined
+        #  unless there was an exception.)
+
+    def get_code(self):
+        code_version = env_var_or_prompt_for_input('CODE_VERSION',
+            'Git tag, branch, or commit to deploy', 'master')
+        repo_dir_name = uuid.uuid1()
+
+        with cd('/tmp/'):
+            if files.exists(repo_dir_name): # this shouldn't happen
+                sudo('rm -rf %s*' % (repo_dir_name))
+            run('git clone %s %s' % (self.git_repo_url, repo_dir_name))
+
+        self.repo_path_name = '/tmp/{}'.format(repo_dir_name)
+        with cd(self.repo_path_name):
+            run('git checkout %s' % (code_version))
+            run('rm -f .python-version')
+        return self.repo_path_name
+
+    def clean_up(self):
+        """Removes repo
+        """
+        sudo('rm -rf %s*' % (self.repo_path_name))
