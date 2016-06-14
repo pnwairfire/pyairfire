@@ -86,13 +86,13 @@ def summarize(data_array, subdata_key, include_details=True, key='fuelbeds'):
     return summary
 
 def _is_num(v):
-    return isinstance(v, (int, float, long))
+    return isinstance(v, (int, float))
 
 def _is_array(v):
     try:
         import numpy
         return isinstance(v, (list, numpy.ndarray))
-    except ImportError, e:
+    except ImportError as e:
         return isinstance(v, list)
 
 def _is_dict(v):

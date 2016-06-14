@@ -9,9 +9,7 @@ import csv
 import sys
 import abc
 
-class MergerBase(object):
-
-    __metaclass__ = abc.ABCMeta
+class MergerBase(object, metaclass=abc.ABCMeta):
 
     class FileSpecifier(object):
         def __init__(self, file_specifier):
@@ -37,7 +35,7 @@ class MergerBase(object):
             for row in csv.reader(input_file):
                 if not headers:
                     headers = [e.strip(' ') for e in row]
-                    headers = dict([(headers[i], i) for i in xrange(len(headers))])
+                    headers = dict([(headers[i], i) for i in range(len(headers))])
                 else:
                     row_dict = {h:row[headers[h]] for h in headers}
                     if ((not f.country_code_whitelist or

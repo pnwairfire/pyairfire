@@ -91,11 +91,11 @@ def parse_datetime(v, k):
     # TODO: make 'k' optional kwargs
     try:
         return parse(v, extra_formats=['%Y-%m-%d %H:%M:%S'])
-    except ValueError, e:
+    except ValueError as e:
         # datetime_parsing will raise ValueError if invalid format; re-raise
         # wih specific msg
         raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
-    except TypeError, e:
+    except TypeError as e:
         # TypeError will e raised if v is not a string; re-raise wih specific msg
         raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
 
@@ -104,7 +104,7 @@ def parse_datetimes(d, *keys):
     for k in keys:
         try:
             r[k] = parse_datetime(d[k], k)
-        except KeyError, e:
+        except KeyError as e:
             raise ValueError("Missing '{}' datetime field".format(k))
     return r
 

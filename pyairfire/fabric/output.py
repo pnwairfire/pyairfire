@@ -19,7 +19,7 @@ def error(msg):
     sys.exit(1)
 
 def debug_log(msg):
-    if os.environ.has_key('DEBUG'):
+    if 'DEBUG' in os.environ:
         print(green(msg))
 
 def confirm(msg):

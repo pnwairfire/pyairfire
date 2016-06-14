@@ -88,7 +88,7 @@ class PointExtractor(object):
             'data': []
 
         }
-        for i in xrange(len(point_time_series)):
+        for i in range(len(point_time_series)):
             r['data'].append({
                 't': self.times[i].strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'l': [[float(e) for e in i] for i in point_time_series[i]]  #  TODO: need to cast to floats?
@@ -193,7 +193,7 @@ class PointExtractor(object):
         lat_index = int((lat - self.sw_lat) / self.lat_res)
         lng_index = int((adjusted_lng - self.adjusted_sw_lng) / self.lat_res)
 
-        lat_index_range = xrange(max(0, lat_index-1), min(self.num_rows, lat_index+2))
-        lng_index_range = xrange(max(0, lng_index-1), min(self.num_cols, lng_index+2))
+        lat_index_range = range(max(0, lat_index-1), min(self.num_rows, lat_index+2))
+        lng_index_range = range(max(0, lng_index-1), min(self.num_cols, lng_index+2))
 
         return (lat_index, lng_index, lat_index_range, lng_index_range)

@@ -64,9 +64,9 @@ def main():
         point_time_series = pe.extract(options.lat, options.lng)
         logging.info("It took %f seconds to extract" % (
             (datetime.datetime.now() - t).seconds))
-        print json.dumps(point_time_series)
+        print(json.dumps(point_time_series))
 
-    except Exception, e:
+    except Exception as e:
         logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e.message)
 

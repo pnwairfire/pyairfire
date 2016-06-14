@@ -86,7 +86,7 @@ def main():
         logging.info("It took %f seconds to submit the log" % (
             (datetime.datetime.now() - t).seconds))
 
-    except Exception, e:
+    except Exception as e:
         scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":

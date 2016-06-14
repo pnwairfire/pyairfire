@@ -50,12 +50,12 @@ def setup_logger(**options):
     global _logger
 
     if options.get('print_debug'):
-        print " * [pyairfire.applogging.applogger] Enabled: %s" % (
-            options.get('enabled', True))
-        print " * [pyairfire.applogging.applogger] Log File: %s" % (
-            options.get('log_file', '(None)'))
-        print " * [pyairfire.applogging.applogger] Log Level: %s" % (
-            options.get('log_level', '(Not Specified)'))
+        print(" * [pyairfire.applogging.applogger] Enabled: %s" % (
+            options.get('enabled', True)))
+        print(" * [pyairfire.applogging.applogger] Log File: %s" % (
+            options.get('log_file', '(None)')))
+        print(" * [pyairfire.applogging.applogger] Log Level: %s" % (
+            options.get('log_level', '(Not Specified)')))
 
     if options.get('enabled', True):
         if options.get('log_file'):
