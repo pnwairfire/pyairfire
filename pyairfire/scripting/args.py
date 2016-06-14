@@ -1,6 +1,6 @@
 __author__      = "Joel Dubowy"
 
-import ConfigParser
+import configparser
 import datetime
 import logging
 import re
@@ -84,7 +84,7 @@ class SetConfigOptionAction(Action):
             raise OptionValueError(msg)
         config = getattr(namespace, self.dest)
         if not config:
-            config = ConfigParser.ConfigParser()
+            config = configparser.ConfigParser()
             setattr(namespace, self.dest, config)
         if not config.has_section(m.group(1)):
             config.add_section(m.group(1))

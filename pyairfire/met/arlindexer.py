@@ -176,7 +176,7 @@ class ArlIndexer(ArlFinder):
                         m = getattr(self, '_write_to_{}'.format(k))
                         m(self._config[k], index_data)
                         succeeded = True
-                    except Exception, e:
+                    except Exception as e:
                         logging.error("Failed to write to {}: {}".format(
                             ' '.join(k.split('_')), e.message))
             if not succeeded:

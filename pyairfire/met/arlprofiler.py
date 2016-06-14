@@ -342,7 +342,7 @@ class ARLProfile(object):
             for var_str in hour[line_numbers[0]].split():
                 first_vars.append(var_str)
             first_vals = hour[line_numbers[1]].split()
-            for v in xrange(len(first_vars)):
+            for v in range(len(first_vars)):
                 vars[first_vars[v]] = []
                 vars[first_vars[v]].append(first_vals[v])
 
@@ -353,10 +353,10 @@ class ARLProfile(object):
                 main_vars.append(var_str)
             for v in main_vars:
                 vars[v] = []
-            for i in xrange(line_numbers[3], len(hour)):
+            for i in range(line_numbers[3], len(hour)):
                 line = hour[i].split()
                 if len(line) > 0:
-                    for j in xrange(len(line)):
+                    for j in range(len(line)):
                         vars[main_vars[j]].append(line[j])
 
             self.hourly_profile[t] = vars
@@ -369,7 +369,7 @@ class ARLProfile(object):
         t = datetime(self.first.year, self.first.month, self.first.day)
         second_hr = t
         # find second hour in file
-        for hr in xrange(1, 23):
+        for hr in range(1, 23):
             second_hr = datetime(int(t.year), int(t.month), int(t.day), int(hr))
             if second_hr in self.hourly_profile:
                 break
@@ -389,20 +389,20 @@ class ARLProfile(object):
         pressure levels that are below the surface of the Earth.
         This data is all nonsense, so it needs to be removed.
         """
-        for dt, param_dict in self.hourly_profile.iteritems():
+        for dt, param_dict in self.hourly_profile.items():
             surface_p = float(param_dict['pressure_at_surface'][0])
             if surface_p > float(param_dict['pressure'][0]) or surface_p < float(param_dict['pressure'][-1]):
                 continue
             new_dict = {}
-            for i in xrange(len(param_dict['pressure'])):
+            for i in range(len(param_dict['pressure'])):
                 if float(param_dict['pressure'][i]) < surface_p:
                     surface_index = i
                     break
-            for k in param_dict.keys():
+            for k in list(param_dict.keys()):
                 # loop through each array, and append to new one
                 if len(param_dict[k]) > 1:
                     new_array = []
-                    for j in xrange(len(param_dict[k])):
+                    for j in range(len(param_dict[k])):
                         if j >= surface_index:
                             new_array.append(float(param_dict[k][j]))
                     new_dict[k] = new_array
@@ -419,7 +419,7 @@ class ARLProfile(object):
         If so, we need to spread those values out to become hourly data.
         """
         # clean up unwanted hours of information
-        for k in self.hourly_profile.keys():
+        for k in list(self.hourly_profile.keys()):
             if k < self.start or k > (self.end):
                 del self.hourly_profile[k]
 
@@ -437,7 +437,7 @@ class ARLProfile(object):
         # TODO: distinguish between floats and ints; use '<string>.isdigit()'
         # (which returns true if integer); can assume that, if string and not int,
         # then it's a float (?)
-        for dt, hp in self.hourly_profile.items():
+        for dt, hp in list(self.hourly_profile.items()):
             for k in hp:
                 if hasattr(hp[k], 'append'):
                     for i in range(len(hp[k])):
@@ -455,7 +455,7 @@ class ARLProfile(object):
         # default Planetary Boundary Layer (PBL) step function
         default_pbl = lambda hr,sunrise,sunset: 1000.0 if (sunrise + 1) < hr < sunset else 100.0
 
-        for dt, hp in self.hourly_profile.items():
+        for dt, hp in list(self.hourly_profile.items()):
             hr = (dt - self.first).total_seconds() / 3600.0
             hp['lat'] = self.lat
             hp['lng'] = self.lng
@@ -509,7 +509,7 @@ class ARLProfile(object):
             return None
 
         dp = []
-        for i in xrange(len(rh)):
+        for i in range(len(rh)):
             if float(rh[i]) < 1.0:
                 dp.append((-5321.0 / ((-5.0) - (5321.0 / (273.0 + float(temp[i]))))) - 273.0)
             else:
@@ -528,9 +528,9 @@ class ARLProfile(object):
         if not pressure or not sphu or not temp:
             return None
 
-        rh = map(lambda s,p,t: (float(s) * float(p) / 0.622) / (exp(21.4 - (5351.0 /(float(t) + 273.15)))), sphu,pressure,temp)
+        rh = list(map(lambda s,p,t: (float(s) * float(p) / 0.622) / (exp(21.4 - (5351.0 /(float(t) + 273.15)))), sphu,pressure,temp))
         # The above calculation is off by a factor of 10. Divide all values by 10
-        return map(lambda h: h / 10.0, rh)
+        return [h / 10.0 for h in rh]
 
     P_SURFACE = 1000  # Psfc (mb)
     T_REF = 288.15    # Tref (K)
@@ -545,7 +545,7 @@ class ARLProfile(object):
         if not pressure:
             return None
 
-        return map(lambda p: (self.T_REF/(self.LAPSE_RATE*0.001))*(1.0 - pow(float(p)/self.P_SURFACE, self.Rd*self.LAPSE_RATE*0.001/self.G)), pressure)
+        return [(self.T_REF/(self.LAPSE_RATE*0.001))*(1.0 - pow(float(p)/self.P_SURFACE, self.Rd*self.LAPSE_RATE*0.001/self.G)) for p in pressure]
 
     def utc_to_local(self):
         # profile dict will contain local met data index by *local* time
