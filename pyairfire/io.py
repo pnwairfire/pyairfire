@@ -77,7 +77,7 @@ class CSV2JSON(object):
                     #headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
                     headers = [e.strip(' ') for e in row]
                 else:
-                    d = dict(zip(headers, [e.strip(' ') for e in row]))
+                    d = dict(list(zip(headers, [e.strip(' ') for e in row])))
                     self._cast_numeric_values(d)
                     data.append(d)
         return data
@@ -98,7 +98,7 @@ class CSV2JSON(object):
 
     def _cast_numeric_values(self, obj):
         # TODO: better way to automatically parse numerical values
-        for k in obj.keys():
+        for k in list(obj.keys()):
             try:
                 # try to parse int
                 obj[k] = int(obj[k])

@@ -10,7 +10,7 @@ import os
 import re
 import requests
 import smtplib
-import StringIO
+import io
 import zipfile
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
@@ -83,7 +83,7 @@ class HipChatArchiver(object):
         url = self.ROOM_URL + '/' + room_id if room_id else self.ROOM_URL
         try:
             data = self._send(url)
-        except Exception, e:
+        except Exception as e:
             exit_with_msg("Failed to query room information: {}".format(e.message))
         return [data] if room_id else data['items']
 
@@ -101,7 +101,7 @@ class HipChatArchiver(object):
                 })
                 logging.debug('Received {} messages from {}'.format(
                     len(histories[-1]['history']), r['name']))
-            except Exception, e:
+            except Exception as e:
                 logging.error("Failed to query history for room {} - {}."
                     " Skipping".format(r['name'], e.message))
         return histories
@@ -126,7 +126,7 @@ class HipChatArchiver(object):
     FILENAME_CLEANER = re.compile('[^\w\-_]')
     def _zip(self, histories):
         logging.info("Zipping up files")
-        in_memory_zip = StringIO.StringIO()
+        in_memory_zip = io.StringIO()
         z =  zipfile.ZipFile(in_memory_zip, 'a', zipfile.ZIP_DEFLATED, False)
         for h in histories:
             filename = '{}/{}.json'.format(self._archive_name,
@@ -180,6 +180,6 @@ class HipChatArchiver(object):
             s.sendmail(msg['from'], self._email_recipients, msg.as_string())
             s.quit()
 
-        except Exception, e:
+        except Exception as e:
             exit_with_msg('Failed to send email to {} - {}'.format(
                 ', '.join(self._email_recipients), e.message))

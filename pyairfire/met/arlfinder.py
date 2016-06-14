@@ -392,14 +392,14 @@ class ArlFinder(object):
 
         # get most recent of each group
         arl_files = [sorted(files)[-1] for first_hour, files in
-            sorted(by_first_hour.items(), key=lambda e: e[0])]
+            sorted(list(by_first_hour.items()), key=lambda e: e[0])]
 
         # remove unecessary at beginning and end
         num_arl_files = len(arl_files)
         s_idx = 0
         # iterate from most recent to oldest.  this ensures that, if there are
         # two files that both span start to end, the more recent one is used
-        for i in reversed(range(num_arl_files)):
+        for i in reversed(list(range(num_arl_files))):
             if start and arl_files[i]['first_hour'] <= start:
                 s_idx = i
                 break
@@ -449,7 +449,7 @@ class ArlFinder(object):
             # already in files_per_hour and that aren't covered by the next file
             if self._fewer_arl_files:
                 if i < (num_arl_files - 1): # not at last file
-                    latest_dt = max(files_per_hour.keys() + [dt]) if files_per_hour else dt
+                    latest_dt = max(list(files_per_hour.keys()) + [dt]) if files_per_hour else dt
                     if latest_dt + ONE_HOUR >= sorted_arl_files[i+1]['first_hour']:
                         continue
 
@@ -466,7 +466,7 @@ class ArlFinder(object):
         Note: Assumes ...
         """
         files = []
-        for dt, f in sorted(files_per_hour.items(), key=lambda e: e[0]):
+        for dt, f in sorted(list(files_per_hour.items()), key=lambda e: e[0]):
             if (not files or (dt - files[-1]['last_hour']) > ONE_HOUR or
                     files[-1]['file'] != f):
                 files.append({'file': f, 'first_hour':dt, 'last_hour': dt})

@@ -55,7 +55,7 @@ def already_running(command):
     else:
         try:
             api.run("pgrep -f '%s'" % (command))
-        except SystemExit, e:
+        except SystemExit as e:
             return False
         return True
 
@@ -78,7 +78,7 @@ def wrapped_run(command, skip_if_already_running=False,
                 api.sudo(command)
             else:
                 api.run(command)
-        except SystemExit, e:
+        except SystemExit as e:
             if not silence_system_exit:
                 raise
 

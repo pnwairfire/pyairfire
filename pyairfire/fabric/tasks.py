@@ -12,7 +12,7 @@ import os
 import re
 from fabric.api import task, roles as roles_decorator, env
 
-from output import error, debug_log
+from .output import error, debug_log
 
 NOT_INTERPOLATED_MATCHER = re.compile('\%\((\w+)\)')
 
@@ -21,11 +21,11 @@ def get_env(roles, env_var_key):
     """Gets the environment (development, production, etc.) from the env var
     and whose key is defined by env_var_key and varifies that it's valid.
     """
-    if not os.environ.has_key(env_var_key):
+    if env_var_key not in os.environ:
         error('Specify %s' % (env_var_key))
-    if os.environ[env_var_key] not in roles.keys():
+    if os.environ[env_var_key] not in list(roles.keys()):
         error("%s must be one of the following: '%s'" % (
-            env_var_key, "', '".join(roles.keys())))
+            env_var_key, "', '".join(list(roles.keys()))))
     return os.environ[env_var_key]
 
 # TODO: rename 'roles' as 'role_hashes'
@@ -40,8 +40,8 @@ def update_roles(roles, env_var_key):
     there's an even better way to do it.
     """
     environment = get_env(roles, env_var_key)
-    for role, role_array in roles[environment].items():
-        for i in xrange(len(role_array)):
+    for role, role_array in list(roles[environment].items()):
+        for i in range(len(role_array)):
             data = {}
             variables = NOT_INTERPOLATED_MATCHER.findall(role_array[i])
             for v in variables:
@@ -106,6 +106,5 @@ class make_task(object):
         d.__name__ = func.__name__
         d.__doc__ = func.__doc__
         d.__module__ = func.__module__
-        d.func_name = func.func_name
 
         return task(roles_decorator(self.roles)(d))
