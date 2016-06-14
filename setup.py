@@ -44,7 +44,7 @@ setup(
         #"ftfy==4.1.1",
         "requests==2.10.0",
         "xmltodict==0.10.2",
-        "Fabric==1.11.1",
+        "Fabric3==1.11.1.post1",
         "pymongo==3.2.2",
         "netCDF4==1.2.4"
 
