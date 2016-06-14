@@ -3,7 +3,7 @@
 # TODO: nest this module under a subpackage?
 """
 # to import standard dateimt package instead of local one
-from __future__ import absolute_import
+
 
 import datetime
 

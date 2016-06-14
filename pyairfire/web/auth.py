@@ -65,7 +65,7 @@ class authenticate(object):
         return decorated
 
     def _check_for_auth_params(self):
-        if not self.REQUIRED_REQUEST_PARAMS_SET.issubset(self.request_args_getter().keys()):
+        if not self.REQUIRED_REQUEST_PARAMS_SET.issubset(list(self.request_args_getter().keys())):
             message = "Request must include parameters '%s' for authentication" % (
                 "', '".join(self.REQUIRED_REQUEST_PARAMS_SET))
             self.request_aborter(401, message=message)

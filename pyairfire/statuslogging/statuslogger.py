@@ -7,10 +7,10 @@ import datetime
 import hashlib
 import json
 import socket
-import urllib2
-import urlparse
+import urllib.request
+import urllib.parse
 
-from statuslogclient import StatusLogClient
+from .statuslogclient import StatusLogClient
 
 __all__ = [
     'StatusLogger'
@@ -54,9 +54,9 @@ class StatusLogger(StatusLogClient):
             url = self._signed_url()
 
             # TODO: send asynchrounously, if possible
-            req = urllib2.Request(url, json.dumps(data))
-            resp = urllib2.urlopen(req, None, self.TIMEOUT)  #.read()
-        except Exception, e:
+            req = urllib.request.Request(url, json.dumps(data))
+            resp = urllib.request.urlopen(req, None, self.TIMEOUT)  #.read()
+        except Exception as e:
             if error_handler:
                 error_handler(e)
             # Otherwise, don't do anything
@@ -65,7 +65,7 @@ class StatusLogger(StatusLogClient):
         return socket.gethostname()
 
     def _signed_url(self):
-        path = urlparse.urlparse(self.api_endpoint).path
+        path = urllib.parse.urlparse(self.api_endpoint).path
         query_string_params = {
             '_ts': datetime.datetime.utcnow().strftime(self.TIMESTAMP_FORMAT),
             '_k': self.api_key

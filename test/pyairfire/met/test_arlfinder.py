@@ -6,7 +6,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 import copy
 import datetime
 import tempfile
-import StringIO # for monkeypatching
+import io # for monkeypatching
 
 from py.test import raises
 
@@ -68,7 +68,7 @@ class TestARLFinder(object):
 
     def test_parse_index_file(self, monkeypatch):
         monkeypatch.setattr(io.Stream, "_open_file",
-            lambda s: StringIO.StringIO(INDEX_2015110200))
+            lambda s: io.StringIO(INDEX_2015110200))
         monkeypatch.setattr(self.arl_finder, "_get_file_pathname",
             lambda i, n: n)
         expected = [

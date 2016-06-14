@@ -5,7 +5,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import json
 import sys
-import StringIO
+import io
 
 from py.test import raises
 
@@ -14,10 +14,10 @@ from pyairfire import io
 class TestCSV2JSON(object):
 
     def setup(self):
-        self._output = StringIO.StringIO()
+        self._output = io.StringIO()
 
     def test_convert_one_fire(self, monkeypatch):
-        monkeypatch.setattr(sys, "stdin", StringIO.StringIO(
+        monkeypatch.setattr(sys, "stdin", io.StringIO(
             'id,name, event_id , foo,bar ,baz \n'
             '12fj33,Big Fire, dslfhew, 123, 34.34 , BAZ\n'
         ))
@@ -36,7 +36,7 @@ class TestCSV2JSON(object):
         assert expected == json.loads(self._output.getvalue())
 
     def test_convert_three_fires_no_merging(self, monkeypatch):
-        monkeypatch.setattr(sys, "stdin", StringIO.StringIO(
+        monkeypatch.setattr(sys, "stdin", io.StringIO(
             'id,name, event_id , foo,bar ,baz \n'
             '12fj33,Big Fire, dslfhew, 123, 34.34 , BAZ\n'
             '12fj33,Big Fire, dslfhew, 343, 24.34 , BAZ\n'

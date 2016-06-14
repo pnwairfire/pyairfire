@@ -5,10 +5,9 @@ __author__      = "Joel Dubowy"
 
 import json
 import logging
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
 
-from statuslogclient import StatusLogClient
+from .statuslogclient import StatusLogClient
 
 __all__ = [
     'StatusReader'
@@ -48,10 +47,10 @@ class StatusReader(StatusLogClient):
          - action -- ex. action='Start'
          - machine -- ex. machine='Smokey'
         """
-        query_string = urllib.urlencode(query)
+        query_string = urllib.parse.urlencode(query)
 
         url = '%s?%s' % (self.api_endpoint, query_string)
         logging.debug("Querying status log: %s", (url))
-        req = urllib2.Request(url)
-        resp = urllib2.urlopen(req, None, timeout or self.TIMEOUT)
+        req = urllib.request.Request(url)
+        resp = urllib.request.urlopen(req, None, timeout or self.TIMEOUT)
         return json.loads(resp.read())

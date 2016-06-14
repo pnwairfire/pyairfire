@@ -13,7 +13,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from statusreader import StatusReader
+from .statusreader import StatusReader
 
 
 __all__ = [
@@ -67,7 +67,7 @@ class StatusNotifier(object):
                 m = getattr(self, 'send_%s' % (channel))
                 m(status_logs, subject=subject, query=query)
 
-            except StatusNotificationError, e:
+            except StatusNotificationError as e:
                 # log message but move on
                 logging.error("Failed to send %s: %s", channel, e.message)
 
@@ -118,7 +118,7 @@ class StatusNotifier(object):
             s.sendmail(msg['from'], recipients, msg.as_string())
             s.quit()
 
-        except smtplib.SMTPException, e:
+        except smtplib.SMTPException as e:
             # Note: e.message is blank
             raise StatusNotificationError(str(e))
 
@@ -159,7 +159,7 @@ class StatusNotifier(object):
               </body>
             </html>
         """ % (
-            ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in query.items()]) if query else "",
+            ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in list(query.items())]) if query else "",
             len(status_logs['logs']),
             ''.join([self.status_log_as_html(sl, verbose=False) for sl in status_logs['logs']]),
             ''.join([self.status_log_as_html(sl) for sl in status_logs['logs']])
@@ -186,7 +186,7 @@ class StatusNotifier(object):
                 status_log['process'],
                 status_log['status'].lower(),
                 status_log['status'],
-                ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in status_log.items()]),
+                ''.join(['<li><span class="key">%s</span>: %s</li>' % (k, v) for (k, v) in list(status_log.items())]),
             )
         else:
             html = """
