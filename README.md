@@ -55,20 +55,6 @@ following to install required python packages:
 
     pip install -r requirements.txt
 
-#### The netcdf Package
-
-pyairfire requires the netcdf python package for generating single-point
-graphs from BlueSky ouput.  Unfortunately, the ```netcdf``` package has in
-the past failed to install due to the following error:
-
-    TypeError: parse_requirements() missing 1 required keyword argument: 'session'
-
-This error is in pip.req.parse_requirements, which is not in pip's public
-API.  So, netcdf isn't listed in pyairfire's requirements in setup.py.
-If you'd like to use the single-point graph functionaility (in
-pyairfire.bluesky.dispersionnc), you'll need to install netcdf package
-manually.
-
 ### Setup Environment
 
 To import pyairfire in development, you'll have to add the repo root directory

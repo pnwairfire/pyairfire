@@ -11,7 +11,7 @@ __author__      = "Joel Dubowy"
 import datetime
 import os
 
-from netcdf import netcdf
+import netCDF4
 
 __all__ = [
     'PointExtractor'
@@ -74,7 +74,7 @@ class PointExtractor(object):
 
         # TODO: make sure this is indexing self.pm25 correctly, given each pair
         # of lat/lng indices in the index ranges
-        point_time_series = self.pm25[0, :, 0, lat_index_range[0]:lat_index_range[-1]+1, lng_index_range[0]:lng_index_range[-1]+1]
+        point_time_series = self.pm25[:, 0, lat_index_range[0]:lat_index_range[-1]+1, lng_index_range[0]:lng_index_range[-1]+1]
 
         r = {
             "grid_indices": {
@@ -103,15 +103,15 @@ class PointExtractor(object):
     def _initialize(self, nc_file_pathname):
         if not os.path.isfile(nc_file_pathname):
             raise RuntimeError("%s doesn't exist" % (nc_file_pathname))
-        (self.nc_file, is_new) = netcdf.open(nc_file_pathname)
+        self.nc_file = netCDF4.Dataset(nc_file_pathname)
 
         self._extract_pm25()
         self._extract_attributes()
         self._extract_times()
 
     def _extract_pm25(self):
-        self.pm25 = self.nc_file.getvar('PM25')
-        self.pms5_data_set = self.pm25.group()
+        self.pm25 = self.nc_file.variables['PM25']
+        self.pm25_data_set = self.pm25.group()
 
     def _extract_attributes(self):
         """Extracs the sw lat/lng and lat/lng resolution from the nc file's global
@@ -132,16 +132,16 @@ class PointExtractor(object):
         """
 
         # lat and lng resolution
-        self.lat_res = self.pms5_data_set.YCELL
-        self.lng_res = self.pms5_data_set.XCELL
+        self.lat_res = self.pm25_data_set.YCELL
+        self.lng_res = self.pm25_data_set.XCELL
 
         # grid dimensions
-        self.num_rows = self.pms5_data_set.NROWS # this corresponds to lat
-        self.num_cols = self.pms5_data_set.NCOLS # this corresponds to lng
+        self.num_rows = self.pm25_data_set.NROWS # this corresponds to lat
+        self.num_cols = self.pm25_data_set.NCOLS # this corresponds to lng
 
         # SW and NE corners of domain
-        self.sw_lat = self.pms5_data_set.YORIG
-        self.sw_lng = self.pms5_data_set.XORIG
+        self.sw_lat = self.pm25_data_set.YORIG
+        self.sw_lng = self.pm25_data_set.XORIG
         self._compute_ne_corner()
         self._compute_adjusted_corner_longitudes()
 
@@ -157,9 +157,9 @@ class PointExtractor(object):
         self.adjusted_ne_lng = self.adjusted_sw_lng + self.lng_res * self.num_cols
 
     def _extract_times(self):
-        self.tflag = self.nc_file.getvar('TFLAG')
+        self.tflag = self.nc_file.variables['TFLAG']
         self.times = []
-        for d, t in self.tflag[0,:,0]:
+        for d, t in self.tflag[:,0,:]:
             self.times.append(self._convert_to_datetime(d, t))
 
     def _convert_to_datetime(self, d, t):
@@ -171,9 +171,9 @@ class PointExtractor(object):
          't' -- an integer reprenting 10000 times the hour of the day.  Ex. 0
                 is midnight, 10000 is 1am, ..., 230000 is 11pm
         """
-        hour = int(t) / 10000
+        hour = t // 10000
         d = int(d) # just to make sure
-        year = d / 1000
+        year = d // 1000
         day_of_year = d % 1000
         return datetime.datetime(year,1,1,hour) +  datetime.timedelta(day_of_year-1)
 
