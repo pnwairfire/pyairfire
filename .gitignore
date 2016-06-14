@@ -4,3 +4,4 @@ build/
 dist/
 pyairfire.egg-info/
 tmp/
+.cache
