@@ -42,10 +42,10 @@ setup(
     install_requires=[
         #"netcdf",  #"netcdf==0.0.28",
         #"ftfy==4.1.1",
-        "requests>=2.7.0",
-        "xmltodict==0.9.2",
-        "Fabric==1.10.2",
-        "pymongo>=3.1.1"
+        "requests==2.10.0",
+        "xmltodict==0.10.2",
+        "Fabric==1.11.1",
+        "pymongo==3.2.2"
 
     ],
     tests_require=test_requirements
