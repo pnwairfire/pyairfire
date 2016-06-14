@@ -11,7 +11,7 @@ import io # for monkeypatching
 from py.test import raises
 
 from pyairfire.met import arlfinder
-from pyairfire import io # for monkeypatching
+from pyairfire import io as p_io # for monkeypatching
 
 ##
 ## Tests for ArlFinder
@@ -67,7 +67,7 @@ class TestARLFinder(object):
         assert expected == self.arl_finder._parse_index_files(['a','b'])
 
     def test_parse_index_file(self, monkeypatch):
-        monkeypatch.setattr(io.Stream, "_open_file",
+        monkeypatch.setattr(p_io.Stream, "_open_file",
             lambda s: io.StringIO(INDEX_2015110200))
         monkeypatch.setattr(self.arl_finder, "_get_file_pathname",
             lambda i, n: n)

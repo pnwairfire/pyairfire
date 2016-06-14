@@ -161,13 +161,13 @@ class TestARLIndexer(object):
         e = datetime.datetime.utcnow()
         with raises(ValueError) as e_info:
             self.arl_indexer._fill_in_start_end(s, e)
-        assert arlindexer.ArlIndexer.END_WITHOUT_START_ERR_MSG == e_info.value.message
+        assert arlindexer.ArlIndexer.END_WITHOUT_START_ERR_MSG == e_info.value.args[0]
 
         # case where start is after end (invalid); exception raised
         s = e + datetime.timedelta(1)
         with raises(ValueError) as e_info:
             self.arl_indexer._fill_in_start_end(s, e)
-        assert arlindexer.ArlIndexer.START_AFTER_END_ERR_MSG == e_info.value.message
+        assert arlindexer.ArlIndexer.START_AFTER_END_ERR_MSG == e_info.value.args[0]
 
         # case where start is before end (valid); they are returned as is
         s = e - datetime.timedelta(1)
@@ -253,15 +253,15 @@ class TestArlIndexDB(object):
 
         with raises(ValueError) as e_info:
             call("hostname")
-        assert e_info.value.message == invalid_error_msg
+        assert e_info.value.args[0] == invalid_error_msg
 
         with raises(ValueError) as e_info:
             call("sdfmongodb://hostname")
-        assert e_info.value.message == invalid_error_msg
+        assert e_info.value.args[0] == invalid_error_msg
 
         with raises(ValueError) as e_info:
             call("mongodb://:sdf@hostname")
-        assert e_info.value.message == invalid_error_msg
+        assert e_info.value.args[0] == invalid_error_msg
 
         ## passing default db url and name
 

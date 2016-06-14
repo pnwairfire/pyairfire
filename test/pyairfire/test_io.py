@@ -9,7 +9,7 @@ import io
 
 from py.test import raises
 
-from pyairfire import io
+from pyairfire import io as p_io
 
 class TestCSV2JSON(object):
 
@@ -22,7 +22,7 @@ class TestCSV2JSON(object):
             '12fj33,Big Fire, dslfhew, 123, 34.34 , BAZ\n'
         ))
         monkeypatch.setattr(sys, "stdout", self._output)
-        io.CSV2JSON().convert()
+        p_io.CSV2JSON().convert()
         expected = [
             {
                 "id": "12fj33",
@@ -43,7 +43,7 @@ class TestCSV2JSON(object):
             '34erw5,Small Fire, 298rijfssdf, 20 20, 234.34.243, baaaz'
         ))
         monkeypatch.setattr(sys, "stdout", self._output)
-        io.CSV2JSON().convert()
+        p_io.CSV2JSON().convert()
         expected = [
             {
                 "id": "12fj33",

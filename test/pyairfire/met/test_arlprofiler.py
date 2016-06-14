@@ -353,7 +353,7 @@ class TestARLProfile(object):
     def test_one_all_hours_with_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
         with tempfile.NamedTemporaryFile() as f:
-            f.write(PROFILE_ONE)
+            f.write(bytes(PROFILE_ONE, 'utf-8'))
             f.flush()
             profiler = arlprofiler.ARLProfile(f.name,
                 datetime.datetime(2014, 5, 30, 0, 0), # first
@@ -368,7 +368,7 @@ class TestARLProfile(object):
     def test_one_all_hours_no_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
         with tempfile.NamedTemporaryFile() as f:
-            f.write(PROFILE_ONE)
+            f.write(bytes(PROFILE_ONE, 'utf-8'))
             f.flush()
             profiler = arlprofiler.ARLProfile(f.name,
                 datetime.datetime(2014, 5, 30, 0, 0), # first
@@ -383,7 +383,7 @@ class TestARLProfile(object):
     def test_one_partial_with_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
         with tempfile.NamedTemporaryFile() as f:
-            f.write(PROFILE_ONE)
+            f.write(bytes(PROFILE_ONE, 'utf-8'))
             f.flush()
             profiler = arlprofiler.ARLProfile(f.name,
                 datetime.datetime(2014, 5, 30, 0, 0), # first
@@ -398,7 +398,7 @@ class TestARLProfile(object):
     def test_one_partial_no_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
         with tempfile.NamedTemporaryFile() as f:
-            f.write(PROFILE_ONE)
+            f.write(bytes(PROFILE_ONE, 'utf-8'))
             f.flush()
             profiler = arlprofiler.ARLProfile(f.name,
                 datetime.datetime(2014, 5, 30, 0, 0), # first

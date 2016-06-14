@@ -391,7 +391,7 @@ class ArlFinder(object):
             # else, not in time window
 
         # get most recent of each group
-        arl_files = [sorted(files)[-1] for first_hour, files in
+        arl_files = [sorted(files, key=lambda f: f['first_hour'])[-1] for first_hour, files in
             sorted(list(by_first_hour.items()), key=lambda e: e[0])]
 
         # remove unecessary at beginning and end
