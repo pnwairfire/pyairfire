@@ -22,10 +22,6 @@ setup(
         'bin/hipchat/hcarch',
         'bin/hipchat/hcarch2log',
         'bin/hms/get-hms-kml',
-        'bin/met/arlindexer',
-        'bin/met/arlfinder',
-        'bin/met/arlprofiler',
-        'bin/met/arlquery',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
