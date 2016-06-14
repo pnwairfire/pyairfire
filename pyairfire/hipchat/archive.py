@@ -84,7 +84,7 @@ class HipChatArchiver(object):
         try:
             data = self._send(url)
         except Exception as e:
-            exit_with_msg("Failed to query room information: {}".format(e.message))
+            exit_with_msg("Failed to query room information: {}".format(e))
         return [data] if room_id else data['items']
 
     def _get_histories(self, rooms):
@@ -103,7 +103,7 @@ class HipChatArchiver(object):
                     len(histories[-1]['history']), r['name']))
             except Exception as e:
                 logging.error("Failed to query history for room {} - {}."
-                    " Skipping".format(r['name'], e.message))
+                    " Skipping".format(r['name'], e))
         return histories
 
     def _get_history(self, room_id):
@@ -182,4 +182,4 @@ class HipChatArchiver(object):
 
         except Exception as e:
             exit_with_msg('Failed to send email to {} - {}'.format(
-                ', '.join(self._email_recipients), e.message))
+                ', '.join(self._email_recipients), e))

@@ -69,7 +69,7 @@ class StatusNotifier(object):
 
             except StatusNotificationError as e:
                 # log message but move on
-                logging.error("Failed to send %s: %s", channel, e.message)
+                logging.error("Failed to send %s: %s", channel, e)
 
     ## Email
 
@@ -119,7 +119,7 @@ class StatusNotifier(object):
             s.quit()
 
         except smtplib.SMTPException as e:
-            # Note: e.message is blank
+            # Note: e's message is blank
             raise StatusNotificationError(str(e))
 
     def generate_email_content(self, status_logs, query=None):

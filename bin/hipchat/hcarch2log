@@ -24,7 +24,7 @@ def main():
                     j = json.loads(f.read())
                 except Exception, e:
                     msg = " -- SKIPPED DAY: {} -- ERROR: {}".format(
-                        filename, e.message)
+                        filename, e)
                     sys.stdout.write(msg)
                     sys.stderr.write(msg)
                     continue
@@ -36,8 +36,7 @@ def main():
                             log['message'].encode('utf-8', 'ignore'))
                         sys.stdout.write(line)
                     except Exception, e:
-                        msg = " -- SKIPPED MESSAGE -- ERROR: {}".format(
-                            e.message)
+                        msg = " -- SKIPPED MESSAGE -- ERROR: {}".format(e)
                         sys.stdout.write(msg)
                         sys.stderr.write(msg)
 

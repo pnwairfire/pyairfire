@@ -87,7 +87,7 @@ def main():
             (datetime.datetime.now() - t).seconds))
 
     except Exception as e:
-        scripting.utils.exit_with_msg(e.message)
+        scripting.utils.exit_with_msg(e)
 
 if __name__ == "__main__":
     main()

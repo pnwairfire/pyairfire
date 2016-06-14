@@ -68,7 +68,7 @@ def main():
 
     except Exception as e:
         logging.debug(traceback.format_exc())
-        scripting.utils.exit_with_msg(e.message)
+        scripting.utils.exit_with_msg(e)
 
 if __name__ == "__main__":
     main()

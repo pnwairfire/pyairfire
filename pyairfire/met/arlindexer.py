@@ -178,7 +178,7 @@ class ArlIndexer(ArlFinder):
                         succeeded = True
                     except Exception as e:
                         logging.error("Failed to write to {}: {}".format(
-                            ' '.join(k.split('_')), e.message))
+                            ' '.join(k.split('_')), e))
             if not succeeded:
                 raise RuntimeError("Failed to record")
 
