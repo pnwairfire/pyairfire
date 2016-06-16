@@ -5,6 +5,12 @@ Team.
 
 ***This software is provided for research purposes only. Use at own risk.***
 
+## Python 2 and 3 Support
+
+This package was originally developed to support python 2.7, but has since
+been refactored to support 3.5. Attempts to support both 2.7 and 3.5 have
+been made but are not guaranteed.
+
 ## Non-python Dependencies
 
 Whether cloning the repo or installing with pip, if you'll be using pyairfire
