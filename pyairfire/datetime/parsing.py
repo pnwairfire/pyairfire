@@ -84,7 +84,7 @@ def fill_in_date(dt):
     return datetime.datetime(d.year, d.month, d.day, t.hour, t.minute, t.second)
 
 ##
-## Moved originally in bluesky package
+## Originally in bluesky package
 ##
 
 def parse_datetime(v, k):

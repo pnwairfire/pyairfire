@@ -1,4 +1,4 @@
-"""Unit tests for bluesky.io"""
+"""Unit tests for pyairfire.io"""
 
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"

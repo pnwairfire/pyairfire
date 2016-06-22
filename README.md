@@ -73,10 +73,6 @@ If you get an error like    ```AttributeError: 'NoneType' object has no attribut
 
 ## Usage:
 
-### pyairfire.bluesky
-
-Look at the docstrings in the code for usage examples.
-
 ### pyairfire.scripting
 
 Look at the docstrings in the code for usage examples.

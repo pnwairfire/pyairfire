@@ -167,8 +167,6 @@ def format_datetimes(data):
 
     args
      - data -- data (possibly nested) containing datatimes to format
-
-    This function could also go in bluesky.datetimeutils
     """
     if _is_datetime(data):
         data = data.isoformat()

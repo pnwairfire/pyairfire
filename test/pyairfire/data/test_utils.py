@@ -1,4 +1,4 @@
-"""Unit tests for bluesky.datautils"""
+"""Unit tests for pyairfire.data.utils"""
 
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
