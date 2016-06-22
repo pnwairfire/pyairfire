@@ -13,7 +13,7 @@ import filecmp
 import logging
 import os
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import xmltodict
 from argparse import (
     ArgumentParser, RawTextHelpFormatter, Action, ArgumentTypeError
@@ -42,7 +42,7 @@ def read_feed(feed):
         if feed in ('smoke', 'fire'):
             feed = "{}{}.kml".format(DEFAUlT_URL_ROOT, feed)
         logging.debug("Getting {}".format(feed))
-        f = urllib2.urlopen(feed)
+        f = urllib.request.urlopen(feed)
         data = f.read()
     return xmltodict.parse(data)
 
@@ -106,7 +106,7 @@ def strip_extras(args, xml):
     # strip placemarks out of smoke plumes
     if args.feed.find('smoke') >= 0:
         xml['kml']['Document']['Placemark'] = [
-            p for p in xml['kml']['Document']['Placemark'] if p.has_key('Polygon')]
+            p for p in xml['kml']['Document']['Placemark'] if 'Polygon' in p]
 
 # From KML:
 #  s['@id'] -> s['PolyStyle']['color']
@@ -134,7 +134,7 @@ def change_smoke_colors(args, xml):
         for s in xml['kml']['Document']['Style']:
             # change color of plume
             if hasattr(s['PolyStyle']['color'], 'append'):
-                for i in xrange(len(s['PolyStyle']['color'])):
+                for i in range(len(s['PolyStyle']['color'])):
                     s['PolyStyle']['color'][i] = convert_color(color_map, s['PolyStyle']['color'][i])
             else:
                 s['PolyStyle']['color'] = convert_color(color_map, s['PolyStyle']['color'])

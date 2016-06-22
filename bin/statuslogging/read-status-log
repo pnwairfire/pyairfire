@@ -158,7 +158,7 @@ Possible Query Parameters (not an exaustive list):
     try:
         query = dict(options.query)
         if options.number_of_past_days:
-            if query.has_key('newer_than') or query.has_key('older_than'):
+            if 'newer_than' in query or 'older_than' in query:
                 msg = ("Don't specify query fields 'newer_than' or 'older_than' along"
                     " with option --number-of-past-days")
                 scripting.utils.exit_with_msg(msg)
@@ -176,7 +176,7 @@ Possible Query Parameters (not an exaustive list):
             sys.stdout.write(json.dumps(logs))
             sys.stdout.write('\n')
 
-    except Exception, e:
+    except Exception as e:
         scripting.utils.exit_with_msg(e)
 
 if __name__ == "__main__":
