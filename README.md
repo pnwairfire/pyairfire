@@ -11,37 +11,6 @@ This package was originally developed to support python 2.7, but has since
 been refactored to support 3.5. Attempts to support both 2.7 and 3.5 have
 been made but are not guaranteed.
 
-## Non-python Dependencies
-
-Whether cloning the repo or installing with pip, if you'll be using pyairfire
-to generate single point graphs from bluesky output, you'll first need to
-manually install gdal, and netcdf, which pyairfire depends on.
-
-On a mac, you can do so with [Homebrew](http://brew.sh/):
-
-    brew install homebrew/science/netcdf
-    brew install gdal --with-netcdf --enable-unsupported
-
-Note that the '--with-netcdf' option is required to build gdal with the
-netCDF driver. See http://trac.osgeo.org/gdal/wiki/NetCDF for more information.
-
-On ubuntu, the following should be sufficient:
-
-    sudo apt-get install libnetcdf-dev
-    sudo apt-get install python-gdal
-    sudo apt-get install libgdal1-1.7.0
-
-You may also need to install libffi-dev on ubuntu:
-
-    sudo apt-get install libffi-dev
-
-
-### met
-
-The met package relies on the fortran arl profile utility. It is
-expected to reside in a directory in the search path. To obtain `profile`,
-contact NOAA.
-
 ## Development
 
 ### Clone Repo
@@ -56,8 +25,7 @@ or http:
 
 ### Install Dependencies
 
-After installing the non-python dependencies (mentioned above), run the
-following to install required python packages:
+Run the following to install required python packages:
 
     pip install -r requirements.txt
 
@@ -65,14 +33,6 @@ following to install required python packages:
 
 To import pyairfire in development, you'll have to add the repo root directory
 to the search path. Some of the scripts bin do this automatically.
-
-Another environmental variable that sometimes needs to be set, depending
-on your platform, is DYLD_LIBRARY_PATH, which needs to include the directory
-that contains libhdf5_hl.7.dylib, needed by netCDF4.  That can be set on
-the command line, such as in the following:
-
-    DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/ ./bin/bluesky/extract_point_pm25_time_series.py
-    DYLD_LIBRARY_PATH=/path/to/hdf5-1.8.9-2/lib/
 
 ## Running tests
 
@@ -83,8 +43,8 @@ First, install test-specific packages:
 Once installed, you can run tests with pytest:
 
     py.test
-    py.test ./test/pyairfire/bluesky/dispersionnc_tests.py
-    py.test ./test/pyairfire/bluesky/
+    py.test ./test/pyairfire/datetime/test_parsing.py
+    py.test ./test/pyairfire/datetime/
 
 You can also use the ```--collect-only``` option to see a list of all tests.
 

@@ -14,11 +14,6 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/bluesky/extract-point-pm25-time-series.py',
-        'bin/bluesky/merge-emissions',
-        'bin/bluesky/merge-fires',
-        'bin/bluesky/process-bluesky-kmz',
-        'bin/bluesky/run-bluesky',
         'bin/hipchat/hcarch',
         'bin/hipchat/hcarch2log',
         'bin/hms/get-hms-kml',
@@ -37,12 +32,10 @@ setup(
     url='https://github.com/pnwairfire/pyairfire',
     description='General toolbox of python utilities for AirFire team.',
     install_requires=[
-        #"netcdf",  #"netcdf==0.0.28",
         #"ftfy==4.1.1",
         "requests==2.10.0",
         "xmltodict==0.10.2",
-        "Fabric3==1.11.1.post1",
-        "netCDF4==1.2.4"
+        "Fabric3==1.11.1.post1"
 
     ],
     tests_require=test_requirements
