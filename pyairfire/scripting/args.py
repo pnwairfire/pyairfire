@@ -11,6 +11,7 @@ from argparse import (
 )
 
 from pyairfire.datetime.parsing import parse as parse_datetime
+from pyairfire.configuration import merge_configs, set_config_value
 from .utils import exit_with_msg
 
 __all__ = [
