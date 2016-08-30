@@ -6,6 +6,7 @@ __author__ = "Joel Dubowy"
 import datetime
 import io
 import json
+import logging
 import os
 import re
 import smtplib
