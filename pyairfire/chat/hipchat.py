@@ -50,8 +50,7 @@ class HipChatArchiver(archivebase.ArchiverBase):
         if r.status_code != 200:
             # TODO: retry
             exit_with_msg("Http failure: {} - {}".format(url, r.content))
-        return json.loads(r.content)
-
+        return r.json()
 
     ROOM_URL = "https://api.hipchat.com/v2/room"
     def _get_rooms(self, room_id=None):
