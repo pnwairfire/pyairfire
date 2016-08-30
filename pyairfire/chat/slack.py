@@ -5,6 +5,7 @@ __author__      = "Joel Dubowy"
 
 
 import json
+import logging
 import requests
 
 import slacker
@@ -69,6 +70,8 @@ class SlackArchiver(archivebase.ArchiverBase):
         while True:
             # Note: unless you set inclusize=true in the request,
             #  the latest / oldest range is non-inclusive
+            logging.debug('Querying history - %s (%s) - %s -> %s',
+                channel['name'], channel['id'], latest, oldest)
             r = self._slack_client.channels.history(
                 channel['id'], latest=latest, oldest=oldest).body
             history.extend(r['messages'])
