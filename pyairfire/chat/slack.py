@@ -58,11 +58,11 @@ class SlackArchiver(archivebase.ArchiverBase):
             histories.append({
                 "id": c['id'],
                 "name": c['name'],
-                "history": self._history(c['id'])
+                "history": self._history(c)
             })
         return histories
 
-    def _history(self, channel_id):
+    def _history(self, channel):
         history = []
         latest = str(self._start_date.timestamp())
         oldest = str(self._end_date.timestamp())
@@ -70,7 +70,7 @@ class SlackArchiver(archivebase.ArchiverBase):
             # Note: unless you set inclusize=true in the request,
             #  the latest / oldest range is non-inclusive
             r = self._slack_client.channels.history(
-                channel, latest=latest, oldest=oldest)
+                channel['id'], latest=latest, oldest=oldest).body
             history.extend(r['messages'])
             # if 'is_limited' is True, that means we've reached
             # the limit for our free plan
