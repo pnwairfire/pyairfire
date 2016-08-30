@@ -1,4 +1,4 @@
-"""pyairfire.hipchat.archive
+"""pyairfire.chat.hipchat
 """
 
 __author__      = "Joel Dubowy"
@@ -19,7 +19,8 @@ from email.mime.text import MIMEText
 from pyairfire.scripting.utils import exit_with_msg
 
 __all__ = [
-    'HipChatArchiver'
+    'HipChatArchiver',
+    'send'
 ]
 
 class HipChatArchiver(object):
@@ -183,3 +184,18 @@ class HipChatArchiver(object):
         except Exception as e:
             exit_with_msg('Failed to send email to {} - {}'.format(
                 ', '.join(self._email_recipients), e))
+
+def send(message, room_id, auth_token, color="green"):
+    data = {
+        "color": color,
+        "message": message,
+        "notify": False,
+        "message_format": "text"
+    }
+    url = "https://api.hipchat.com/v2/room/{}/notification?auth_token={}".format(
+        room_id, auth_token)
+    headers = {
+        'Content-type': 'application/json',
+        'Accept': 'text/plain'
+    }
+    return requests.post(url, data=json.dumps(data), headers=headers)

@@ -1,4 +1,4 @@
-"""pyairfire.slack.notifications
+"""pyairfire.chat.slack
 """
 
 __author__      = "Joel Dubowy"
