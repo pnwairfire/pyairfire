@@ -52,7 +52,7 @@ class ArchiverBase(object):
     FILENAME_CLEANER = re.compile('[^\w\-_]')
     def _zip(self, histories):
         logging.info("Zipping up files")
-        in_memory_zip = io.StringIO()
+        in_memory_zip = io.BytesIO()
         z =  zipfile.ZipFile(in_memory_zip, 'a', zipfile.ZIP_DEFLATED, False)
         for h in histories:
             filename = '{}/{}.json'.format(self._archive_name,
@@ -66,7 +66,7 @@ class ArchiverBase(object):
 
         zip_file_name = os.path.join(self._dest_dir, self._zip_file_name)
         logging.info('Writing zipfile {}'.format(zip_file_name))
-        with open(zip_file_name, 'w') as zf:
+        with open(zip_file_name, 'wb') as zf:
             in_memory_zip.seek(0) # is this necessary
             zf.write(in_memory_zip.read())
 
