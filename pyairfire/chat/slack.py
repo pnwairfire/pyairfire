@@ -27,6 +27,7 @@ class SlackArchiver(archivebase.ArchiverBase):
     # TODO: should there indeed be a default sender?
     DEFAULT_EMAIL_SENDER = "slack-archiver@airfire.org"
     DEFAULT_EMAIL_SUBJECT = "Slack archive {} through {}"
+    ARCHIVE_PREFIX = 'slack-archive'
 
     def __init__(self, token, num_days, **options):
         super(SlackArchiver, self).__init__(num_days, **options)
