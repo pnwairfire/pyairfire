@@ -6,6 +6,7 @@ __author__      = "Joel Dubowy"
 import json
 import logging
 import requests
+import traceback
 
 from pyairfire.scripting.utils import exit_with_msg
 from . import archivebase
@@ -62,6 +63,7 @@ class HipChatArchiver(archivebase.ArchiverBase):
         try:
             data = self._send(url)
         except Exception as e:
+            logging.debug(traceback.format_exc())
             exit_with_msg("Failed to query room information: {}".format(e))
         return [data] if room_id else data['items']
 
