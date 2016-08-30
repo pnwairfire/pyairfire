@@ -34,6 +34,7 @@ setup(
     install_requires=[
         #"ftfy==4.1.1",
         "requests==2.10.0",
+        "slacker==0.9.24",
         "xmltodict==0.10.2",
         "Fabric3==1.11.1.post1"
 

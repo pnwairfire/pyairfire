@@ -7,9 +7,80 @@ __author__      = "Joel Dubowy"
 import json
 import requests
 
+import slacker
+
+from pyairfire.scripting.utils import exit_with_msg
+from . import archivebase
+
 __all__ = [
+    'SlackArchiver',
     'send'
 ]
+
+
+##
+## Archives
+##
+
+class SlackArchiver(archivebase.ArchiverBase):
+
+    # TODO: should there indeed be a default sender?
+    DEFAULT_EMAIL_SENDER = "slack-archiver@airfire.org"
+    DEFAULT_EMAIL_SUBJECT = "Slack archive {} through {}"
+
+    def __init__(self, token, num_days, **options):
+        super(SlackArchiver, self).__init__(num_days, **options)
+
+        self._slack_client = slacker.Slacker(token)
+        try:
+            self._slack_client.api.test()
+        except slacker.Error:
+            raise RuntimeError('')
+
+    def archive(self, channel=None):
+        channels = self._channels(channel)
+        histories = self._histories(channels)
+        in_memory_zip = self._zip(histories)
+        self._write(in_memory_zip)
+        self._email(in_memory_zip)
+
+    def _channels(self, channel):
+        channels = self._slack_client.channels.list().body['channels']
+        if channel:
+            channels = [c for c in channels if c['name'] == channel]
+        return channels
+
+    def _histories(self, channels):
+        histories = []
+        for c in channels:
+            histories.append({
+                "id": c['id'],
+                "name": c['name'],
+                "history": self._history(c['id'])
+            })
+        return histories
+
+    def _history(self, channel_id):
+        history = []
+        latest = str(self._start_date.timestamp())
+        oldest = str(self._end_date.timestamp())
+        while True:
+            # Note: unless you set inclusize=true in the request,
+            #  the latest / oldest range is non-inclusive
+            r = self._slack_client.channels.history(
+                channel, latest=latest, oldest=oldest)
+            history.extend(r['messages'])
+            # if 'is_limited' is True, that means we've reached
+            # the limit for our free plan
+            if not r['has_more'] or r.get('is_limited'):
+                break
+            latest = history[-1]['ts']
+        return history
+
+
+##
+## Notifications
+##
 
 def send(webhook_url, text, channel=None, icon_emoji=None, username=None):
     """Posts notification to slack channel
