@@ -36,7 +36,8 @@ class SlackArchiver(archivebase.ArchiverBase):
         try:
             self._slack_client.api.test()
         except slacker.Error:
-            raise RuntimeError('')
+            raise RuntimeError(
+                "Invalid token, or otherwise failed to use slack API")
 
     def archive(self, channel=None):
         channels = self._channels(channel)
