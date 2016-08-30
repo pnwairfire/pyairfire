@@ -17,6 +17,7 @@ setup(
         'bin/hipchat/hcarch',
         'bin/hipchat/hcarch2log',
         'bin/hms/get-hms-kml',
+        'bin/slack/sarch',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
