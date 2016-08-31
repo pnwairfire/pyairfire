@@ -15,7 +15,10 @@ import logging
 import re
 import sys
 
-import afscripting as scripting
+from afscripting import (
+    options as scripting_options,
+    utils as scripting_utils
+)
 
 try:
     from pyairfire import statuslogging
@@ -70,15 +73,15 @@ OPTIONAL_OPTIONS = [
         'action': "callback",
         'help': "extra fields to add to status log",
         'default': {},
-        'callback': scripting.options.extract_and_set_key_value
+        'callback': scripting_options.extract_and_set_key_value
     }
 ]
 
 def error_handler(e):
-    scripting.utils.exit_with_msg("Failed to submit status: %s" % (e))
+    scripting_utils.exit_with_msg("Failed to submit status: %s" % (e))
 
 def main():
-    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
+    parser, options, args = scripting_options.parse_options(REQUIRED_OPTIONS,
         OPTIONAL_OPTIONS)
 
     try:
@@ -89,7 +92,7 @@ def main():
             (datetime.datetime.now() - t).seconds))
 
     except Exception as e:
-        scripting.utils.exit_with_msg(e)
+        scripting_utils.exit_with_msg(e)
 
 if __name__ == "__main__":
     main()

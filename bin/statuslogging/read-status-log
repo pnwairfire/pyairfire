@@ -33,7 +33,10 @@ import json
 import re
 import sys
 
-import afscripting as scripting
+from afscripting import (
+    options as scripting_options,
+    utils as scripting_utils
+)
 
 try:
     from pyairfire import statuslogging
@@ -66,7 +69,7 @@ OPTIONAL_OPTIONS = [
         'action': "callback",
         'help': "extra query parameters",
         'default': {},
-        'callback': scripting.options.extract_and_set_key_value
+        'callback': scripting_options.extract_and_set_key_value
     },
     {
         'long': "--number-of-past-days",
@@ -83,7 +86,7 @@ OPTIONAL_OPTIONS = [
         'help': "email addresses to send queried logs to; specicy emails separately or comma-separated",
         'action': 'callback',
         'default': [],
-        'callback': scripting.options.append_or_split_and_extend
+        'callback': scripting_options.append_or_split_and_extend
     },
     {
         'long': "--email-sender",
@@ -154,7 +157,7 @@ Possible Query Parameters (not an exaustive list):
   - machine -- ex. machine=Smokey
 
 """
-    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
+    parser, options, args = scripting_options.parse_options(REQUIRED_OPTIONS,
         OPTIONAL_OPTIONS, post_options_outputter=lambda: post_options_content)
 
     try:
@@ -163,7 +166,7 @@ Possible Query Parameters (not an exaustive list):
             if 'newer_than' in query or 'older_than' in query:
                 msg = ("Don't specify query fields 'newer_than' or 'older_than' along"
                     " with option --number-of-past-days")
-                scripting.utils.exit_with_msg(msg)
+                scripting_utils.exit_with_msg(msg)
             newer_than = datetime.datetime.now()-datetime.timedelta(
                 days=options.number_of_past_days)
             query.update(newer_than=newer_than.strftime("%Y-%m-%dT%H:%M:%S"))
@@ -179,7 +182,7 @@ Possible Query Parameters (not an exaustive list):
             sys.stdout.write('\n')
 
     except Exception as e:
-        scripting.utils.exit_with_msg(e)
+        scripting_utils.exit_with_msg(e)
 
 if __name__ == "__main__":
     main()
