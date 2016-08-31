@@ -1,3 +1,6 @@
+"""pyairfire
+"""
+
 __author__      = "Joel Dubowy"
 
 __version_info__ = (1,2,6)

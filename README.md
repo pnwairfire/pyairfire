@@ -43,8 +43,8 @@ First, install test-specific packages:
 Once installed, you can run tests with pytest:
 
     py.test
-    py.test ./test/pyairfire/datetime/test_parsing.py
-    py.test ./test/pyairfire/datetime/
+    py.test ./test/pyairfire/data/test_utils.py
+    py.test ./test/pyairfire/data/
 
 You can also use the ```--collect-only``` option to see a list of all tests.
 

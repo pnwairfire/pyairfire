@@ -34,10 +34,12 @@ setup(
         "requests==2.10.0",
         "xmltodict==0.10.2",
         "Fabric3==1.11.1.post1",
-        "afscripting==1.0.0"
+        "afscripting==1.0.0",
+        "afdatetime==1.0.0"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/afscripting/",
+        "https://pypi.smoke.airfire.org/simple/afdatetime/"
     ],
     tests_require=test_requirements
 )
