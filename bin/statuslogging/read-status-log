@@ -33,13 +33,15 @@ import json
 import re
 import sys
 
+import afscripting as scripting
+
 try:
-    from pyairfire import statuslogging, scripting
+    from pyairfire import statuslogging
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
     sys.path.insert(0, root_dir)
-    from pyairfire import statuslogging, scripting
+    from pyairfire import statuslogging
 
 # Note: though some argue that all required parameters should be specified as
 # positional arguments, I prefer using 'options' flags, even though this
