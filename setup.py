@@ -14,10 +14,7 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/hipchat/hcarch',
-        'bin/hipchat/hcarch2log',
         'bin/hms/get-hms-kml',
-        'bin/slack/sarch',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
@@ -35,7 +32,6 @@ setup(
     install_requires=[
         #"ftfy==4.1.1",
         "requests==2.10.0",
-        "slacker==0.9.24",
         "xmltodict==0.10.2",
         "Fabric3==1.11.1.post1"
 
