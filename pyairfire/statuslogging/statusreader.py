@@ -53,4 +53,4 @@ class StatusReader(StatusLogClient):
         logging.debug("Querying status log: %s", (url))
         req = urllib.request.Request(url)
         resp = urllib.request.urlopen(req, None, timeout or self.TIMEOUT)
-        return json.loads(resp.read())
+        return json.loads(resp.read().decode('ascii'))
