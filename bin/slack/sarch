@@ -2,9 +2,15 @@
 
 """sarch: archives slack channel histories
 
-Queries list of channels, and then queries the history for each of them.
+This script does the following:
 
-TODO: rename this script?
+ 1. queries the list of public channels
+ 2. queries the history for each channel
+ 3. dumps each channel's history to a json file
+ 4. packages the files in a zip file
+ 5. emails and/or writes the zipfile to disk
+
+To create a token, set up a bot in slack.
 """
 
 __author__      = "Joel Dubowy"

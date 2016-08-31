@@ -1,4 +1,5 @@
-"""pyairfire.chat.slack
+"""pyairfire.chat.slack:  Utilities for archiving slack chat histories and
+posting messages.
 """
 
 __author__      = "Joel Dubowy"
