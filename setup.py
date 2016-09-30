@@ -32,8 +32,8 @@ setup(
     install_requires=[
         #"ftfy==4.1.1",
         "xmltodict==0.10.2",
-        "afscripting==1.0.0",
-        "afdatetime==1.0.0"
+        "afscripting>=1.0.2,<2.0.0",
+        "afdatetime>=1.0.2,<2.0.0"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/afscripting/",
