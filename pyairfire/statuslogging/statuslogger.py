@@ -64,6 +64,7 @@ class StatusLogger(StatusLogClient):
     def _machine(self):
         return socket.gethostname()
 
+    # TODD: Remove this method and use afweb.auth.sign_url
     def _signed_url(self):
         path = urllib.parse.urlparse(self.api_endpoint).path
         query_string_params = {

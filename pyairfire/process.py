@@ -17,10 +17,6 @@ __all__ = [
 class RunTimeRecorder(object):
     """Records run time information in dict that RunTimeRecorder is
     instantiated with.
-
-    TODO: rename this module or move this class to a more appropriate
-      module...or, move this class to another more general-purpose
-      package (like pyairfire).
     """
 
     def __init__(self, rt_dict):
