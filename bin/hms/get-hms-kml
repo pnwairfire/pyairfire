@@ -144,8 +144,10 @@ def reverse_smoke_plumes(args, xml):
         # achieved by listing red first, then yellow, then green.  Google Earth
         # expects it in the reverse order. This KML was generated for google earth,
         # so we need to reverse the order
-        if 'Placemark' in xml['kml']['Document']:
-            xml['kml']['Document']['Placemark'].reverse()
+        try:
+            xml['kml']['Document']['Folder'].reverse()
+        except:
+            logging.warn('Failed to reverse smoke plumes')
 
 def output(base_name, do_archive, xml):
     output_file_name = base_name
