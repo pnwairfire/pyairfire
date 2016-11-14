@@ -103,10 +103,6 @@ def strip_extras(args, xml):
     logging.debug('Stripping extras')
     # strip logo and legend
     xml['kml']['Document'].pop('ScreenOverlay', None)
-    # strip placemarks out of smoke plumes
-    if args.feed.find('smoke') >= 0:
-        xml['kml']['Document']['Placemark'] = [
-            p for p in xml['kml']['Document']['Placemark'] if 'Polygon' in p]
 
 # From KML:
 #  s['@id'] -> s['PolyStyle']['color']
