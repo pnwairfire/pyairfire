@@ -14,7 +14,6 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/hms/get-hms-kml',
         'bin/statuslogging/log-status.py',
         'bin/statuslogging/read-status-log'
     ],
