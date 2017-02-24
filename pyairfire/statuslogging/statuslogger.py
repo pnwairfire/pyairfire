@@ -54,7 +54,7 @@ class StatusLogger(StatusLogClient):
             url = self._signed_url()
 
             # TODO: send asynchrounously, if possible
-            req = urllib.request.Request(url, json.dumps(data))
+            req = urllib.request.Request(url, json.dumps(data).encode('utf-8'))
             resp = urllib.request.urlopen(req, None, self.TIMEOUT)  #.read()
         except Exception as e:
             if error_handler:
