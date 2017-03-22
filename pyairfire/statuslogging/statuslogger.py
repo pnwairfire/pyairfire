@@ -16,6 +16,30 @@ __all__ = [
     'StatusLogger'
 ]
 
+
+class PostHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Post data on redirect.
+
+    adapted from http://stackoverflow.com/questions/33382273/python-3-5-urllib-request-request-post-data-to-website-doing-get-and-not-post
+    """
+    CONTENT_HEADERS = ("content-length", "content-type")
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        m = req.get_method()
+        if (code in (301, 302, 303, 307) and m in ("GET", "HEAD")
+            or code in (301, 302, 303) and m == "POST"):
+            newurl = newurl.replace(' ', '%20')
+
+            newheaders = dict((k, v) for k, v in req.headers.items()
+                              if k.lower() not in self.CONTENT_HEADERS)
+            return urllib.request.Request(newurl, data=req.data,
+                headers=newheaders,origin_req_host=req.origin_req_host,
+                unverifiable=True)
+        else:
+            raise urllib.request.HTTPError(req.get_full_url(), code, msg, headers, fp)
+
+urlopener = urllib.request.build_opener(PostHTTPRedirectHandler)
+
+
 class StatusLogger(StatusLogClient):
     """Class for submitting statuses to status-logs service
     """
@@ -54,8 +78,9 @@ class StatusLogger(StatusLogClient):
             url = self._signed_url()
 
             # TODO: send asynchrounously, if possible
-            req = urllib.request.Request(url, json.dumps(data).encode('utf-8'))
-            resp = urllib.request.urlopen(req, None, self.TIMEOUT)  #.read()
+            data = json.dumps(data).encode('utf-8')
+            resp = urlopener.open(url, data, self.TIMEOUT)  #.read()
+
         except Exception as e:
             if error_handler:
                 error_handler(e)
