@@ -34,7 +34,7 @@ setup(
         "afscripting>=1.0.2,<2.0.0"
     ],
     dependency_links=[
-        "https://pypi.smoke.airfire.org/simple/afscripting/"
+        "https://pypi.airfire.org/simple/afscripting/"
     ],
     tests_require=test_requirements
 )
