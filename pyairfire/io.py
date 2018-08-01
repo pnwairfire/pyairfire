@@ -19,7 +19,7 @@ class Stream(object):
         This method exists soley for the purpose of monkeypatching the opening
         of the file (since you can't monkeypatch 'open' directly with py.test)
         """
-        return open(self._file_name, self._flag)
+        return open(self._file_name, self._flag, encoding='utf-8')
 
     def __enter__(self):
         if self._file_name:
