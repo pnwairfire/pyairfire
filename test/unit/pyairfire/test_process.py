@@ -19,25 +19,29 @@ class TestRunTimeRecorder(object):
 
     def test_compute_time_components(self):
         with freezegun.freeze_time("2018-01-02 01:01:01.0123"):
-            hours, minutes, seconds = self._rtr._compute_time_components()
+            end, hours, minutes, seconds = self._rtr._compute_time_components()
+            assert end == datetime.datetime(2018,1,2,1,1,1,12300)
             assert hours == 25
             assert minutes == 1
             assert seconds == 1.0123
 
         with freezegun.freeze_time("2018-01-02 00:00:00"):
-            hours, minutes, seconds = self._rtr._compute_time_components()
+            end, hours, minutes, seconds = self._rtr._compute_time_components()
+            assert end == datetime.datetime(2018,1,2,0,0,0)
             assert hours == 24
             assert minutes == 0
             assert seconds == 0
 
         with freezegun.freeze_time("2018-01-01 00:00:01"):
-            hours, minutes, seconds = self._rtr._compute_time_components()
+            end, hours, minutes, seconds = self._rtr._compute_time_components()
+            assert end == datetime.datetime(2018,1,1,0,0,1)
             assert hours == 0
             assert minutes == 0
             assert seconds == 1
 
         with freezegun.freeze_time("2018-01-01 00:00:00"):
-            hours, minutes, seconds = self._rtr._compute_time_components()
+            end, hours, minutes, seconds = self._rtr._compute_time_components()
+            assert end == datetime.datetime(2018,1,1,0,0,0)
             assert hours == 0
             assert minutes == 0
             assert seconds == 0
