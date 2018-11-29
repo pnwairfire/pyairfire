@@ -29,17 +29,24 @@ class RunTimeRecorder(object):
         self._start = datetime.datetime.utcnow()
 
     def __exit__(self, e_type, value, tb):
-        end = datetime.datetime.utcnow()
-        rt = end - self._start
-        hours = rt.seconds / 3600 + 24*rt.days
-        remaining_seconds = rt.seconds % 3600
-        minutes = remaining_seconds / 60
-        seconds = remaining_seconds % 60
+        hours, minutes, seconds = self._compute_time_components()
         self._rt_dict.update({
-            "start": self._format(self._start),
-            "end": self._format(end),
-            "total": "{}h {}m {}s".format(hours, minutes, seconds)
+            "start": self._format_datetime(self._start),
+            "end": self._format_datetime(end),
+            "total": self._format_total(hours, minutes, seconds)
         })
 
-    def _format(self, dt):
-        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    def _format_datetime(self, dt):
+        return dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    def _format_total(self, hours, minutes, seconds):
+        return "{}h {}m {}s".format(
+            hours, minutes, seconds)
+
+    def _compute_time_components(self):
+        end = datetime.datetime.utcnow()
+        rt = end - self._start
+        hours, rem = divmod(rt.total_seconds(), 3600)
+        minutes, seconds = divmod(rem, 60)
+        seconds = int(seconds) + rt.microseconds / 1000000
+        return hours, minutes, seconds
