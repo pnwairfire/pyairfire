@@ -60,3 +60,17 @@ class TestRunTimeRecorder(object):
         assert "10h 0m 1s" == self._rtr._format_total(10,0,1)
         assert "31h 0m 0s" == self._rtr._format_total(31,0,0)
         assert "31h 23m 3.023s" == self._rtr._format_total(31,23,3.023)
+
+    def test_record(self):
+        start = datetime.datetime(2018, 1, 1)
+        with freezegun.freeze_time(start) as frozen_start:
+            rt = {}
+            with RunTimeRecorder(rt):
+                frozen_start.tick(delta=datetime.timedelta(
+                    days=1,seconds=3601, microseconds=12300))
+
+            assert rt == {
+                "start": "2018-01-01T00:00:00.000000Z",
+                "end": "2018-01-02T01:00:01.012300Z",
+                "total": "25h 0m 1.0123s"
+            }
