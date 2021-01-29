@@ -176,7 +176,7 @@ def format_datetimes(data):
             data[i] = format_datetimes(data[i])
 
     elif _is_dict(data):
-        for k in data:
+        for k in list(data.keys()):
             # first, format key if it's a datetime
             if _is_datetime(k):
                 v = data.pop(k)
