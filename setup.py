@@ -21,8 +21,7 @@ setup(
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.8",
         "Operating System :: POSIX",
         "Operating System :: MacOS"
     ],
@@ -30,8 +29,8 @@ setup(
     description='General toolbox of python utilities for AirFire team.',
     install_requires=[
         #"ftfy==4.1.1",
-        "xmltodict==0.10.2",
-        "afscripting>=1.0.2,<2.0.0"
+        "xmltodict==0.12.0",
+        "afscripting>=2.0.0,<3.0.0"
     ],
     dependency_links=[
         "https://pypi.airfire.org/simple/afscripting/"
