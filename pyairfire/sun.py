@@ -121,7 +121,10 @@ class Sun(object):
 
         eqtime = 4*deg(vary*sin(2*rad(Mlong))-2*Eccent*sin(rad(Manom))+4*Eccent*vary*sin(rad(Manom))*cos(2*rad(Mlong))-0.5*vary*vary*sin(4*rad(Mlong))-1.25*Eccent*Eccent*sin(2*rad(Manom)))
 
-        hourangle = deg(acos(cos(rad(90.833))/(cos(rad(self.lat))*cos(rad(declination)))-tan(rad(self.lat))*tan(rad(declination))))
+        # Note: we bound the input to acos to [-1,1] to prevent failures with
+        # far north and south latitudes during the summer (when there's 24
+        # hours of sun)
+        hourangle = deg(acos(max(-1, min(1, cos(rad(90.833))/(cos(rad(self.lat))*cos(rad(declination)))-tan(rad(self.lat))*tan(rad(declination))))))
 
         solarnoon_t = (720 - 4 * self.lng - eqtime) / 1440
         sunrise_t = solarnoon_t - hourangle * 4 / 1440
