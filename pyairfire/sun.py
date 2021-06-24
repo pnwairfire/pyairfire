@@ -123,7 +123,7 @@ class Sun(object):
 
         # Note: we bound the input to acos to [-1,1] to prevent failures with
         # far north and south latitudes during the summer (when there's 24
-        # hours of sun)
+        # hours of sun) and winter (when there's 24 hours of darkness)
         hourangle = deg(acos(max(-1, min(1, cos(rad(90.833))/(cos(rad(self.lat))*cos(rad(declination)))-tan(rad(self.lat))*tan(rad(declination))))))
 
         solarnoon_t = (720 - 4 * self.lng - eqtime) / 1440
