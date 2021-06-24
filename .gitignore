@@ -5,3 +5,4 @@ dist/
 pyairfire.egg-info/
 tmp/
 .cache
+.private
