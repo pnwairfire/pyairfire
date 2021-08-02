@@ -4,8 +4,11 @@ TODO: move and rename this package?
 """
 
 import csv
+import io as pio
 import json
+import logging
 import sys
+import urllib.request
 
 class Stream(object):
 
@@ -14,12 +17,21 @@ class Stream(object):
         self._flag = flag
 
     def _open_file(self):
-        """Opens the imput file.
+        """Opens the input file.
 
-        This method exists soley for the purpose of monkeypatching the opening
-        of the file (since you can't monkeypatch 'open' directly with py.test)
+        This method was originally written for the purpose of monkeypatching
+        the opening of local files (since you can't monkeypatch 'open' directly
+        with py.test).  But, it was subsequently refactored to support both
+        local files and files over http(s).
         """
-        return open(self._file_name, self._flag, encoding='utf-8')
+
+        if  self._file_name.startswith('http'):
+            logging.debug("Loading file over http: %s", self._file_name)
+            resp = urllib.request.urlopen(self._file_name)
+            return pio.StringIO(resp.read().decode())
+        else:
+            logging.debug("Loading local file: %s", self._file_name)
+            return open(self._file_name, self._flag, encoding='utf-8')
 
     def __enter__(self):
         if self._file_name:
