@@ -5,7 +5,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import datetime
 
-from py.test import raises
+from pytest import raises
 
 from pyairfire import sun
 

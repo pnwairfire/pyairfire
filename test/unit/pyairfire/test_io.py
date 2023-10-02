@@ -7,13 +7,13 @@ import json
 import sys
 import io
 
-from py.test import raises
+from pytest import raises
 
 from pyairfire import io as p_io
 
 class TestCSV2JSON(object):
 
-    def setup(self):
+    def setup_method(self):
         self._output = io.StringIO()
 
     def test_convert_one_fire(self, monkeypatch):

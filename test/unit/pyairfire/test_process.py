@@ -6,13 +6,13 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 import datetime
 
 import freezegun
-#from py.test import raises
+#from pytest import raises
 
 from pyairfire.process import RunTimeRecorder
 
 class TestRunTimeRecorder(object):
 
-    def setup(self):
+    def setup_method(self):
         self._d = {}
         self._rtr = RunTimeRecorder(self._d)
         self._rtr._start = datetime.datetime(2018,1,1)

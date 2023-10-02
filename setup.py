@@ -29,7 +29,7 @@ setup(
     description='General toolbox of python utilities for AirFire team.',
     install_requires=[
         #"ftfy==4.1.1",
-        "xmltodict==0.12.0",
+        "xmltodict==0.13.0",
         "afscripting>=2.0.0,<3.0.0"
     ],
     dependency_links=[

@@ -10,13 +10,13 @@ import os
 import shutil
 import tempfile
 
-from py.test import raises
+from pytest import raises
 
 from pyairfire import osutils
 
 class TestCreateWorkingDir(object):
 
-    def setup(self):
+    def setup_method(self):
         self._os_getcwd_calls = []
         self._os_makedirs_calls = []
         self._tempfile_mkdtemp_calls = []
