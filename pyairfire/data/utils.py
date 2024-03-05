@@ -125,6 +125,7 @@ def multiply_nested_data(nested_data, multiplier, data_key_matcher=None):
     """
     if _is_array(nested_data):
         for i in range(len(nested_data)):
+            # TODO: recurse if nested_data[i] is dict or array
             if _is_num(nested_data[i]):
                 nested_data[i] = nested_data[i] * multiplier
 
