@@ -1,5 +1,7 @@
 """pyairfire.data.utils"""
 
+import numbers
+
 __all__ = [
     'deepmerge',
     'summarize',
@@ -99,7 +101,7 @@ def summarize(data_array, subdata_key, include_details=True, key='fuelbeds',
     return summary
 
 def _is_num(v):
-    return isinstance(v, (int, float))
+    return isinstance(v, numbers.Number)
 
 def _is_array(v):
     try:
