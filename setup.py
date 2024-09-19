@@ -29,6 +29,7 @@ setup(
     description='General toolbox of python utilities for AirFire team.',
     install_requires=[
         #"ftfy==6.2.3",
+        "numpy==2.1.1",
         "xmltodict==0.13.0",
         "afscripting>=3.0.0,<4.0.0"
     ],
