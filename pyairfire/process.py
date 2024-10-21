@@ -26,7 +26,7 @@ class RunTimeRecorder(object):
         self._rt_dict = rt_dict
 
     def __enter__(self):
-        self._start = datetime.datetime.utcnow()
+        self._start = datetime.datetime.now(datetime.UTC)
 
     def __exit__(self, e_type, value, tb):
         end, hours, minutes, seconds = self._compute_time_components()
@@ -44,7 +44,7 @@ class RunTimeRecorder(object):
             hours, minutes, seconds)
 
     def _compute_time_components(self):
-        end = datetime.datetime.utcnow()
+        end = datetime.datetime.now(datetime.UTC)
         rt = end - self._start
         hours, rem = divmod(rt.total_seconds(), 3600)
         minutes, seconds = divmod(rem, 60)

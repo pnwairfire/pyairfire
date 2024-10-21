@@ -70,7 +70,7 @@ class StatusLogger(StatusLogClient):
                 'status': status,
                 'machine': self.machine,
                 'process': self.process,
-                'timestamp': datetime.datetime.utcnow().strftime(self.TIMESTAMP_FORMAT),
+                'timestamp': datetime.datetime.now(datetime.UTC).strftime(self.TIMESTAMP_FORMAT),
 
             }
             data.update(self.static_fields)
@@ -93,7 +93,7 @@ class StatusLogger(StatusLogClient):
     def _signed_url(self):
         path = urllib.parse.urlparse(self.api_endpoint).path
         query_string_params = {
-            '_ts': datetime.datetime.utcnow().strftime(self.TIMESTAMP_FORMAT),
+            '_ts': datetime.datetime.now(datetime.UTC).strftime(self.TIMESTAMP_FORMAT),
             '_k': self.api_key
         }
         query_string = '&'.join(sorted([

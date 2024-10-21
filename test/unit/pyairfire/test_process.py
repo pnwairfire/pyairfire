@@ -6,6 +6,8 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 import datetime
 
 import freezegun
+import time_machine
+from zoneinfo import ZoneInfo
 #from pytest import raises
 
 from pyairfire.process import RunTimeRecorder
@@ -15,33 +17,33 @@ class TestRunTimeRecorder(object):
     def setup_method(self):
         self._d = {}
         self._rtr = RunTimeRecorder(self._d)
-        self._rtr._start = datetime.datetime(2018,1,1)
+        self._rtr._start = datetime.datetime(2018,1,1, tzinfo=datetime.UTC)
 
     def test_compute_time_components(self):
-        with freezegun.freeze_time("2018-01-02 01:01:01.0123"):
+        with time_machine.travel(datetime.datetime(2018,1,2,1,1,1,12300, tzinfo=ZoneInfo("UTC"))):
             end, hours, minutes, seconds = self._rtr._compute_time_components()
-            assert end == datetime.datetime(2018,1,2,1,1,1,12300)
+            assert end == datetime.datetime(2018,1,2,1,1,1,12300, tzinfo=datetime.UTC)
             assert hours == 25
             assert minutes == 1
             assert seconds == 1.0123
 
-        with freezegun.freeze_time("2018-01-02 00:00:00"):
+        with freezegun.freeze_time(datetime.datetime(2018,1,2,0,0,0, tzinfo=ZoneInfo("UTC"))):
             end, hours, minutes, seconds = self._rtr._compute_time_components()
-            assert end == datetime.datetime(2018,1,2,0,0,0)
+            assert end == datetime.datetime(2018,1,2,0,0,0, tzinfo=datetime.UTC)
             assert hours == 24
             assert minutes == 0
             assert seconds == 0
 
-        with freezegun.freeze_time("2018-01-01 00:00:01"):
+        with freezegun.freeze_time(datetime.datetime(2018,1,1,0,0,1, tzinfo=ZoneInfo("UTC"))):
             end, hours, minutes, seconds = self._rtr._compute_time_components()
-            assert end == datetime.datetime(2018,1,1,0,0,1)
+            assert end == datetime.datetime(2018,1,1,0,0,1, tzinfo=datetime.UTC)
             assert hours == 0
             assert minutes == 0
             assert seconds == 1
 
-        with freezegun.freeze_time("2018-01-01 00:00:00"):
+        with freezegun.freeze_time(datetime.datetime(2018,1,1,0,0,0, tzinfo=ZoneInfo("UTC"))):
             end, hours, minutes, seconds = self._rtr._compute_time_components()
-            assert end == datetime.datetime(2018,1,1,0,0,0)
+            assert end == datetime.datetime(2018,1,1,0,0,0, tzinfo=datetime.UTC)
             assert hours == 0
             assert minutes == 0
             assert seconds == 0
